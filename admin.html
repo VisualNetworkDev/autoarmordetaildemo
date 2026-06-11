@@ -1,340 +1,2330 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Auto Armor | Demo Control</title>
-<meta name="theme-color" content="#020305" />
-<style>
-:root{--bg:#020305;--panel:rgba(8,13,22,.9);--panel2:rgba(14,20,31,.86);--line:rgba(91,178,255,.25);--line2:rgba(255,255,255,.12);--text:#f6fbff;--muted:#a9b8ca;--blue:#087cff;--blue2:#5fc9ff;--purple:#895bff;--gold:#d8bf75;--red:#ff6578;--green:#58edb3;--r:24px;--shadow:0 28px 90px rgba(0,0,0,.68)}
-*{box-sizing:border-box;margin:0;padding:0}html,body{height:100%;overflow:hidden;background:#020305;color:var(--text)}body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;letter-spacing:.01em}
-body:before{content:"";position:fixed;inset:0;z-index:-5;background:radial-gradient(circle at 14% -8%,rgba(8,124,255,.18),transparent 32%),radial-gradient(circle at 94% 0,rgba(137,91,255,.13),transparent 30%),linear-gradient(180deg,#07090f,#020305 70%,#000)}
-body:after{content:"";position:fixed;inset:-70px;z-index:-4;opacity:.34;background-image:linear-gradient(45deg,rgba(255,255,255,.022) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.022) 50%,rgba(255,255,255,.022) 75%,transparent 75%),linear-gradient(-45deg,rgba(95,201,255,.024) 25%,transparent 25%,transparent 50%,rgba(95,201,255,.016) 50%,rgba(95,201,255,.016) 75%,transparent 75%);background-size:36px 36px,36px 36px;filter:contrast(145%)}
-button,input,select,textarea{font:inherit;color:inherit}button{border:0;cursor:pointer;background:none}a{color:inherit;text-decoration:none}img{display:block;width:100%;height:auto}select option{background:#070d16;color:#fff}
-input,select,textarea{width:100%;min-height:46px;border:1px solid var(--line);outline:none;border-radius:15px;background:linear-gradient(180deg,#0d1420,#060a11);color:#fff;padding:12px 13px;font-size:15px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.03)}textarea{resize:vertical;min-height:92px}label{font-size:12px;font-weight:1000;text-transform:uppercase;color:#d9e6f5;letter-spacing:.06em}.field{display:grid;gap:7px}.wide{grid-column:1/-1}.hidden{display:none!important}
-.app{height:100%;display:grid;grid-template-columns:280px 1fr;max-width:1440px;margin:0 auto;border-left:1px solid rgba(255,255,255,.06);border-right:1px solid rgba(255,255,255,.06)}
-.sidebar{display:grid;grid-template-rows:auto 1fr auto;gap:18px;padding:18px;border-right:1px solid var(--line);background:rgba(3,6,11,.84);backdrop-filter:blur(16px)}.logo{display:flex;gap:12px;align-items:center}.shield{width:46px;height:46px;border-radius:16px;border:1px solid rgba(95,201,255,.52);display:grid;place-items:center;background:rgba(8,124,255,.12);box-shadow:0 0 24px rgba(8,124,255,.2)}.brand b{display:block;font-size:20px;font-weight:1000}.brand span{display:block;color:var(--blue2);font-size:11px;font-weight:1000;letter-spacing:.18em;margin-top:4px}.tabs{display:grid;gap:8px;align-content:start;overflow:auto;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab{width:100%;text-align:left;padding:13px 14px;border-radius:16px;color:#d7e5f4;font-weight:1000;text-transform:uppercase;font-size:13px;letter-spacing:.055em;border:1px solid transparent}.tab.active{border-color:rgba(95,201,255,.55);background:linear-gradient(180deg,rgba(8,124,255,.22),rgba(8,124,255,.08));box-shadow:0 0 24px rgba(8,124,255,.12)}.quick{display:grid;gap:10px}.main{display:grid;grid-template-rows:auto 1fr;min-width:0}.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 22px;border-bottom:1px solid var(--line);background:rgba(3,6,11,.75);backdrop-filter:blur(16px)}.topbar h1{font-size:28px;line-height:1;font-weight:1000;text-transform:uppercase}.topbar p{color:var(--muted);font-size:13px;margin-top:4px}.top-actions{display:flex;gap:10px;flex-wrap:wrap}.content{overflow:auto;scrollbar-width:none;padding:22px}.content::-webkit-scrollbar{display:none}.view{display:none}.view.active{display:block;animation:lift .25s ease both}@keyframes lift{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.btn,.primary,.ghost,.danger,.ok,.gold{min-height:42px;padding:0 14px;border-radius:14px;font-weight:1000;text-transform:uppercase;letter-spacing:.055em;font-size:13px;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}.primary{background:linear-gradient(135deg,var(--blue),#0d65dd);box-shadow:0 14px 38px rgba(8,124,255,.25)}.ghost{border:1px solid var(--line2);background:rgba(255,255,255,.035)}.danger{background:linear-gradient(135deg,#ff4e68,#b51732)}.ok{background:linear-gradient(135deg,#25c987,#0d8b68)}.gold{background:linear-gradient(135deg,#d7be74,#8f7031);color:#080b10}.mini{min-height:34px;padding:0 10px;font-size:12px;border-radius:12px}
-.panel,.card{border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(180deg,rgba(11,17,27,.9),rgba(5,9,15,.84));box-shadow:var(--shadow);overflow:hidden;position:relative}.panel:before,.card:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(135deg,rgba(95,201,255,.07),transparent 26%,rgba(137,91,255,.045));opacity:.7}.inner{position:relative;padding:18px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:14px;margin-bottom:16px}.section-head h2{font-size:28px;text-transform:uppercase;line-height:1;font-weight:1000}.section-head p{color:var(--muted);font-size:14px;margin-top:6px}.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:1000;text-transform:uppercase;letter-spacing:.07em;border:1px solid rgba(95,201,255,.38);color:var(--blue2);background:rgba(8,124,255,.11)}.badge.green{border-color:rgba(88,237,179,.45);color:var(--green);background:rgba(88,237,179,.08)}.badge.red{border-color:rgba(255,101,120,.45);color:#ffadb8;background:rgba(255,101,120,.08)}.badge.gold{border-color:rgba(216,191,117,.48);color:var(--gold);background:rgba(216,191,117,.09)}.badge.purple{border-color:rgba(137,91,255,.52);color:#d2c2ff;background:rgba(137,91,255,.1)}
-.grid{display:grid;gap:16px}.two{grid-template-columns:1fr 1fr}.three{grid-template-columns:repeat(3,1fr)}.four{grid-template-columns:repeat(4,1fr)}.field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.stat{padding:16px}.stat b{display:block;font-size:28px}.stat span{color:var(--muted);font-size:13px;text-transform:uppercase;font-weight:1000}.list{display:grid;gap:12px}.booking-card{display:grid;grid-template-columns:1.1fr .9fr auto;gap:14px;align-items:center;padding:14px;border:1px solid var(--line2);border-radius:18px;background:rgba(255,255,255,.035)}.booking-card h3{font-size:18px}.booking-card p{color:var(--muted);font-size:13px;line-height:1.45}.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.filters{display:flex;gap:8px;overflow:auto;scrollbar-width:none;margin-bottom:14px}.filters::-webkit-scrollbar{display:none}.filter{min-width:max-content;padding:10px 12px;border-radius:999px;border:1px solid var(--line2);font-weight:1000;font-size:12px;text-transform:uppercase;color:var(--muted)}.filter.active{border-color:rgba(95,201,255,.55);color:#fff;background:rgba(8,124,255,.13)}
-.pkg-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.pkg-card .pkg-top{display:flex;justify-content:space-between;gap:12px;align-items:start}.prices{display:grid;gap:8px;margin-top:12px}.price-line{display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:7px}.price-line span{color:#d8e6f5;font-size:13px;text-transform:uppercase;font-weight:900}.features{display:grid;gap:7px;margin-top:12px}.feature{display:grid;grid-template-columns:20px 1fr;gap:8px;color:#d5e4f3;font-size:13px}.feature i{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(95,201,255,.42);background:rgba(8,124,255,.11);font-style:normal;color:var(--blue2);font-size:11px;font-weight:1000}.editor{display:none;margin-top:14px}.editor.active{display:block}.check-row{display:grid;grid-template-columns:24px 1fr;gap:9px;align-items:center;border:1px solid var(--line2);border-radius:14px;padding:10px;background:rgba(255,255,255,.03)}.check-row input{min-height:auto;width:20px;height:20px;accent-color:var(--blue)}.check-row span{font-size:13px;color:#dce9f8;font-weight:800}
-.gallery-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.gallery-card img{height:170px;object-fit:cover}.gallery-card .inner{padding:14px}.preview-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.preview-grid img{height:160px;object-fit:cover;border-radius:16px;border:1px solid var(--line)}.upload-box{border:1px dashed rgba(95,201,255,.45);border-radius:18px;background:rgba(8,124,255,.06);padding:14px;display:grid;gap:10px}.scanner-box{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px}.video-wrap{border:1px solid var(--line);border-radius:20px;overflow:hidden;background:#000;min-height:320px;display:grid;place-items:center}.video-wrap video{width:100%;height:100%;object-fit:cover}.log{max-height:280px;overflow:auto;display:grid;gap:8px;scrollbar-width:none}.log::-webkit-scrollbar{display:none}.modal{position:fixed;inset:0;z-index:100;display:none;place-items:center;background:rgba(0,0,0,.66);padding:18px}.modal.open{display:grid}.modal-box{width:min(920px,100%);max-height:90vh;overflow:auto;scrollbar-width:none}.modal-box::-webkit-scrollbar{display:none}.drawer-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.notice{border:1px solid rgba(216,191,117,.38);background:rgba(216,191,117,.08);border-radius:16px;padding:13px;color:#f1dfad;font-size:13px;line-height:1.5}.pay-card{border:1px solid var(--line2);border-radius:18px;background:rgba(255,255,255,.03);padding:14px;display:grid;gap:12px}.day-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.small-text{color:var(--muted);font-size:13px;line-height:1.45}.toast{position:fixed;right:18px;bottom:18px;z-index:200;display:none;max-width:360px;padding:14px 16px;border-radius:16px;border:1px solid var(--line);background:#07101c;box-shadow:var(--shadow);font-weight:900}.toast.show{display:block;animation:lift .2s ease both}
-@media(max-width:1050px){.app{grid-template-columns:1fr}.sidebar{grid-template-rows:auto auto;gap:10px}.tabs{display:flex;overflow:auto}.tab{width:auto;min-width:max-content}.quick{display:none}.topbar{padding:14px}.content{padding:14px}.two,.three,.four,.scanner-box{grid-template-columns:1fr}.pkg-grid,.gallery-grid{grid-template-columns:1fr 1fr}.booking-card{grid-template-columns:1fr}.actions{justify-content:flex-start}.topbar h1{font-size:24px}}
-@media(max-width:560px){.sidebar{padding:12px}.brand b{font-size:18px}.brand span{font-size:10px}.shield{width:42px;height:42px}.topbar{display:grid}.top-actions{display:grid;grid-template-columns:1fr 1fr}.top-actions .btn,.top-actions .primary,.top-actions .ghost{width:100%}.field-grid,.pkg-grid,.gallery-grid,.day-grid{grid-template-columns:1fr}.booking-card{padding:12px}.actions{display:grid;grid-template-columns:1fr 1fr}.actions button{width:100%}.btn,.primary,.ghost,.danger,.ok,.gold{font-size:12px;min-height:42px;padding:0 11px}.section-head{display:grid}.section-head h2{font-size:24px}.stat b{font-size:24px}.preview-grid{grid-template-columns:1fr}.video-wrap{min-height:240px}}
-
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Auto Armor | Demo Control</title>
+    <meta name="theme-color" content="#020305" />
+    <style>
+      :root {
+        --bg: #020305;
+        --panel: rgba(8, 13, 22, 0.9);
+        --panel2: rgba(14, 20, 31, 0.86);
+        --line: rgba(91, 178, 255, 0.25);
+        --line2: rgba(255, 255, 255, 0.12);
+        --text: #f6fbff;
+        --muted: #a9b8ca;
+        --blue: #087cff;
+        --blue2: #5fc9ff;
+        --purple: #895bff;
+        --gold: #d8bf75;
+        --red: #ff6578;
+        --green: #58edb3;
+        --r: 24px;
+        --shadow: 0 28px 90px rgba(0, 0, 0, 0.68);
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        min-height: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+        background: #020305;
+        color: var(--text);
+      }
+      body {
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          Arial,
+          sans-serif;
+        letter-spacing: 0.01em;
+      }
+      body:before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -5;
+        background:
+          radial-gradient(
+            circle at 14% -8%,
+            rgba(8, 124, 255, 0.18),
+            transparent 32%
+          ),
+          radial-gradient(
+            circle at 94% 0,
+            rgba(137, 91, 255, 0.13),
+            transparent 30%
+          ),
+          linear-gradient(180deg, #07090f, #020305 70%, #000);
+      }
+      body:after {
+        content: "";
+        position: fixed;
+        inset: -70px;
+        z-index: -4;
+        opacity: 0.34;
+        background-image:
+          linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0.022) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(255, 255, 255, 0.022) 50%,
+            rgba(255, 255, 255, 0.022) 75%,
+            transparent 75%
+          ),
+          linear-gradient(
+            -45deg,
+            rgba(95, 201, 255, 0.024) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(95, 201, 255, 0.016) 50%,
+            rgba(95, 201, 255, 0.016) 75%,
+            transparent 75%
+          );
+        background-size:
+          36px 36px,
+          36px 36px;
+        filter: contrast(145%);
+      }
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+        color: inherit;
+      }
+      button {
+        border: 0;
+        cursor: pointer;
+        background: none;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      select option {
+        background: #070d16;
+        color: #fff;
+      }
+      input,
+      select,
+      textarea {
+        width: 100%;
+        min-height: 46px;
+        border: 1px solid var(--line);
+        outline: none;
+        border-radius: 15px;
+        background: linear-gradient(180deg, #0d1420, #060a11);
+        color: #fff;
+        padding: 12px 13px;
+        font-size: 15px;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+      }
+      textarea {
+        resize: vertical;
+        min-height: 92px;
+      }
+      label {
+        font-size: 12px;
+        font-weight: 1000;
+        text-transform: uppercase;
+        color: #d9e6f5;
+        letter-spacing: 0.06em;
+      }
+      .field {
+        display: grid;
+        gap: 7px;
+      }
+      .wide {
+        grid-column: 1/-1;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .app {
+        height: 100dvh;
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        max-width: 1440px;
+        margin: 0 auto;
+        border-left: 1px solid rgba(255, 255, 255, 0.06);
+        border-right: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .sidebar {
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        gap: 18px;
+        padding: 18px;
+        border-right: 1px solid var(--line);
+        background: rgba(3, 6, 11, 0.84);
+        backdrop-filter: blur(16px);
+      }
+      .logo {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .shield {
+        width: 46px;
+        height: 46px;
+        border-radius: 16px;
+        border: 1px solid rgba(95, 201, 255, 0.52);
+        display: grid;
+        place-items: center;
+        background: rgba(8, 124, 255, 0.12);
+        box-shadow: 0 0 24px rgba(8, 124, 255, 0.2);
+      }
+      .brand b {
+        display: block;
+        font-size: 20px;
+        font-weight: 1000;
+      }
+      .brand span {
+        display: block;
+        color: var(--blue2);
+        font-size: 11px;
+        font-weight: 1000;
+        letter-spacing: 0.18em;
+        margin-top: 4px;
+      }
+      .tabs {
+        display: grid;
+        gap: 8px;
+        align-content: start;
+        overflow: auto;
+        scrollbar-width: none;
+      }
+      .tabs::-webkit-scrollbar {
+        display: none;
+      }
+      .tab {
+        width: 100%;
+        text-align: left;
+        padding: 13px 14px;
+        border-radius: 16px;
+        color: #d7e5f4;
+        font-weight: 1000;
+        text-transform: uppercase;
+        font-size: 13px;
+        letter-spacing: 0.055em;
+        border: 1px solid transparent;
+      }
+      .tab.active {
+        border-color: rgba(95, 201, 255, 0.55);
+        background: linear-gradient(
+          180deg,
+          rgba(8, 124, 255, 0.22),
+          rgba(8, 124, 255, 0.08)
+        );
+        box-shadow: 0 0 24px rgba(8, 124, 255, 0.12);
+      }
+      .quick {
+        display: grid;
+        gap: 10px;
+      }
+      .main {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        min-width: 0;
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 16px 22px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(3, 6, 11, 0.75);
+        backdrop-filter: blur(16px);
+      }
+      .topbar h1 {
+        font-size: 28px;
+        line-height: 1;
+        font-weight: 1000;
+        text-transform: uppercase;
+      }
+      .topbar p {
+        color: var(--muted);
+        font-size: 13px;
+        margin-top: 4px;
+      }
+      .top-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .content {
+        overflow: auto;
+        scrollbar-width: none;
+        padding: 22px 22px calc(44px + env(safe-area-inset-bottom));
+        min-height: 0;
+      }
+      .content::-webkit-scrollbar {
+        display: none;
+      }
+      .view {
+        display: none;
+      }
+      .view.active {
+        display: block;
+        animation: lift 0.25s ease both;
+      }
+      @keyframes lift {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .btn,
+      .primary,
+      .ghost,
+      .danger,
+      .ok,
+      .gold {
+        min-height: 42px;
+        padding: 0 14px;
+        border-radius: 14px;
+        font-weight: 1000;
+        text-transform: uppercase;
+        letter-spacing: 0.055em;
+        font-size: 13px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        white-space: nowrap;
+      }
+      .primary {
+        background: linear-gradient(135deg, var(--blue), #0d65dd);
+        box-shadow: 0 14px 38px rgba(8, 124, 255, 0.25);
+      }
+      .ghost {
+        border: 1px solid var(--line2);
+        background: rgba(255, 255, 255, 0.035);
+      }
+      .danger {
+        background: linear-gradient(135deg, #ff4e68, #b51732);
+      }
+      .ok {
+        background: linear-gradient(135deg, #25c987, #0d8b68);
+      }
+      .gold {
+        background: linear-gradient(135deg, #d7be74, #8f7031);
+        color: #080b10;
+      }
+      button[disabled],
+      button.busy {
+        opacity: 0.65;
+        pointer-events: none;
+        filter: saturate(0.85);
+      }
+      button.busy::after {
+        content: "";
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        border: 2px solid currentColor;
+        border-right-color: transparent;
+        display: inline-block;
+        animation: spin 0.75s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      .mini {
+        min-height: 34px;
+        padding: 0 10px;
+        font-size: 12px;
+        border-radius: 12px;
+      }
+      .panel,
+      .card {
+        border: 1px solid var(--line);
+        border-radius: var(--r);
+        background: linear-gradient(
+          180deg,
+          rgba(11, 17, 27, 0.9),
+          rgba(5, 9, 15, 0.84)
+        );
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        position: relative;
+      }
+      .panel:before,
+      .card:before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: linear-gradient(
+          135deg,
+          rgba(95, 201, 255, 0.07),
+          transparent 26%,
+          rgba(137, 91, 255, 0.045)
+        );
+        opacity: 0.7;
+      }
+      .inner {
+        position: relative;
+        padding: 18px;
+      }
+      .section-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 16px;
+      }
+      .section-head h2 {
+        font-size: 28px;
+        text-transform: uppercase;
+        line-height: 1;
+        font-weight: 1000;
+      }
+      .section-head p {
+        color: var(--muted);
+        font-size: 14px;
+        margin-top: 6px;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 999px;
+        padding: 7px 10px;
+        font-size: 11px;
+        font-weight: 1000;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        border: 1px solid rgba(95, 201, 255, 0.38);
+        color: var(--blue2);
+        background: rgba(8, 124, 255, 0.11);
+      }
+      .badge.green {
+        border-color: rgba(88, 237, 179, 0.45);
+        color: var(--green);
+        background: rgba(88, 237, 179, 0.08);
+      }
+      .badge.red {
+        border-color: rgba(255, 101, 120, 0.45);
+        color: #ffadb8;
+        background: rgba(255, 101, 120, 0.08);
+      }
+      .badge.gold {
+        border-color: rgba(216, 191, 117, 0.48);
+        color: var(--gold);
+        background: rgba(216, 191, 117, 0.09);
+      }
+      .badge.purple {
+        border-color: rgba(137, 91, 255, 0.52);
+        color: #d2c2ff;
+        background: rgba(137, 91, 255, 0.1);
+      }
+      .grid {
+        display: grid;
+        gap: 16px;
+      }
+      .two {
+        grid-template-columns: 1fr 1fr;
+      }
+      .three {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .four {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      .field-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 13px;
+      }
+      .stat {
+        padding: 16px;
+      }
+      .stat b {
+        display: block;
+        font-size: 28px;
+      }
+      .stat span {
+        color: var(--muted);
+        font-size: 13px;
+        text-transform: uppercase;
+        font-weight: 1000;
+      }
+      .list {
+        display: grid;
+        gap: 12px;
+      }
+      .booking-card {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr auto;
+        gap: 14px;
+        align-items: center;
+        padding: 14px;
+        border: 1px solid var(--line2);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.035);
+      }
+      .booking-card h3 {
+        font-size: 18px;
+      }
+      .booking-card p {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+      .actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+      .filters {
+        display: flex;
+        gap: 8px;
+        overflow: auto;
+        scrollbar-width: none;
+        margin-bottom: 14px;
+      }
+      .filters::-webkit-scrollbar {
+        display: none;
+      }
+      .filter {
+        min-width: max-content;
+        padding: 10px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--line2);
+        font-weight: 1000;
+        font-size: 12px;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .filter.active {
+        border-color: rgba(95, 201, 255, 0.55);
+        color: #fff;
+        background: rgba(8, 124, 255, 0.13);
+      }
+      .pkg-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+      .pkg-card .pkg-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: start;
+      }
+      .prices {
+        display: grid;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .price-line {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding-bottom: 7px;
+      }
+      .price-line span {
+        color: #d8e6f5;
+        font-size: 13px;
+        text-transform: uppercase;
+        font-weight: 900;
+      }
+      .features {
+        display: grid;
+        gap: 7px;
+        margin-top: 12px;
+      }
+      .feature {
+        display: grid;
+        grid-template-columns: 20px 1fr;
+        gap: 8px;
+        color: #d5e4f3;
+        font-size: 13px;
+      }
+      .feature i {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(95, 201, 255, 0.42);
+        background: rgba(8, 124, 255, 0.11);
+        font-style: normal;
+        color: var(--blue2);
+        font-size: 11px;
+        font-weight: 1000;
+      }
+      .editor {
+        display: none;
+        margin-top: 14px;
+      }
+      .editor.active {
+        display: block;
+      }
+      .check-row {
+        display: grid;
+        grid-template-columns: 24px 1fr;
+        gap: 9px;
+        align-items: center;
+        border: 1px solid var(--line2);
+        border-radius: 14px;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .check-row input {
+        min-height: auto;
+        width: 20px;
+        height: 20px;
+        accent-color: var(--blue);
+      }
+      .check-row span {
+        font-size: 13px;
+        color: #dce9f8;
+        font-weight: 800;
+      }
+      .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+      .gallery-card img {
+        height: 170px;
+        object-fit: cover;
+      }
+      .gallery-card .inner {
+        padding: 14px;
+      }
+      .preview-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .preview-grid img {
+        height: 160px;
+        object-fit: cover;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+      }
+      .upload-box {
+        border: 1px dashed rgba(95, 201, 255, 0.45);
+        border-radius: 18px;
+        background: rgba(8, 124, 255, 0.06);
+        padding: 14px;
+        display: grid;
+        gap: 10px;
+      }
+      .scanner-box {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 320px;
+        gap: 16px;
+      }
+      .video-wrap {
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        overflow: hidden;
+        background: #000;
+        min-height: 320px;
+        display: grid;
+        place-items: center;
+      }
+      .video-wrap video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .log {
+        max-height: 280px;
+        overflow: auto;
+        display: grid;
+        gap: 8px;
+        scrollbar-width: none;
+      }
+      .log::-webkit-scrollbar {
+        display: none;
+      }
+      .modal {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: none;
+        place-items: center;
+        background: rgba(0, 0, 0, 0.66);
+        padding: 18px;
+      }
+      .modal.open {
+        display: grid;
+      }
+      .modal-box {
+        width: min(920px, 100%);
+        max-height: 90vh;
+        overflow: auto;
+        scrollbar-width: none;
+      }
+      .modal-box::-webkit-scrollbar {
+        display: none;
+      }
+      .drawer-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 14px;
+      }
+      .notice {
+        border: 1px solid rgba(216, 191, 117, 0.38);
+        background: rgba(216, 191, 117, 0.08);
+        border-radius: 16px;
+        padding: 13px;
+        color: #f1dfad;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .pay-card {
+        border: 1px solid var(--line2);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.03);
+        padding: 14px;
+        display: grid;
+        gap: 12px;
+      }
+      .day-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+      }
+      .small-text {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+      .toast {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        z-index: 200;
+        display: none;
+        max-width: 360px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: #07101c;
+        box-shadow: var(--shadow);
+        font-weight: 900;
+      }
+      .toast.show {
+        display: block;
+        animation: lift 0.2s ease both;
+      }
+      @media (max-width: 1050px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          grid-template-rows: auto auto;
+          gap: 10px;
+        }
+        .tabs {
+          display: flex;
+          overflow: auto;
+        }
+        .tab {
+          width: auto;
+          min-width: max-content;
+        }
+        .quick {
+          display: none;
+        }
+        .topbar {
+          padding: 14px;
+        }
+        .content {
+          padding: 14px;
+        }
+        .two,
+        .three,
+        .four,
+        .scanner-box {
+          grid-template-columns: 1fr;
+        }
+        .pkg-grid,
+        .gallery-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .booking-card {
+          grid-template-columns: 1fr;
+        }
+        .actions {
+          justify-content: flex-start;
+        }
+        .topbar h1 {
+          font-size: 24px;
+        }
+      }
+      @media (max-width: 560px) {
+        .sidebar {
+          padding: 12px;
+        }
+        .brand b {
+          font-size: 18px;
+        }
+        .brand span {
+          font-size: 10px;
+        }
+        .shield {
+          width: 42px;
+          height: 42px;
+        }
+        .topbar {
+          display: grid;
+        }
+        .top-actions {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+        }
+        .top-actions .btn,
+        .top-actions .primary,
+        .top-actions .ghost {
+          width: 100%;
+        }
+        .field-grid,
+        .pkg-grid,
+        .gallery-grid,
+        .day-grid {
+          grid-template-columns: 1fr;
+        }
+        .booking-card {
+          padding: 12px;
+        }
+        .actions {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+        }
+        .actions button {
+          width: 100%;
+        }
+        .btn,
+        .primary,
+        .ghost,
+        .danger,
+        .ok,
+        .gold {
+          font-size: 12px;
+          min-height: 42px;
+          padding: 0 11px;
+        }
+        .section-head {
+          display: grid;
+        }
+        .section-head h2 {
+          font-size: 24px;
+        }
+        .stat b {
+          font-size: 24px;
+        }
+        .preview-grid {
+          grid-template-columns: 1fr;
+        }
+        .video-wrap {
+          min-height: 240px;
+        }
+      }
+    
 @media(max-width:1050px){
-  html,body{height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-  .app{height:auto;min-height:100dvh;display:block;}
-  .sidebar{position:sticky;top:0;z-index:30;}
-  .main{display:block;min-height:auto;}
-  .content{overflow:visible;min-height:auto;padding-bottom:calc(34px + env(safe-area-inset-bottom));}
+  html,body{height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:auto;}
+  .app{height:auto;min-height:100dvh;display:block;overflow:visible;}
+  .sidebar{position:sticky;top:0;z-index:30;max-height:48dvh;overflow:auto;}
+  .main{display:block;min-height:auto;overflow:visible;}
+  .content{overflow:visible;min-height:auto;padding-bottom:calc(120px + env(safe-area-inset-bottom));}
   .modal-box{max-height:calc(100dvh - 36px);overflow:auto;-webkit-overflow-scrolling:touch;}
 }
-
-button[disabled], .primary[disabled], .ghost[disabled], .danger[disabled], .ok[disabled], .gold[disabled]{cursor:not-allowed;opacity:.62;filter:saturate(.75)}
-button.is-loading{position:relative;pointer-events:none;opacity:.78;color:transparent!important}
-button.is-loading::after{content:"";position:absolute;left:50%;top:50%;width:17px;height:17px;margin:-8.5px 0 0 -8.5px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:aaSpin .75s linear infinite}
-@keyframes aaSpin{to{transform:rotate(360deg)}}
+@media(max-width:560px){
+  .content{padding-bottom:calc(150px + env(safe-area-inset-bottom));}
+  .scanner-box{gap:12px;}
+  .video-wrap{min-height:260px;}
+}
 </style>
-<script defer src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-</head>
-<body>
-<div class="app">
-  <aside class="sidebar">
-    <div class="logo"><div class="shield">🛡</div><div class="brand"><b>AUTO ARMOR</b><span>DEMO CONTROL</span></div></div>
-    <nav class="tabs" id="tabs"></nav>
-    <div class="quick"><button class="primary" data-tab="scanner">Open QR Scanner</button><button class="ghost" id="refreshBtn">Refresh Data</button></div>
-  </aside>
-  <section class="main">
-    <header class="topbar"><div><h1 id="pageTitle">Dashboard</h1><p>No password for demo. Customer page stays separate.</p></div><div class="top-actions"><button class="primary" data-tab="scanner">Scan QR</button><button class="ghost" id="saveAllBtn">Save Current Section</button></div></header>
-    <main class="content">
-      <section id="dashboardView" class="view active"></section>
-      <section id="bookingsView" class="view"></section>
-      <section id="scannerView" class="view"></section>
-      <section id="packagesView" class="view"></section>
-      <section id="addonsView" class="view"></section>
-      <section id="galleryView" class="view"></section>
-      <section id="reviewsView" class="view"></section>
-      <section id="couponsView" class="view"></section>
-      <section id="availabilityView" class="view"></section>
-      <section id="staffView" class="view"></section>
-      <section id="settingsView" class="view"></section>
-    </main>
-  </section>
-</div>
-<div class="modal" id="bookingModal"><div class="modal-box panel"><div class="inner" id="bookingDetail"></div></div></div>
-<div class="toast" id="toast"></div>
-<script>
-const API_URL='https://script.google.com/macros/s/AKfycbz5MfcLAb7X0xLrqVkMwcLQ0EAawxQz1rlIDqqalNpkjspiuTIgF6WMdXp4ZP-x3MiauA/exec';
-const API_ENABLED=/(^|\.)github\.io$/i.test(location.hostname);
-const PREVIEW_MODE=!API_ENABLED;
-const TABS=[['dashboard','Dashboard'],['bookings','Bookings'],['scanner','Scanner'],['packages','Packages'],['addons','Add-ons'],['gallery','Gallery'],['reviews','Reviews'],['coupons','Coupons'],['availability','Availability'],['staff','Staff'],['settings','Settings']];
-const VEHICLES=['Sedan','Small SUV','Large SUV / Truck','Large Truck','Motorcycle','RV','Boat / Trailer'];
-const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-const PERMISSIONS=['View Bookings','Update Status','Scan QR','Add Extras','Complete Jobs','Manage Gallery','Manage Reviews','Manage Prices','Manage Staff','Settings'];
-const $=s=>document.querySelector(s);const $$=s=>Array.from(document.querySelectorAll(s));
-let active='dashboard',filter='All',selectedId='',stream=null,detector=null,scanTimer=null,gpsWatchId=null,gpsBookingId='';
-let edit={packageId:'',addonId:'',staffId:'',galleryId:''};
-let galleryDraft={mainImage:'',secondImage:''};
-let data={bookings:[],packages:[],addons:[],gallery:[],reviews:[],coupons:[],availability:{days:['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],startTime:'08:00',endTime:'17:00',serviceAreaText:'Jacksonville & surrounding areas'},staff:[],settings:{businessName:'Auto Armor Mobile Detailing',phone:'904-601-8480',email:'autoarmor@example.com',instagramHandle:'@autoarmor.de',instagramUrl:'https://www.instagram.com/autoarmor.de',googleReviewUrl:'#',serviceAreaText:'Jacksonville & surrounding areas',travelFeeDefault:15,depositPercent:10,depositRequired:true,paymentMethods:['Cash','Zelle','Stripe'],stripeEnabled:false,stripePublishableKey:'',stripePaymentLink:'',squareEnabled:false,squarePaymentLink:'',zelleName:'Auto Armor',zelleAccount:'904-601-8480',cashApp:'',venmo:'',invoiceLink:'',defaultBalanceAction:'After Completion',paymentNote:'Deposit applies to final balance.'},tracking:[],qrLogs:[],payments:[]};
-const seedPackages=[
-{id:'basic',name:'Basic Refresh',badge:'Routine Maintenance',description:'Perfect for maintenance cleaning.',duration:'1.5–2 hours',visible:true,featured:false,premium:false,features:['Exterior hand wash','Wheels & tire shine','Quick interior vacuum','Dash & surface wipe down','Interior windows'],prices:{'Sedan':99,'Small SUV':119,'Large SUV / Truck':139,'Large Truck':159,'Motorcycle':79,'RV':0,'Boat / Trailer':0}},
-{id:'full',name:'Full Detail',badge:'Most Popular',description:'The most requested inside-and-out detail.',duration:'3–4 hours',visible:true,featured:true,premium:false,features:['Everything in Basic Refresh','Deep interior vacuum','Door jambs cleaned','Interior UV protectant','Premium spray wax','Trim & tire shine'],prices:{'Sedan':179,'Small SUV':199,'Large SUV / Truck':229,'Large Truck':249,'Motorcycle':129,'RV':0,'Boat / Trailer':0}},
-{id:'premium',name:'Premium Detail',badge:'Showroom Level Clean',description:'Premium detail built for a luxury finish.',duration:'5–6 hours',visible:true,featured:false,premium:true,features:['Everything in Full Detail','Shampoo seats & carpets','Leather cleaning & conditioning','Clay bar treatment','Light engine bay cleaning'],prices:{'Sedan':249,'Small SUV':279,'Large SUV / Truck':299,'Large Truck':349,'Motorcycle':179,'RV':0,'Boat / Trailer':0}},
-{id:'specialty',name:'Specialty Vehicle',badge:'Request Quote',description:'Motorcycles, RVs, boats, trailers and custom work.',duration:'Custom review',visible:true,featured:false,premium:false,features:['Photo-based estimate','Oversized vehicle review','Custom service plan','Final price confirmed before service'],prices:{'Sedan':0,'Small SUV':0,'Large SUV / Truck':0,'Large Truck':0,'Motorcycle':175,'RV':300,'Boat / Trailer':0}}
-];
-const seedAddons=[
-{id:'pet',name:'Pet Hair Removal',description:'Deep removal from seats, carpet and cargo areas.',price:25,label:'$25–$75',variable:true,requiresConfirm:true,visible:true,category:'Interior'},
-{id:'stain',name:'Stain Removal',description:'Spot treatment for seats and carpet stains.',price:25,label:'$25+',variable:true,requiresConfirm:true,visible:true,category:'Interior'},
-{id:'odor',name:'Odor Elimination',description:'Treatment for smoke, food, pets or moisture smells.',price:50,label:'$50',variable:false,requiresConfirm:false,visible:true,category:'Interior'},
-{id:'headlight',name:'Headlight Restoration',description:'Restore faded headlights.',price:75,label:'$75',variable:false,requiresConfirm:false,visible:true,category:'Exterior'},
-{id:'engine',name:'Engine Bay Detail',description:'Light engine bay cleaning and dressing.',price:50,label:'$50',variable:false,requiresConfirm:false,visible:true,category:'Exterior'},
-{id:'wax',name:'Wax Protection',description:'Added paint protection and gloss.',price:100,label:'Starting at $100',variable:true,requiresConfirm:false,visible:true,category:'Protection'},
-{id:'ceramic',name:'Ceramic Coating',description:'Premium paint protection.',price:250,label:'Starting at $250',variable:true,requiresConfirm:true,visible:true,category:'Protection'},
-{id:'paint',name:'Paint Correction',description:'Machine polishing and defect reduction.',price:300,label:'Starting at $300',variable:true,requiresConfirm:true,visible:true,category:'Correction'}
-];
-const seedReviews=[{id:'r1',name:'Marcus T.',rating:5,service:'Full Detail',text:'The SUV looked brand new inside. Booking was easy and they came right to my driveway.',status:'approved',featured:true},{id:'r2',name:'Ashley R.',rating:5,service:'Premium Detail',text:'The before and after was crazy. Seats, carpets and wheels came out much better than expected.',status:'approved',featured:true}];
-const seedStaff=[{id:'S-1001',name:'Owner',email:'owner@example.com',role:'Owner',services:['All'],days:['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],active:true,permissions:PERMISSIONS.slice()}];
-function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
-function money(n){n=Number(n||0);return n?'$'+n.toFixed(0):'Quote'}
-function readLS(k,f){try{return JSON.parse(localStorage.getItem(k)||'')||f}catch(e){return f}}
-function writeLS(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){toast('Storage is full. Use fewer large photos for this demo.')}}
-function api(action,params={}){if(!API_ENABLED){return Promise.resolve({ok:false,preview:true,skipped:true,action})}return new Promise((resolve,reject)=>{if(!API_URL){reject(new Error('missing api'));return}const cb='aa_admin_'+Math.random().toString(36).slice(2);const q=new URLSearchParams({action,callback:cb,...params});const s=document.createElement('script');let done=false;const cleanup=()=>{try{s.remove()}catch(e){}setTimeout(()=>{try{delete window[cb]}catch(e){}},60000)};const timer=setTimeout(()=>{if(done)return;done=true;window[cb]=function(){};cleanup();reject(new Error('API timeout'))},30000);window[cb]=res=>{if(done)return;done=true;clearTimeout(timer);cleanup();resolve(res)};s.onerror=()=>{if(done)return;done=true;clearTimeout(timer);window[cb]=function(){};cleanup();reject(new Error('API network error'))};s.src=API_URL+'?'+q.toString();document.body.appendChild(s)})}
-function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}
-function setButtonLoading(btn,on,label){
-  if(!btn)return;
-  if(on){btn.dataset.originalText=btn.dataset.originalText||btn.textContent;btn.disabled=true;btn.classList.add('is-loading');if(label)btn.setAttribute('aria-label',label)}
-  else{btn.disabled=false;btn.classList.remove('is-loading');if(btn.dataset.originalText){btn.textContent=btn.dataset.originalText;delete btn.dataset.originalText}}
-}
-async function withButtonLoading(btn,label,fn){
-  if(btn&&btn.disabled)return;
-  setButtonLoading(btn,true,label||'Working');
-  try{return await fn()}
-  catch(err){console.error(err);toast(err&&err.message?err.message:'Action failed. Try again.')}
-  finally{setButtonLoading(btn,false)}
-}
-async function syncApi(action,params){
-  try{return await api(action,params)}
-  catch(err){console.warn('API sync failed:',action,err&&err.message?err.message:err);toast('Saved on this device. Server sync did not finish.');return {ok:false,error:err&&err.message?err.message:String(err)}}
-}
-
-function hydrate(){
-  data.bookings = mergeById(data.bookings||[],readLS('aa_bookings_demo',[]));
-  data.packages = data.packages?.length?data.packages:readLS('aa_packages_demo',seedPackages);
-  data.addons = data.addons?.length?data.addons:readLS('aa_addons_demo',seedAddons);
-  data.gallery = readLS('aa_gallery_custom',data.gallery||[]);
-  data.reviews = data.reviews?.length?data.reviews:readLS('aa_reviews_demo',seedReviews);
-  data.coupons = data.coupons?.length?data.coupons:readLS('aa_coupons_demo',[{code:'FIRST20',type:'Percent',value:20,minPackage:'',expires:'',limit:0,active:true},{code:'FULL149',type:'Fixed Sedan Full Detail',value:149,minPackage:'full',expires:'',limit:0,active:true}]);
-  data.staff = data.staff?.length?data.staff:readLS('aa_staff_demo',seedStaff);
-  data.settings = {...data.settings,...readLS('aa_settings_demo',{})};
-  data.availability = {...data.availability,...readLS('aa_availability_demo',{})};
-}
-function mergeById(a,b){const map=new Map();[...a,...b].forEach(x=>x&&x.id&&map.set(String(x.id),{...(map.get(String(x.id))||{}),...x}));return [...map.values()].sort((x,y)=>String(y.id).localeCompare(String(x.id)));}
-function persistLocal(){writeLS('aa_bookings_demo',data.bookings);writeLS('aa_packages_demo',data.packages);writeLS('aa_addons_demo',data.addons);writeLS('aa_gallery_custom',data.gallery);writeLS('aa_reviews_demo',data.reviews);writeLS('aa_coupons_demo',data.coupons);writeLS('aa_staff_demo',data.staff);writeLS('aa_settings_demo',data.settings);writeLS('aa_availability_demo',data.availability)}
-function renderTabs(){ $('#tabs').innerHTML=TABS.map(t=>`<button class="tab ${active===t[0]?'active':''}" data-tab="${t[0]}">${t[1]}</button>`).join(''); }
-function show(tab){active=tab;$$('.view').forEach(v=>v.classList.remove('active'));$('#'+tab+'View').classList.add('active');$('#pageTitle').textContent=TABS.find(t=>t[0]===tab)?.[1]||'Control';renderTabs();renderActive();}
-function renderActive(){if(active==='dashboard')renderDashboard();if(active==='bookings')renderBookings();if(active==='scanner')renderScanner();if(active==='packages')renderPackages();if(active==='addons')renderAddons();if(active==='gallery')renderGallery();if(active==='reviews')renderReviews();if(active==='coupons')renderCoupons();if(active==='availability')renderAvailability();if(active==='staff')renderStaff();if(active==='settings')renderSettings();}
-function badgeStatus(s){let cls=/Completed/.test(s)?'green':/Cancel/.test(s)?'red':/Proposed|Payment/.test(s)?'gold':/Started|On The Way/.test(s)?'purple':'';return `<span class="badge ${cls}">${escapeHtml(s||'Request Received')}</span>`}
-function renderDashboard(){const b=data.bookings;const rev=b.filter(x=>x.status==='Completed').reduce((s,x)=>s+Number(x.total||0),0);const stats=[['Today',b.length],['Pending',b.filter(x=>/Request|Pending|Proposed/.test(x.status||'')).length],['Confirmed',b.filter(x=>/Confirmed|Scheduled/.test(x.status||'')).length],['In Progress',b.filter(x=>/On The Way|Started/.test(x.status||'')).length],['Completed',b.filter(x=>x.status==='Completed').length],['Revenue',money(rev)]];$('#dashboardView').innerHTML=`<div class="grid three">${stats.map(s=>`<div class="panel stat"><div class="inner"><span>${s[0]}</span><b>${s[1]}</b></div></div>`).join('')}</div><div style="height:16px"></div><div class="panel"><div class="inner"><div class="section-head"><div><h2>Jobs Today</h2><p>Quick actions without opening a long admin page.</p></div><button class="primary" data-tab="bookings">View Bookings</button></div><div class="list">${b.slice(0,5).map(bookingCard).join('')||'<p class="small-text">No bookings yet.</p>'}</div></div></div>`}
-function bookingCard(b){return `<article class="booking-card"><div><h3>${escapeHtml(b.customerName||'Customer')} ${badgeStatus(b.status)}</h3><p>${escapeHtml(b.vehicleInfo||b.vehicleType||'Vehicle')} • ${escapeHtml(b.packageName||'Package')}<br>${escapeHtml(b.appointmentDate||'Date pending')} ${escapeHtml(b.appointmentTime||'')} • ${escapeHtml(b.address||'Address pending')}</p></div><div><p><b>Total:</b> ${money(b.total)}<br><b>Balance:</b> ${money(b.balance)}<br><b>Payment:</b> ${escapeHtml(b.balanceAction||'Not requested')}</p></div><div class="actions"><button class="ghost mini" data-open-booking="${b.id}">Open</button><button class="ok mini" data-status="${b.id}|Price Confirmed">Confirm</button><button class="primary mini" data-status="${b.id}|Technician On The Way">On The Way</button><button class="gold mini" data-payment-due="${b.id}">Due Now</button></div></article>`}
-function renderBookings(){const statuses=['All','Request Received','Price Confirmed','Appointment Scheduled','Schedule Change Proposed','Technician On The Way','Service Started','Payment Required','Completed','Canceled'];let list=data.bookings.filter(b=>filter==='All'||b.status===filter);$('#bookingsView').innerHTML=`<div class="section-head"><div><h2>Bookings</h2><p>Manage quotes, schedule changes, GPS status, on-site extras, balance due and final receipt.</p></div></div><div class="filters">${statuses.map(s=>`<button class="filter ${filter===s?'active':''}" data-filter="${s}">${s}</button>`).join('')}</div><div class="list">${list.map(bookingCard).join('')||'<div class="notice">No bookings under this filter.</div>'}</div>`}
-function renderScanner(){const logs=(data.qrLogs||[]).slice(0,8);$('#scannerView').innerHTML=`<div class="section-head"><div><h2>QR Scanner</h2><p>Tap Scan Customer QR when you arrive. The camera reads the secure QR from the customer's email and starts the service automatically.</p></div><button class="primary" id="openCameraBtn">Scan Customer QR</button></div><div class="scanner-box"><div class="panel"><div class="inner"><div class="video-wrap" id="videoWrap"><p class="small-text">Camera preview will appear here after you start the scan.</p></div><div style="height:12px"></div><div class="upload-box"><label>Camera blocked? Take or upload a photo of the customer QR.</label><input id="qrPhotoInput" type="file" accept="image/*" capture="environment"><p class="small-text">The system decodes the QR image automatically. A booking ID alone cannot start service.</p></div><div class="notice" style="margin-top:12px">On-site extras unlock only after the customer's secure QR is scanned. After completion, the same QR becomes final-receipt only.</div></div></div><div class="panel"><div class="inner"><h3>Scan Log</h3><div class="log">${logs.map(l=>`<div class="notice"><b>${escapeHtml(l.bookingId||'QR')}</b><br>${escapeHtml(l.result||'Scanned')} • ${escapeHtml(l.at||l.createdAt||'')}</div>`).join('')||'<p class="small-text">No scans yet.</p>'}</div></div></div></div>`}
-function packageCard(p){const prices=VEHICLES.map(v=>`<div class="price-line"><span>${v}</span><b>${money((p.prices||{})[v])}</b></div>`).join('');return `<article class="card pkg-card"><div class="inner"><div class="pkg-top"><div><span class="badge ${p.featured?'green':p.premium?'purple':''}">${escapeHtml(p.badge||'Package')}</span><h3>${escapeHtml(p.name)}</h3><p class="small-text">${escapeHtml(p.description||'')}</p></div><div class="actions"><button class="ghost mini" data-edit-package="${p.id}">Edit</button><button class="danger mini" data-delete-package="${p.id}">Delete</button></div></div><div class="prices">${prices}</div><div class="features">${(p.features||[]).map(f=>`<div class="feature"><i>✓</i><span>${escapeHtml(f)}</span></div>`).join('')}</div></div></article>`}
-function renderPackages(){const p=edit.packageId?data.packages.find(x=>x.id===edit.packageId):null;$('#packagesView').innerHTML=`<div class="section-head"><div><h2>Packages</h2><p>Cards match the customer page logic. Edit prices without touching code.</p></div><button class="primary" id="newPackageBtn">New Package</button></div><div class="pkg-grid">${data.packages.map(packageCard).join('')}</div><div style="height:16px"></div><div class="panel"><div class="inner"><h3>${p?'Edit Package':'Package Editor'}</h3>${packageForm(p)}</div></div>`}
-function packageForm(p={}){p=p||{};return `<div class="field-grid"><div class="field"><label>Name</label><input id="pkgName" value="${escapeHtml(p.name||'')}"></div><div class="field"><label>Badge</label><input id="pkgBadge" value="${escapeHtml(p.badge||'')}"></div><div class="field"><label>Duration</label><input id="pkgDuration" value="${escapeHtml(p.duration||'')}"></div><div class="field"><label>Visible</label><select id="pkgVisible"><option value="true">Visible</option><option value="false">Hidden</option></select></div><div class="field wide"><label>Description</label><textarea id="pkgDescription">${escapeHtml(p.description||'')}</textarea></div>${VEHICLES.map(v=>`<div class="field"><label>${v} Price</label><input id="price_${v.replace(/[^a-z0-9]/gi,'_')}" type="number" value="${Number((p.prices||{})[v]||0)}"></div>`).join('')}<div class="field wide"><label>Included Services, one per line</label><textarea id="pkgFeatures">${escapeHtml((p.features||[]).join('\n'))}</textarea></div></div><div class="drawer-actions"><button class="primary" id="savePackageBtn">${p.id?'Update Package':'Save Package'}</button>${p.id?'<button class="ghost" id="clearPackageBtn">Cancel Edit</button>':''}</div>`}
-function renderAddons(){const a=edit.addonId?data.addons.find(x=>x.id===edit.addonId):null;$('#addonsView').innerHTML=`<div class="section-head"><div><h2>Add-ons</h2><p>Manage extras that can be selected by the customer or added on site.</p></div><button class="primary" id="newAddonBtn">New Add-on</button></div><div class="grid three">${data.addons.map(a=>`<article class="card"><div class="inner"><span class="badge">${escapeHtml(a.category||'Add-on')}</span><h3>${escapeHtml(a.name)}</h3><p class="small-text">${escapeHtml(a.description||'')}</p><h3>${escapeHtml(a.label||money(a.price))}</h3><div class="actions"><button class="ghost mini" data-edit-addon="${a.id}">Edit</button><button class="danger mini" data-delete-addon="${a.id}">Delete</button></div></div></article>`).join('')}</div><div style="height:16px"></div><div class="panel"><div class="inner"><h3>${a?'Edit Add-on':'Add-on Editor'}</h3>${addonForm(a)}</div></div>`}
-function addonForm(a={}){a=a||{};return `<div class="field-grid"><div class="field"><label>Name</label><input id="addonName" value="${escapeHtml(a.name||'')}"></div><div class="field"><label>Category</label><input id="addonCategory" value="${escapeHtml(a.category||'')}"></div><div class="field"><label>Base Price</label><input id="addonPrice" type="number" value="${Number(a.price||0)}"></div><div class="field"><label>Label</label><input id="addonLabel" value="${escapeHtml(a.label||'')}"></div><div class="field"><label>Variable Price</label><select id="addonVariable"><option value="false">No</option><option value="true">Yes</option></select></div><div class="field"><label>Visible</label><select id="addonVisible"><option value="true">Visible</option><option value="false">Hidden</option></select></div><div class="field wide"><label>Description</label><textarea id="addonDescription">${escapeHtml(a.description||'')}</textarea></div></div><div class="drawer-actions"><button class="primary" id="saveAddonBtn">${a.id?'Update Add-on':'Save Add-on'}</button>${a.id?'<button class="ghost" id="clearAddonBtn">Cancel Edit</button>':''}</div>`}
-function renderGallery(){const g=edit.galleryId?data.gallery.find(x=>x.id===edit.galleryId):null;if(g){galleryDraft.mainImage=g.mainImage||g.image||g.beforeFileId||'';galleryDraft.secondImage=g.secondImage||g.afterFileId||''}$('#galleryView').innerHTML=`<div class="section-head"><div><h2>Gallery / Results</h2><p>Upload from phone gallery or take directly from the camera. No URL fields for customers or staff.</p></div></div><div class="panel"><div class="inner"><h3>${g?'Edit Result':'Create Result'}</h3><div class="field-grid"><div class="field"><label>Title</label><input id="galTitle" value="${escapeHtml(g?.title||'')}"></div><div class="field"><label>Category</label><select id="galCategory"><option>Interior</option><option>Exterior</option><option>Wheels</option><option>Seats</option><option>Engine Bay</option><option>Paint Correction</option><option>Premium Detail</option></select></div><div class="field"><label>Vehicle</label><input id="galVehicle" value="${escapeHtml(g?.vehicle||'')}"></div><div class="field"><label>Related Service</label><input id="galService" value="${escapeHtml(g?.service||'')}"></div><div class="field wide"><label>Description</label><textarea id="galDescription">${escapeHtml(g?.description||'')}</textarea></div><div class="field"><label>Photo Mode</label><select id="galMode"><option value="single">Single Result Photo</option><option value="pair">Before / After Pair</option></select></div><div class="field"><label>Visible On Customer Page</label><select id="galVisible"><option value="true">Visible</option><option value="false">Hidden</option></select></div></div><div style="height:14px"></div><div class="grid two"><div class="upload-box"><b>Main Photo</b><input id="galMainFile" type="file" accept="image/*" capture="environment"><p class="small-text">Choose from phone gallery or open camera.</p></div><div class="upload-box"><b>Second Photo Optional</b><input id="galSecondFile" type="file" accept="image/*" capture="environment"><p class="small-text">Use only when this result needs a before/after pair.</p></div></div><div style="height:12px"></div><div class="preview-grid" id="galPreview">${galleryDraft.mainImage?`<img src="${galleryDraft.mainImage}">`:''}${galleryDraft.secondImage?`<img src="${galleryDraft.secondImage}">`:''}</div><div class="drawer-actions"><button class="primary" id="saveGalleryBtn">${g?'Update Result':'Save Result'}</button>${g?'<button class="ghost" id="clearGalleryBtn">Cancel Edit</button>':''}</div></div></div><div style="height:16px"></div><div class="gallery-grid">${data.gallery.map(x=>`<article class="card gallery-card"><img src="${x.mainImage||x.image||x.beforeFileId||''}" onerror="this.style.display='none'" alt="${escapeHtml(x.title)}"><div class="inner"><span class="badge">${escapeHtml(x.category||'Result')}</span><h3>${escapeHtml(x.title)}</h3><p class="small-text">${escapeHtml(x.description||'')}</p><div class="actions"><button class="ghost mini" data-edit-gallery="${x.id}">Edit</button><button class="danger mini" data-delete-gallery="${x.id}">Delete</button></div></div></article>`).join('')||'<div class="notice">No gallery results yet.</div>'}</div>`; if(g?.category)$('#galCategory').value=g.category;if(g?.mode)$('#galMode').value=g.mode;if(g?.visible===false)$('#galVisible').value='false'}
-function renderReviews(){const list=data.reviews;$('#reviewsView').innerHTML=`<div class="section-head"><div><h2>Reviews</h2><p>Approve, reject or feature reviews before they appear publicly.</p></div></div><div class="grid three">${list.map(r=>`<article class="card"><div class="inner"><span class="badge ${r.status==='approved'?'green':r.status==='rejected'?'red':'gold'}">${escapeHtml(r.status||'pending')}</span><h3>${'★'.repeat(Number(r.rating||5))}</h3><p class="small-text">“${escapeHtml(r.text)}”</p><b>${escapeHtml(r.name)}</b><p class="small-text">${escapeHtml(r.service||'Mobile Detail')}</p><div class="actions"><button class="ok mini" data-review="${r.id}|approved">Approve</button><button class="danger mini" data-review="${r.id}|rejected">Reject</button><button class="ghost mini" data-feature-review="${r.id}">${r.featured?'Unfeature':'Feature'}</button></div></div></article>`).join('')}</div>`}
-function renderCoupons(){ $('#couponsView').innerHTML=`<div class="section-head"><div><h2>Coupons</h2><p>Create codes like FIRST20 or FULL149.</p></div><button class="primary" id="addCouponBtn">Add Coupon</button></div><div class="list">${data.coupons.map((c,i)=>`<div class="booking-card"><div><h3>${escapeHtml(c.code)} ${c.active!==false?'<span class="badge green">Active</span>':'<span class="badge red">Off</span>'}</h3><p>${escapeHtml(c.type)} • ${escapeHtml(c.value)} ${c.expires?'• Expires '+escapeHtml(c.expires):''}</p></div><div></div><div class="actions"><button class="danger mini" data-delete-coupon="${i}">Delete</button></div></div>`).join('')}</div><div style="height:16px"></div><div class="panel"><div class="inner"><h3>Coupon Editor</h3><div class="field-grid"><div class="field"><label>Code</label><input id="couponCode" placeholder="FIRST20"></div><div class="field"><label>Type</label><select id="couponType"><option>Percent</option><option>Fixed Amount</option><option>Fixed Sedan Full Detail</option></select></div><div class="field"><label>Value</label><input id="couponValue" type="number" value="20"></div><div class="field"><label>Expiration</label><input id="couponExpires" type="date"></div><div class="field"><label>Active</label><select id="couponActive"><option value="true">Active</option><option value="false">Off</option></select></div></div></div></div>` }
-function renderAvailability(){const a=data.availability||{};$('#availabilityView').innerHTML=`<div class="section-head"><div><h2>Availability</h2><p>Mark working days and start/end hours. Service area stays general for Jacksonville.</p></div></div><div class="panel"><div class="inner"><div class="day-grid">${DAYS.map(d=>`<label class="check-row"><input type="checkbox" class="availDay" value="${d}" ${(a.days||[]).includes(d)?'checked':''}><span>${d}</span></label>`).join('')}</div><div style="height:16px"></div><div class="field-grid"><div class="field"><label>Start Time</label><input id="availStart" type="time" value="${escapeHtml(a.startTime||'08:00')}"></div><div class="field"><label>End Time</label><input id="availEnd" type="time" value="${escapeHtml(a.endTime||'17:00')}"></div><div class="field wide"><label>Service Area</label><input id="serviceAreaText" value="${escapeHtml(a.serviceAreaText||data.settings.serviceAreaText||'Jacksonville & surrounding areas')}"></div></div><div style="height:14px"></div><button class="primary" id="saveAvailabilityBtn">Save Availability</button></div></div>`}
-function renderStaff(){const s=edit.staffId?data.staff.find(x=>x.id===edit.staffId):null;$('#staffView').innerHTML=`<div class="section-head"><div><h2>Staff</h2><p>Edit existing staff without duplicating them. Assign permissions by role.</p></div><button class="primary" id="newStaffBtn">New Staff</button></div><div class="grid two"><div class="panel"><div class="inner"><h3>${s?'Edit Staff':'Staff Editor'}</h3>${staffForm(s)}</div></div><div class="list">${data.staff.map(x=>`<article class="booking-card"><div><h3>${escapeHtml(x.name)} ${x.active!==false?'<span class="badge green">Active</span>':'<span class="badge red">Off</span>'}</h3><p>${escapeHtml(x.role)} • ${escapeHtml(x.email)}<br>${(x.permissions||[]).length} permissions</p></div><div></div><div class="actions"><button class="ghost mini" data-edit-staff="${x.id}">Edit</button><button class="danger mini" data-delete-staff="${x.id}">Delete</button></div></article>`).join('')}</div></div>`}
-function staffForm(s={}){s=s||{};return `<div class="field-grid"><div class="field"><label>Name</label><input id="staffName" value="${escapeHtml(s.name||'')}"></div><div class="field"><label>Email</label><input id="staffEmail" value="${escapeHtml(s.email||'')}"></div><div class="field"><label>Role</label><input id="staffRole" value="${escapeHtml(s.role||'Detailer')}"></div><div class="field"><label>Active</label><select id="staffActive"><option value="true">Active</option><option value="false">Off</option></select></div><div class="field wide"><label>Services</label><input id="staffServices" value="${escapeHtml((s.services||[]).join(', '))}" placeholder="Full Detail, Premium Detail"></div><div class="wide"><label>Permissions</label><div style="height:8px"></div><div class="day-grid">${PERMISSIONS.map(p=>`<label class="check-row"><input type="checkbox" class="staffPerm" value="${p}" ${(s.permissions||[]).includes(p)?'checked':''}><span>${p}</span></label>`).join('')}</div></div></div><div class="drawer-actions"><button class="primary" id="saveStaffBtn">${s.id?'Update Staff':'Save Staff'}</button>${s.id?'<button class="ghost" id="clearStaffBtn">Cancel Edit</button>':''}</div>`}
-function renderSettings(){const s=data.settings;$('#settingsView').innerHTML=`<div class="section-head"><div><h2>Settings & Payments</h2><p>Business info, Instagram, deposits and payment options.</p></div></div><div class="grid two"><div class="panel"><div class="inner"><h3>Business Settings</h3><div class="field-grid"><div class="field"><label>Business Name</label><input id="setBusiness" value="${escapeHtml(s.businessName||'')}"></div><div class="field"><label>Phone</label><input id="setPhone" value="${escapeHtml(s.phone||'')}"></div><div class="field"><label>Email</label><input id="setEmail" value="${escapeHtml(s.email||'')}"></div><div class="field"><label>Instagram Handle</label><input id="setInstagramHandle" value="${escapeHtml(s.instagramHandle||'')}"></div><div class="field wide"><label>Instagram Link</label><input id="setInstagramUrl" value="${escapeHtml(s.instagramUrl||'')}"></div><div class="field wide"><label>Google Review Link</label><input id="setGoogleReviewUrl" value="${escapeHtml(s.googleReviewUrl||'')}"></div><div class="field wide"><label>Service Area</label><input id="setServiceArea" value="${escapeHtml(s.serviceAreaText||'Jacksonville & surrounding areas')}"></div></div></div></div><div class="panel"><div class="inner"><h3>Deposit & Balance</h3><div class="field-grid"><div class="field"><label>Deposit Required</label><select id="setDepositRequired"><option value="true">Yes</option><option value="false">No</option></select></div><div class="field"><label>Deposit Percent</label><input id="setDepositPercent" type="number" value="${Number(s.depositPercent||10)}"></div><div class="field"><label>Travel Fee Default</label><input id="setTravelFee" type="number" value="${Number(s.travelFeeDefault||15)}"></div><div class="field"><label>Default Balance Action</label><select id="setBalanceAction"><option>After Completion</option><option>Due Now</option><option>Owner Review</option></select></div><div class="field wide"><label>Payment Note</label><textarea id="setPaymentNote">${escapeHtml(s.paymentNote||'')}</textarea></div></div></div></div></div><div style="height:16px"></div><div class="panel"><div class="inner"><h3>Payment Methods</h3><div class="grid three"><div class="pay-card"><label class="check-row"><input type="checkbox" class="payMethod" value="Cash" ${(s.paymentMethods||[]).includes('Cash')?'checked':''}><span>Cash</span></label><label class="check-row"><input type="checkbox" class="payMethod" value="Zelle" ${(s.paymentMethods||[]).includes('Zelle')?'checked':''}><span>Zelle</span></label><div class="field"><label>Zelle Name</label><input id="setZelleName" value="${escapeHtml(s.zelleName||'')}"></div><div class="field"><label>Zelle Phone / Email</label><input id="setZelleAccount" value="${escapeHtml(s.zelleAccount||'')}"></div></div><div class="pay-card"><label class="check-row"><input type="checkbox" class="payMethod" value="Stripe" ${(s.paymentMethods||[]).includes('Stripe')?'checked':''}><span>Stripe</span></label><div class="field"><label>Stripe Publishable Key</label><input id="setStripeKey" value="${escapeHtml(s.stripePublishableKey||'')}"></div><div class="field"><label>Stripe Payment Link</label><input id="setStripeLink" value="${escapeHtml(s.stripePaymentLink||'')}"></div></div><div class="pay-card"><label class="check-row"><input type="checkbox" class="payMethod" value="Square" ${(s.paymentMethods||[]).includes('Square')?'checked':''}><span>Square</span></label><div class="field"><label>Square Payment Link</label><input id="setSquareLink" value="${escapeHtml(s.squarePaymentLink||'')}"></div><div class="field"><label>Invoice / Other Payment Link</label><input id="setInvoiceLink" value="${escapeHtml(s.invoiceLink||'')}"></div></div></div><div style="height:14px"></div><button class="primary" id="saveSettingsBtn">Save Settings</button></div></div>`;$('#setDepositRequired').value=String(s.depositRequired!==false);$('#setBalanceAction').value=s.defaultBalanceAction||'After Completion'}
-
-function bookingQrStarted(b){
-  if(!b) return false;
-  if(b.qrStarted===true) return true;
-  const id=String(b.id||'');
-  return String(b.status||'')==='Service Started' && (data.qrLogs||[]).some(l=>String(l.bookingId||'')===id && String(l.result||'').toLowerCase().includes('service started'));
-}
-function scanToken(raw){
-  let v=String(raw||'').trim();
-  if(!v) return '';
-  try{v=decodeURIComponent(v)}catch(e){}
-  try{
-    if(/^https?:\/\//i.test(v)){
-      const u=new URL(v);
-      return (u.searchParams.get('qr')||u.searchParams.get('token')||u.searchParams.get('code')||u.searchParams.get('id')||v).trim();
-    }
-  }catch(e){}
-  return v.replace(/^qr:/i,'').trim();
-}
-function findBookingFromScan(raw){
-  const token=scanToken(raw);
-  if(!token) return null;
-  // Secure scanner flow: only the QR token starts service. A plain booking ID is not enough.
-  return data.bookings.find(x=>String(x.qrData||'')===token)||null;
-}
-function receiptOnlyCard(b){
-  return `<div class="notice"><b>Completed service.</b><br>This QR is receipt-only now. It does not unlock extras, service start, admin tools, customer contact data, staff data, internal notes or dashboard information.</div><div style="height:12px"></div><div class="panel"><div class="inner"><span class="badge gold">Final Receipt Only</span><h3>${escapeHtml(b.id||'Receipt')}</h3><div class="price-line"><span>Package</span><b>${escapeHtml(b.packageName||'Mobile Detail')}</b></div><div class="price-line"><span>Vehicle</span><b>${escapeHtml(b.vehicleInfo||b.vehicleType||'Vehicle')}</b></div><div class="price-line"><span>Extras</span><b>${escapeHtml((b.addonNames||[]).join(', ')||'None')}</b></div><div class="price-line"><span>Total</span><b>${money(b.total)}</b></div><div class="price-line"><span>Deposit Paid</span><b>${money(b.depositPaid)}</b></div><div class="price-line"><span>Balance</span><b>${money(b.balance)}</b></div></div></div>`;
-}
-function showCompletedQrReceipt(b){
-  const wrap=$('#videoWrap');
-  if(wrap) wrap.innerHTML=receiptOnlyCard(b);
-}
-function openBooking(id){
-selectedId=id;
-const b=data.bookings.find(x=>x.id===id);
-if(!b)return;
-const qrReady=bookingQrStarted(b);
-const actionButtons=`<button class="ok" data-status="${b.id}|Price Confirmed">Confirm Price</button><button class="primary" data-status="${b.id}|Technician On The Way">On The Way + GPS</button><button class="gold" data-payment-due="${b.id}">Balance Due Now</button><button class="ok" data-complete="${b.id}">Complete</button><button class="danger" data-status="${b.id}|Canceled">Cancel</button><button class="danger" data-delete-booking="${b.id}">Delete Booking</button>`;
-const extraPanel=qrReady?`<div class="panel"><div class="inner"><h3>Add Extra Service</h3><p class="small-text">Unlocked by customer QR scan. Use this only for services approved on site after arrival.</p><div class="field-grid"><div class="field"><label>Extra Name</label><input id="extraName" placeholder="Pet Hair Removal"></div><div class="field"><label>Price</label><input id="extraPrice" type="number" value="50"></div></div><div style="height:12px"></div><button class="primary" data-extra="${b.id}">Add Extra</button></div></div>`:`<div class="panel"><div class="inner"><h3>On-Site Extras Locked</h3><p class="small-text">Extra services only unlock after the customer confirmation QR is scanned at arrival.</p><div style="height:12px"></div><button class="primary" data-tab="scanner">Open QR Scanner</button></div></div>`;
-$('#bookingDetail').innerHTML=`<div class="section-head"><div><span class="badge">${escapeHtml(b.id)}</span><h2>${escapeHtml(b.customerName||'Customer')}</h2><p>${escapeHtml(b.vehicleInfo||b.vehicleType||'Vehicle')} • ${escapeHtml(b.packageName||'Package')}</p></div><button class="ghost" id="closeModal">Close</button></div><div class="grid two"><div class="panel"><div class="inner"><h3>Service Info</h3><p class="small-text"><b>Status:</b> ${escapeHtml(b.status||'')}<br><b>QR Start:</b> ${qrReady?'Scanned':'Not scanned yet'}<br><b>Date:</b> ${escapeHtml(b.appointmentDate||'')} ${escapeHtml(b.appointmentTime||'')}<br><b>Address:</b> ${escapeHtml(b.address||'')} ${escapeHtml(b.city||'')}<br><b>Phone:</b> ${escapeHtml(b.phone||'')}<br><b>Email:</b> ${escapeHtml(b.email||'')}</p><div class="drawer-actions">${actionButtons}</div></div></div><div class="panel"><div class="inner"><h3>Totals</h3><div class="price-line"><span>Total</span><b>${money(b.total)}</b></div><div class="price-line"><span>Deposit</span><b>${money(b.depositPaid)}</b></div><div class="price-line"><span>Balance</span><b>${money(b.balance)}</b></div><div class="price-line"><span>Action</span><b>${escapeHtml(b.balanceAction||'Not requested')}</b></div></div></div></div><div style="height:16px"></div><div class="grid two"><div class="panel"><div class="inner"><h3>Propose New Date / Time</h3><div class="field-grid"><div class="field"><label>New Date</label><input id="propDate" type="date"></div><div class="field"><label>New Time</label><input id="propTime" type="time"></div><div class="field wide"><label>Reason for change</label><textarea id="propReason" placeholder="Explain why this time is recommended"></textarea></div></div><div style="height:12px"></div><button class="primary" data-propose="${b.id}">Send Schedule Option</button></div></div>${extraPanel}</div>`;
-$('#bookingModal').classList.add('open');
-}
-function updateBooking(id,patch){const i=data.bookings.findIndex(x=>x.id===id);if(i<0)return;data.bookings[i]={...data.bookings[i],...patch};writeLS('aa_bookings_demo',data.bookings);renderActive();if($('#bookingModal').classList.contains('open'))openBooking(id)}
-async function setStatus(id,status){if(status==='Service Started'){toast('Scan the customer QR to start service.');show('scanner');return}const patch={status};if(status==='Technician On The Way'){startLiveGps(id);patch.balanceAction=patch.balanceAction||'Not requested'}if(status==='Completed'||status==='Canceled'){stopLiveGps();if(status==='Completed')patch.completedAt=new Date().toISOString();patch.balanceAction=status==='Completed'?'After Completion':'Not requested'}updateBooking(id,patch);await syncApi('updateBookingStatus',{id,status,balanceAction:patch.balanceAction||''});toast(status==='Technician On The Way'?'Updated: On The Way. GPS is sharing to client tracking.':'Updated: '+status)}
-function saveGpsPoint(id,pos){const t={id:'T-'+Date.now(),bookingId:id,lat:pos.coords.latitude,lng:pos.coords.longitude,accuracy:pos.coords.accuracy,at:new Date().toLocaleString(),status:'On The Way'};data.tracking=[...(data.tracking||[]),t];api('saveTracking',{id,lat:t.lat,lng:t.lng,accuracy:t.accuracy}).catch(()=>{});}
-function startLiveGps(id){if(!navigator.geolocation){toast('GPS is not available on this device.');return}stopLiveGps();gpsBookingId=id;navigator.geolocation.getCurrentPosition(pos=>{saveGpsPoint(id,pos);toast('GPS started. Client tracking now shows technician location.')},()=>toast('GPS permission was not granted.'),{enableHighAccuracy:true,timeout:12000,maximumAge:30000});gpsWatchId=navigator.geolocation.watchPosition(pos=>saveGpsPoint(id,pos),()=>{}, {enableHighAccuracy:true,maximumAge:15000,timeout:20000});}
-function stopLiveGps(){if(gpsWatchId!==null&&navigator.geolocation){navigator.geolocation.clearWatch(gpsWatchId)}gpsWatchId=null;gpsBookingId='';}
-async function markPaymentDue(id){updateBooking(id,{status:'Payment Required',balanceAction:'Due Now'});await syncApi('updateBookingStatus',{id,status:'Payment Required',balanceAction:'Due Now'});toast('Balance marked Due Now. Customer tracking will show payment required.')}
-async function complete(id){stopLiveGps();updateBooking(id,{status:'Completed',completedAt:new Date().toISOString(),balanceAction:'After Completion'});await syncApi('completeService',{id,balanceAction:'After Completion'});toast('Service completed and final receipt action triggered.')}
-async function startByCode(raw){
-  const token=scanToken(raw);
-  if(!token){toast('Scan the customer QR or upload a clear QR photo.');return}
-  const b=findBookingFromScan(raw);
-  if(!b){toast('Secure QR token not found. A plain booking ID cannot start service.');return}
-  if(String(b.status||'')==='Completed'){showCompletedQrReceipt(b);toast('Completed QR is receipt-only now.');return}
-  let res=null;
-  try{res=await api('validateQrStartService',{qr:token})}catch(e){toast('Could not validate QR with the server. Try again.');return}
-  if(res&&res.completed){showCompletedQrReceipt(res.receipt||b);toast('Completed QR is receipt-only now.');return}
-  if(res&&res.ok===false){toast(res.error||'QR could not start service.');return}
-  data.qrLogs=[{id:'QR-'+Date.now(),bookingId:b.id,result:'Service started by secure QR scan',at:new Date().toLocaleString()},...(data.qrLogs||[])];
-  updateBooking(b.id,{status:'Service Started',startedAt:new Date().toISOString(),qrStarted:true});
-  toast('Secure QR validated. Service started and extras unlocked.');
-  show('bookings');
-  openBooking(b.id);
-}
-async function openCamera(){
-  const wrap=$('#videoWrap');
-  try{
-    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('Camera not available. Upload a QR photo instead.');return}
-    stopCamera();
-    const constraints=[{video:{facingMode:{ideal:'environment'}},audio:false},{video:true,audio:false}];
-    let lastError=null;
-    for(const c of constraints){try{stream=await navigator.mediaDevices.getUserMedia(c);break}catch(e){lastError=e}}
-    if(!stream)throw lastError||new Error('Camera unavailable');
-    wrap.innerHTML='<video id="qrVideo" autoplay playsinline muted></video><canvas id="qrCanvas" hidden></canvas>';
-    const video=$('#qrVideo');video.srcObject=stream;await video.play();
-    toast('Camera opened. Point it at the customer QR.');
-    if('BarcodeDetector' in window){try{detector=new BarcodeDetector({formats:['qr_code']})}catch(e){detector=null}}
-    runQrLoop();
-  }catch(e){toast('Camera permission failed. Upload a QR photo instead.')}
-}
-function runQrLoop(){
-  const scan=async()=>{
-    if(!stream)return;
-    const raw=await decodeQrFromVideo();
-    if(raw){stopCamera();startByCode(raw);return}
-    scanTimer=requestAnimationFrame(scan);
-  };
-  scanTimer=requestAnimationFrame(scan);
-}
-async function decodeQrFromVideo(){
-  const v=$('#qrVideo');if(!v||!v.videoWidth||!v.videoHeight)return '';
-  try{if(detector){const codes=await detector.detect(v);if(codes&&codes.length)return codes[0].rawValue||''}}catch(e){}
-  if(!window.jsQR)return '';
-  const c=$('#qrCanvas')||document.createElement('canvas');const ctx=c.getContext('2d',{willReadFrequently:true});
-  c.width=v.videoWidth;c.height=v.videoHeight;ctx.drawImage(v,0,0,c.width,c.height);
-  return decodeQrFromCanvas(c);
-}
-function decodeQrFromCanvas(canvas){
-  if(!window.jsQR)return '';
-  const ctx=canvas.getContext('2d',{willReadFrequently:true});const img=ctx.getImageData(0,0,canvas.width,canvas.height);
-  const code=window.jsQR(img.data,img.width,img.height,{inversionAttempts:'attemptBoth'});
-  return code&&code.data?code.data:'';
-}
-function stopCamera(){if(scanTimer){cancelAnimationFrame(scanTimer);clearInterval(scanTimer)}scanTimer=null;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}detector=null}
-async function decodeQrImageFile(file){
-  if(!file){return}
-  if(!window.jsQR){toast('QR image decoder is still loading. Try again in a second.');return}
-  const img=new Image();const url=URL.createObjectURL(file);
-  img.onload=()=>{try{const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);const raw=decodeQrFromCanvas(c);URL.revokeObjectURL(url);if(raw)startByCode(raw);else toast('No QR found in that image. Try a clearer photo.')}catch(e){toast('Could not read that QR image.')}};
-  img.onerror=()=>{URL.revokeObjectURL(url);toast('Could not load that image.')};img.src=url;
-}
-async function compressFile(file,max=1350,q=.78){return new Promise((resolve,reject)=>{const img=new Image();const rd=new FileReader();rd.onload=()=>{img.onload=()=>{let w=img.width,h=img.height;if(Math.max(w,h)>max){const r=max/Math.max(w,h);w=Math.round(w*r);h=Math.round(h*r)}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);resolve(c.toDataURL('image/jpeg',q));};img.onerror=reject;img.src=rd.result};rd.onerror=reject;rd.readAsDataURL(file)})}
-async function galleryFile(which,file){if(!file)return;try{galleryDraft[which]=await compressFile(file);const p=$('#galPreview');if(p)p.innerHTML=`${galleryDraft.mainImage?`<img src="${galleryDraft.mainImage}">`:''}${galleryDraft.secondImage?`<img src="${galleryDraft.secondImage}">`:''}`;}catch(e){toast('Could not read image.')}}
-async function savePackage(){const prices={};VEHICLES.forEach(v=>prices[v]=Number($('#price_'+v.replace(/[^a-z0-9]/gi,'_')).value||0));const id=edit.packageId||'pkg-'+Date.now();const obj={id,name:$('#pkgName').value||'Package',badge:$('#pkgBadge').value||'',duration:$('#pkgDuration').value||'',visible:$('#pkgVisible').value==='true',description:$('#pkgDescription').value||'',features:$('#pkgFeatures').value.split('\n').map(x=>x.trim()).filter(Boolean),prices};const i=data.packages.findIndex(x=>x.id===id);if(i>=0)data.packages[i]=obj;else data.packages.push(obj);edit.packageId='';persistLocal();await syncApi('savePackages',{packagesJson:JSON.stringify(data.packages)});renderPackages();toast('Package saved.')}
-async function saveAddon(){const id=edit.addonId||'addon-'+Date.now();const obj={id,name:$('#addonName').value||'Add-on',category:$('#addonCategory').value||'',price:Number($('#addonPrice').value||0),label:$('#addonLabel').value||'',variable:$('#addonVariable').value==='true',visible:$('#addonVisible').value==='true',description:$('#addonDescription').value||''};const i=data.addons.findIndex(x=>x.id===id);if(i>=0)data.addons[i]=obj;else data.addons.push(obj);edit.addonId='';persistLocal();await syncApi('saveAddons',{addonsJson:JSON.stringify(data.addons)});renderAddons();toast('Add-on saved.')}
-async function saveGallery(){if(!galleryDraft.mainImage){toast('Add a main photo first.');return}const id=edit.galleryId||'gal-'+Date.now();const obj={id,title:$('#galTitle').value||'Detail Result',category:$('#galCategory').value||'Result',vehicle:$('#galVehicle').value||'',service:$('#galService').value||'',description:$('#galDescription').value||'',mode:$('#galMode').value,visible:$('#galVisible').value==='true',mainImage:galleryDraft.mainImage,secondImage:galleryDraft.secondImage};const i=data.gallery.findIndex(x=>x.id===id);if(i>=0)data.gallery[i]=obj;else data.gallery.unshift(obj);edit.galleryId='';galleryDraft={mainImage:'',secondImage:''};persistLocal();await syncApi('saveGallery',{galleryJson:JSON.stringify(data.gallery.map(x=>({...x,beforeFileId:x.beforeFileId||'',afterFileId:x.afterFileId||''})))});renderGallery();toast('Gallery result saved.')}
-async function saveStaff(){const id=edit.staffId||'S-'+Date.now();const obj={id,name:$('#staffName').value||'Staff',email:$('#staffEmail').value||'',role:$('#staffRole').value||'Detailer',services:$('#staffServices').value.split(',').map(x=>x.trim()).filter(Boolean),active:$('#staffActive').value==='true',permissions:$$('.staffPerm:checked').map(x=>x.value)};const i=data.staff.findIndex(x=>x.id===id);if(i>=0)data.staff[i]=obj;else data.staff.push(obj);edit.staffId='';persistLocal();await syncApi('saveStaff',{staffJson:JSON.stringify(data.staff)});renderStaff();toast('Staff saved.')}
-async function saveAvailability(){data.availability={days:$$('.availDay:checked').map(x=>x.value),startTime:$('#availStart').value,endTime:$('#availEnd').value,serviceAreaText:$('#serviceAreaText').value};persistLocal();await syncApi('saveAvailability',{availabilityJson:JSON.stringify(data.availability)});toast('Availability saved.')}
-async function saveSettings(){data.settings={...data.settings,businessName:$('#setBusiness').value,phone:$('#setPhone').value,email:$('#setEmail').value,instagramHandle:$('#setInstagramHandle').value,instagramUrl:$('#setInstagramUrl').value,googleReviewUrl:$('#setGoogleReviewUrl').value,serviceAreaText:$('#setServiceArea').value,depositRequired:$('#setDepositRequired').value==='true',depositPercent:Number($('#setDepositPercent').value||0),travelFeeDefault:Number($('#setTravelFee').value||0),defaultBalanceAction:$('#setBalanceAction').value,paymentNote:$('#setPaymentNote').value,paymentMethods:$$('.payMethod:checked').map(x=>x.value),zelleName:$('#setZelleName').value,zelleAccount:$('#setZelleAccount').value,stripePublishableKey:$('#setStripeKey').value,stripePaymentLink:$('#setStripeLink').value,squarePaymentLink:$('#setSquareLink').value,invoiceLink:$('#setInvoiceLink').value};persistLocal();await syncApi('saveSettings',{settingsJson:JSON.stringify(data.settings)});toast('Settings saved.')}
-async function saveCoupon(){const c={code:$('#couponCode').value.trim().toUpperCase(),type:$('#couponType').value,value:Number($('#couponValue').value||0),expires:$('#couponExpires').value,active:$('#couponActive').value==='true'};if(!c.code){toast('Enter a coupon code.');return}data.coupons.push(c);persistLocal();await syncApi('saveCoupons',{couponsJson:JSON.stringify(data.coupons)});renderCoupons();toast('Coupon added.')}
-async function propose(id){const date=$('#propDate').value,time=$('#propTime').value,reason=$('#propReason').value;if(!date||!time||!reason){toast('Add date, time and reason.');return}const proposal={date,time,reason,status:'pending',createdAt:new Date().toISOString()};updateBooking(id,{status:'Schedule Change Proposed',proposal});await syncApi('proposeSchedule',{id,date,time,reason});toast('Schedule option sent to customer tracking.')}
-async function addExtra(id){const b=data.bookings.find(x=>x.id===id);if(!b)return;if(!bookingQrStarted(b)){toast('Scan the customer QR first. Extras unlock only after arrival.');show('scanner');return}const name=$('#extraName').value||'Extra Service';const price=Number($('#extraPrice').value||0);b.addonNames=[...(b.addonNames||[]),name];b.total=Number(b.total||0)+price;b.balance=Number(b.balance||0)+price;b.status='Extra Services Added';updateBooking(id,b);const res=await syncApi('addExtraService',{id,addonName:name,price});if(res&&!res.ok)toast(res.error||'Extra service could not be saved.');else toast('Extra service added and balance updated.')}
-
-async function deleteBooking(id){
-  const b=data.bookings.find(x=>String(x.id)===String(id));
-  if(!b){toast('Booking not found.');return}
-  if(!confirm('Delete booking '+id+'? This removes the booking, service logs, tracking, QR logs, payment records and stored booking photos from Drive.'))return;
-  data.bookings=data.bookings.filter(x=>String(x.id)!==String(id));
-  data.tracking=(data.tracking||[]).filter(x=>String(x.bookingId)!==String(id));
-  data.qrLogs=(data.qrLogs||[]).filter(x=>String(x.bookingId)!==String(id));
-  persistLocal();
-  const modal=$('#bookingModal');if(modal)modal.classList.remove('open');
-  renderActive();
-  const res=await syncApi('deleteBooking',{id});
-  if(res&&res.ok)toast('Booking deleted everywhere. Related Sheet rows and stored Drive photos were removed.');
-}
-document.addEventListener('click',async e=>{
-  const btn=e.target.closest('button');
-  const tab=e.target.closest('[data-tab]')?.dataset.tab;
-  if(tab){await withButtonLoading(btn,'Opening',async()=>{show(tab);const m=$('#bookingModal');if(m)m.classList.remove('open');if(tab==='scanner')await openCamera();});return}
-  const fl=e.target.closest('[data-filter]')?.dataset.filter;if(fl){filter=fl;renderBookings();return}
-  const op=e.target.closest('[data-open-booking]')?.dataset.openBooking;if(op){openBooking(op);return}
-  const st=e.target.closest('[data-status]')?.dataset.status;if(st){const [id,status]=st.split('|');await withButtonLoading(btn,'Updating',()=>setStatus(id,status));return}
-  const due=e.target.closest('[data-payment-due]')?.dataset.paymentDue;if(due){await withButtonLoading(btn,'Saving',()=>markPaymentDue(due));return}
-  const comp=e.target.closest('[data-complete]')?.dataset.complete;if(comp){await withButtonLoading(btn,'Completing',()=>complete(comp));return}
-  const del=e.target.closest('[data-delete-booking]')?.dataset.deleteBooking;if(del){await withButtonLoading(btn,'Deleting',()=>deleteBooking(del));return}
-  if(e.target.id==='closeModal'||e.target.id==='bookingModal'){$('#bookingModal').classList.remove('open');return}
-  if(e.target.id==='openCameraBtn'){await withButtonLoading(btn,'Opening Camera',()=>openCamera());return}
-  if(e.target.id==='savePackageBtn'){await withButtonLoading(btn,'Saving Package',()=>savePackage());return}
-  if(e.target.id==='newPackageBtn'){edit.packageId='';renderPackages();return}
-  if(e.target.id==='clearPackageBtn'){edit.packageId='';renderPackages();return}
-  const ep=e.target.closest('[data-edit-package]')?.dataset.editPackage;if(ep){edit.packageId=ep;renderPackages();return}
-  const dp=e.target.closest('[data-delete-package]')?.dataset.deletePackage;if(dp){await withButtonLoading(btn,'Deleting',async()=>{data.packages=data.packages.filter(x=>x.id!==dp);persistLocal();await syncApi('savePackages',{packagesJson:JSON.stringify(data.packages)});renderPackages();toast('Package deleted.');});return}
-  if(e.target.id==='saveAddonBtn'){await withButtonLoading(btn,'Saving Add-on',()=>saveAddon());return}
-  if(e.target.id==='newAddonBtn'){edit.addonId='';renderAddons();return}
-  if(e.target.id==='clearAddonBtn'){edit.addonId='';renderAddons();return}
-  const ea=e.target.closest('[data-edit-addon]')?.dataset.editAddon;if(ea){edit.addonId=ea;renderAddons();return}
-  const da=e.target.closest('[data-delete-addon]')?.dataset.deleteAddon;if(da){await withButtonLoading(btn,'Deleting',async()=>{data.addons=data.addons.filter(x=>x.id!==da);persistLocal();await syncApi('saveAddons',{addonsJson:JSON.stringify(data.addons)});renderAddons();toast('Add-on deleted.');});return}
-  if(e.target.id==='saveGalleryBtn'){await withButtonLoading(btn,'Saving Gallery',()=>saveGallery());return}
-  if(e.target.id==='clearGalleryBtn'){edit.galleryId='';galleryDraft={mainImage:'',secondImage:''};renderGallery();return}
-  const eg=e.target.closest('[data-edit-gallery]')?.dataset.editGallery;if(eg){edit.galleryId=eg;renderGallery();return}
-  const dg=e.target.closest('[data-delete-gallery]')?.dataset.deleteGallery;if(dg){await withButtonLoading(btn,'Deleting',async()=>{data.gallery=data.gallery.filter(x=>x.id!==dg);persistLocal();await syncApi('saveGallery',{galleryJson:JSON.stringify(data.gallery.map(x=>({...x,beforeFileId:x.beforeFileId||'',afterFileId:x.afterFileId||''})))});renderGallery();toast('Gallery item deleted.');});return}
-  const rv=e.target.closest('[data-review]')?.dataset.review;if(rv){const [id,status]=rv.split('|');await withButtonLoading(btn,'Updating Review',async()=>{const r=data.reviews.find(x=>x.id===id);if(r){r.status=status;persistLocal();await syncApi('updateReviewStatus',{id,status});renderReviews();}});return}
-  const fr=e.target.closest('[data-feature-review]')?.dataset.featureReview;if(fr){await withButtonLoading(btn,'Updating Review',async()=>{const r=data.reviews.find(x=>x.id===fr);if(r){r.featured=!r.featured;persistLocal();await syncApi('saveReviews',{reviewsJson:JSON.stringify(data.reviews)});renderReviews();}});return}
-  if(e.target.id==='addCouponBtn'){await withButtonLoading(btn,'Saving Coupon',()=>saveCoupon());return}
-  const dc=e.target.closest('[data-delete-coupon]')?.dataset.deleteCoupon;if(dc!==undefined){await withButtonLoading(btn,'Deleting Coupon',async()=>{data.coupons.splice(Number(dc),1);persistLocal();await syncApi('saveCoupons',{couponsJson:JSON.stringify(data.coupons)});renderCoupons();toast('Coupon deleted.');});return}
-  if(e.target.id==='saveAvailabilityBtn'){await withButtonLoading(btn,'Saving Availability',()=>saveAvailability());return}
-  if(e.target.id==='saveStaffBtn'){await withButtonLoading(btn,'Saving Staff',()=>saveStaff());return}
-  if(e.target.id==='newStaffBtn'){edit.staffId='';renderStaff();return}
-  if(e.target.id==='clearStaffBtn'){edit.staffId='';renderStaff();return}
-  const es=e.target.closest('[data-edit-staff]')?.dataset.editStaff;if(es){edit.staffId=es;renderStaff();return}
-  const ds=e.target.closest('[data-delete-staff]')?.dataset.deleteStaff;if(ds){await withButtonLoading(btn,'Deleting Staff',async()=>{data.staff=data.staff.filter(x=>x.id!==ds);persistLocal();await syncApi('saveStaff',{staffJson:JSON.stringify(data.staff)});renderStaff();toast('Staff deleted.');});return}
-  if(e.target.id==='saveSettingsBtn'){await withButtonLoading(btn,'Saving Settings',()=>saveSettings());return}
-  const pr=e.target.closest('[data-propose]')?.dataset.propose;if(pr){await withButtonLoading(btn,'Sending Schedule',()=>propose(pr));return}
-  const ex=e.target.closest('[data-extra]')?.dataset.extra;if(ex){await withButtonLoading(btn,'Adding Extra',()=>addExtra(ex));return}
-  if(e.target.id==='refreshBtn'){await withButtonLoading(btn,'Refreshing',async()=>{await syncAdminData();renderActive();toast('Data refreshed.');});return}
-  if(e.target.id==='saveAllBtn'){await withButtonLoading(btn,'Saving',async()=>{if(active==='settings')await saveSettings();else if(active==='availability')await saveAvailability();else {persistLocal();toast('Saved locally for demo.')}});return}
-});
-document.addEventListener('change',e=>{if(e.target.id==='galMainFile')galleryFile('mainImage',e.target.files[0]);if(e.target.id==='galSecondFile')galleryFile('secondImage',e.target.files[0]);if(e.target.id==='qrPhotoInput')decodeQrImageFile(e.target.files[0]);});
-function formIsFocused(){const el=document.activeElement;return !!(el&&['INPUT','TEXTAREA','SELECT'].includes(el.tagName));}
-async function syncAdminData(){if(!API_ENABLED)return;try{const res=await api('getAdminData');if(res&&res.ok){data={...data,...res};hydrate();if(!formIsFocused())renderActive();}}catch(e){console.warn('Admin API sync skipped:',e&&e.message?e.message:e);}}
-function load(){hydrate();renderTabs();renderActive();toast('Demo ready.');setTimeout(syncAdminData,250);}
-load();
-</script>
-</body>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="logo">
+          <div class="shield">🛡</div>
+          <div class="brand"><b>AUTO ARMOR</b><span>DEMO CONTROL</span></div>
+        </div>
+        <nav class="tabs" id="tabs"></nav>
+        <div class="quick">
+          <button class="ghost" id="refreshBtn">Refresh Data</button>
+        </div>
+      </aside>
+      <section class="main">
+        <header class="topbar">
+          <div>
+            <h1 id="pageTitle">Dashboard</h1>
+            <p>No password for demo. Customer page stays separate.</p>
+          </div>
+          <div class="top-actions">
+            <button class="primary" data-tab="scanner">Scan QR</button
+            ><button class="ghost" id="saveAllBtn">Save Current Section</button>
+          </div>
+        </header>
+        <main class="content">
+          <section id="dashboardView" class="view active"></section>
+          <section id="bookingsView" class="view"></section>
+          <section id="scannerView" class="view"></section>
+          <section id="packagesView" class="view"></section>
+          <section id="addonsView" class="view"></section>
+          <section id="galleryView" class="view"></section>
+          <section id="reviewsView" class="view"></section>
+          <section id="couponsView" class="view"></section>
+          <section id="availabilityView" class="view"></section>
+          <section id="staffView" class="view"></section>
+          <section id="settingsView" class="view"></section>
+        </main>
+      </section>
+    </div>
+    <div class="modal" id="bookingModal">
+      <div class="modal-box panel">
+        <div class="inner" id="bookingDetail"></div>
+      </div>
+    </div>
+    <div class="toast" id="toast"></div>
+    <script>
+      const API_URL =
+        "https://script.google.com/macros/s/AKfycbz5MfcLAb7X0xLrqVkMwcLQ0EAawxQz1rlIDqqalNpkjspiuTIgF6WMdXp4ZP-x3MiauA/exec";
+      const TABS = [
+        ["dashboard", "Dashboard"],
+        ["bookings", "Bookings"],
+        ["packages", "Packages"],
+        ["addons", "Add-ons"],
+        ["gallery", "Gallery"],
+        ["reviews", "Reviews"],
+        ["coupons", "Coupons"],
+        ["availability", "Availability"],
+        ["staff", "Staff"],
+        ["settings", "Settings"],
+      ];
+      const VEHICLES = [
+        "Sedan",
+        "Small SUV",
+        "Large SUV / Truck",
+        "Large Truck",
+        "Motorcycle",
+        "RV",
+        "Boat / Trailer",
+      ];
+      const DAYS = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ];
+      const PERMISSIONS = [
+        "View Bookings",
+        "Update Status",
+        "Scan QR",
+        "Add Extras",
+        "Complete Jobs",
+        "Manage Gallery",
+        "Manage Reviews",
+        "Manage Prices",
+        "Manage Staff",
+        "Settings",
+      ];
+      const $ = (s) => document.querySelector(s);
+      const $$ = (s) => Array.from(document.querySelectorAll(s));
+      let active = "dashboard",
+        filter = "All",
+        selectedId = "",
+        stream = null,
+        detector = null,
+        scanTimer = null,
+        scannedBookingId = "",
+        gpsWatchId = null,
+        gpsBookingId = "",
+        gpsLastSent = 0;
+      let edit = { packageId: "", addonId: "", staffId: "", galleryId: "" };
+      let galleryDraft = { mainImage: "", secondImage: "" };
+      let data = {
+        bookings: [],
+        packages: [],
+        addons: [],
+        gallery: [],
+        reviews: [],
+        coupons: [],
+        availability: {
+          days: [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+          ],
+          startTime: "08:00",
+          endTime: "17:00",
+          serviceAreaText: "Jacksonville & surrounding areas",
+        },
+        staff: [],
+        settings: {
+          businessName: "Auto Armor Mobile Detailing",
+          phone: "904-601-8480",
+          email: "autoarmor@example.com",
+          instagramHandle: "@autoarmor.de",
+          instagramUrl: "https://www.instagram.com/autoarmor.de",
+          googleReviewUrl: "#",
+          serviceAreaText: "Jacksonville & surrounding areas",
+          travelFeeDefault: 15,
+          depositPercent: 10,
+          depositRequired: true,
+          paymentMethods: ["Cash", "Zelle", "Stripe"],
+          stripeEnabled: false,
+          stripePublishableKey: "",
+          stripePaymentLink: "",
+          squareEnabled: false,
+          squarePaymentLink: "",
+          zelleName: "Auto Armor",
+          zelleAccount: "904-601-8480",
+          cashApp: "",
+          venmo: "",
+          invoiceLink: "",
+          defaultBalanceAction: "After Completion",
+          paymentNote: "Deposit applies to final balance.",
+        },
+        tracking: [],
+        qrLogs: [],
+        payments: [],
+      };
+      const seedPackages = [
+        {
+          id: "basic",
+          name: "Basic Refresh",
+          badge: "Routine Maintenance",
+          description: "Perfect for maintenance cleaning.",
+          duration: "1.5–2 hours",
+          visible: true,
+          featured: false,
+          premium: false,
+          features: [
+            "Exterior hand wash",
+            "Wheels & tire shine",
+            "Quick interior vacuum",
+            "Dash & surface wipe down",
+            "Interior windows",
+          ],
+          prices: {
+            Sedan: 99,
+            "Small SUV": 119,
+            "Large SUV / Truck": 139,
+            "Large Truck": 159,
+            Motorcycle: 79,
+            RV: 0,
+            "Boat / Trailer": 0,
+          },
+        },
+        {
+          id: "full",
+          name: "Full Detail",
+          badge: "Most Popular",
+          description: "The most requested inside-and-out detail.",
+          duration: "3–4 hours",
+          visible: true,
+          featured: true,
+          premium: false,
+          features: [
+            "Everything in Basic Refresh",
+            "Deep interior vacuum",
+            "Door jambs cleaned",
+            "Interior UV protectant",
+            "Premium spray wax",
+            "Trim & tire shine",
+          ],
+          prices: {
+            Sedan: 179,
+            "Small SUV": 199,
+            "Large SUV / Truck": 229,
+            "Large Truck": 249,
+            Motorcycle: 129,
+            RV: 0,
+            "Boat / Trailer": 0,
+          },
+        },
+        {
+          id: "premium",
+          name: "Premium Detail",
+          badge: "Showroom Level Clean",
+          description: "Premium detail built for a luxury finish.",
+          duration: "5–6 hours",
+          visible: true,
+          featured: false,
+          premium: true,
+          features: [
+            "Everything in Full Detail",
+            "Shampoo seats & carpets",
+            "Leather cleaning & conditioning",
+            "Clay bar treatment",
+            "Light engine bay cleaning",
+          ],
+          prices: {
+            Sedan: 249,
+            "Small SUV": 279,
+            "Large SUV / Truck": 299,
+            "Large Truck": 349,
+            Motorcycle: 179,
+            RV: 0,
+            "Boat / Trailer": 0,
+          },
+        },
+        {
+          id: "specialty",
+          name: "Specialty Vehicle",
+          badge: "Request Quote",
+          description: "Motorcycles, RVs, boats, trailers and custom work.",
+          duration: "Manual review",
+          visible: true,
+          featured: false,
+          premium: false,
+          features: [
+            "Photo-based estimate",
+            "Oversized vehicle review",
+            "Custom service plan",
+            "Final price confirmed before service",
+          ],
+          prices: {
+            Sedan: 0,
+            "Small SUV": 0,
+            "Large SUV / Truck": 0,
+            "Large Truck": 0,
+            Motorcycle: 175,
+            RV: 300,
+            "Boat / Trailer": 0,
+          },
+        },
+      ];
+      const seedAddons = [
+        {
+          id: "pet",
+          name: "Pet Hair Removal",
+          description: "Deep removal from seats, carpet and cargo areas.",
+          price: 25,
+          label: "$25–$75",
+          variable: true,
+          requiresConfirm: true,
+          visible: true,
+          category: "Interior",
+        },
+        {
+          id: "stain",
+          name: "Stain Removal",
+          description: "Spot treatment for seats and carpet stains.",
+          price: 25,
+          label: "$25+",
+          variable: true,
+          requiresConfirm: true,
+          visible: true,
+          category: "Interior",
+        },
+        {
+          id: "odor",
+          name: "Odor Elimination",
+          description: "Treatment for smoke, food, pets or moisture smells.",
+          price: 50,
+          label: "$50",
+          variable: false,
+          requiresConfirm: false,
+          visible: true,
+          category: "Interior",
+        },
+        {
+          id: "headlight",
+          name: "Headlight Restoration",
+          description: "Restore faded headlights.",
+          price: 75,
+          label: "$75",
+          variable: false,
+          requiresConfirm: false,
+          visible: true,
+          category: "Exterior",
+        },
+        {
+          id: "engine",
+          name: "Engine Bay Detail",
+          description: "Light engine bay cleaning and dressing.",
+          price: 50,
+          label: "$50",
+          variable: false,
+          requiresConfirm: false,
+          visible: true,
+          category: "Exterior",
+        },
+        {
+          id: "wax",
+          name: "Wax Protection",
+          description: "Added paint protection and gloss.",
+          price: 100,
+          label: "Starting at $100",
+          variable: true,
+          requiresConfirm: false,
+          visible: true,
+          category: "Protection",
+        },
+        {
+          id: "ceramic",
+          name: "Ceramic Coating",
+          description: "Premium paint protection.",
+          price: 250,
+          label: "Starting at $250",
+          variable: true,
+          requiresConfirm: true,
+          visible: true,
+          category: "Protection",
+        },
+        {
+          id: "paint",
+          name: "Paint Correction",
+          description: "Machine polishing and defect reduction.",
+          price: 300,
+          label: "Starting at $300",
+          variable: true,
+          requiresConfirm: true,
+          visible: true,
+          category: "Correction",
+        },
+      ];
+      const seedReviews = [
+        {
+          id: "r1",
+          name: "Marcus T.",
+          rating: 5,
+          service: "Full Detail",
+          text: "The SUV looked brand new inside. Booking was easy and they came right to my driveway.",
+          status: "approved",
+          featured: true,
+        },
+        {
+          id: "r2",
+          name: "Ashley R.",
+          rating: 5,
+          service: "Premium Detail",
+          text: "The before and after was crazy. Seats, carpets and wheels came out much better than expected.",
+          status: "approved",
+          featured: true,
+        },
+      ];
+      const seedStaff = [
+        {
+          id: "S-1001",
+          name: "Owner",
+          email: "owner@example.com",
+          role: "Owner",
+          services: ["All"],
+          days: [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+          ],
+          active: true,
+          permissions: PERMISSIONS.slice(),
+        },
+      ];
+      function escapeHtml(v) {
+        return String(v ?? "").replace(
+          /[&<>"']/g,
+          (m) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[m],
+        );
+      }
+      function money(n) {
+        n = Number(n || 0);
+        return n ? "$" + n.toFixed(0) : "Quote";
+      }
+      function readLS(k, f) {
+        try {
+          return JSON.parse(localStorage.getItem(k) || "") || f;
+        } catch (e) {
+          return f;
+        }
+      }
+      function writeLS(k, v) {
+        try {
+          localStorage.setItem(k, JSON.stringify(v));
+        } catch (e) {
+          toast("Storage is full. Use fewer large photos for this demo.");
+        }
+      }
+      function api(action, params = {}) {
+        return new Promise((resolve, reject) => {
+          if (!API_URL) {
+            reject(new Error("missing api"));
+            return;
+          }
+          const cb = "aa_admin_" + Math.random().toString(36).slice(2);
+          const q = new URLSearchParams({ action, callback: cb, ...params });
+          const s = document.createElement("script");
+          let done = false;
+          const timer = setTimeout(() => {
+            if (done) return;
+            done = true;
+            window[cb] = function () {};
+            setTimeout(() => {
+              try {
+                delete window[cb];
+              } catch (e) {}
+            }, 60000);
+            s.remove();
+            reject(new Error("API timeout"));
+          }, 30000);
+          window[cb] = (res) => {
+            if (done) return;
+            done = true;
+            clearTimeout(timer);
+            try {
+              delete window[cb];
+            } catch (e) {}
+            s.remove();
+            resolve(res);
+          };
+          s.onerror = () => {
+            if (done) return;
+            done = true;
+            clearTimeout(timer);
+            window[cb] = function () {};
+            setTimeout(() => {
+              try {
+                delete window[cb];
+              } catch (e) {}
+            }, 60000);
+            s.remove();
+            reject(new Error("API network error"));
+          };
+          s.src = API_URL + "?" + q.toString();
+          document.body.appendChild(s);
+        });
+      }
+      function toast(msg) {
+        const t = $("#toast");
+        t.textContent = msg;
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 2600);
+      }
+      function hydrate() {
+        data.bookings = mergeById(
+          data.bookings || [],
+          readLS("aa_bookings_demo", []),
+        );
+        data.packages = data.packages?.length
+          ? data.packages
+          : readLS("aa_packages_demo", seedPackages);
+        data.addons = data.addons?.length
+          ? data.addons
+          : readLS("aa_addons_demo", seedAddons);
+        data.gallery = readLS("aa_gallery_custom", data.gallery || []);
+        data.reviews = data.reviews?.length
+          ? data.reviews
+          : readLS("aa_reviews_demo", seedReviews);
+        data.coupons = data.coupons?.length
+          ? data.coupons
+          : readLS("aa_coupons_demo", [
+              {
+                code: "FIRST20",
+                type: "Percent",
+                value: 20,
+                minPackage: "",
+                expires: "",
+                limit: 0,
+                active: true,
+              },
+              {
+                code: "FULL149",
+                type: "Fixed Sedan Full Detail",
+                value: 149,
+                minPackage: "full",
+                expires: "",
+                limit: 0,
+                active: true,
+              },
+            ]);
+        data.staff = data.staff?.length
+          ? data.staff
+          : readLS("aa_staff_demo", seedStaff);
+        data.settings = { ...data.settings, ...readLS("aa_settings_demo", {}) };
+        data.availability = {
+          ...data.availability,
+          ...readLS("aa_availability_demo", {}),
+        };
+      }
+      function mergeById(a, b) {
+        const map = new Map();
+        [...a, ...b].forEach(
+          (x) =>
+            x &&
+            x.id &&
+            map.set(String(x.id), { ...(map.get(String(x.id)) || {}), ...x }),
+        );
+        return [...map.values()].sort((x, y) =>
+          String(y.id).localeCompare(String(x.id)),
+        );
+      }
+      function persistLocal() {
+        writeLS("aa_bookings_demo", data.bookings);
+        writeLS("aa_packages_demo", data.packages);
+        writeLS("aa_addons_demo", data.addons);
+        writeLS("aa_gallery_custom", data.gallery);
+        writeLS("aa_reviews_demo", data.reviews);
+        writeLS("aa_coupons_demo", data.coupons);
+        writeLS("aa_staff_demo", data.staff);
+        writeLS("aa_settings_demo", data.settings);
+        writeLS("aa_availability_demo", data.availability);
+      }
+      function renderTabs() {
+        $("#tabs").innerHTML = TABS.map(
+          (t) =>
+            `<button class="tab ${active === t[0] ? "active" : ""}" data-tab="${t[0]}">${t[1]}</button>`,
+        ).join("");
+      }
+      function show(tab) {
+        active = tab;
+        $$(".view").forEach((v) => v.classList.remove("active"));
+        $("#" + tab + "View").classList.add("active");
+        $("#pageTitle").textContent =
+          TABS.find((t) => t[0] === tab)?.[1] || "Control";
+        renderTabs();
+        renderActive();
+      }
+      function renderActive() {
+        if (active === "dashboard") renderDashboard();
+        if (active === "bookings") renderBookings();
+        if (active === "scanner") renderScanner();
+        if (active === "packages") renderPackages();
+        if (active === "addons") renderAddons();
+        if (active === "gallery") renderGallery();
+        if (active === "reviews") renderReviews();
+        if (active === "coupons") renderCoupons();
+        if (active === "availability") renderAvailability();
+        if (active === "staff") renderStaff();
+        if (active === "settings") renderSettings();
+      }
+      function badgeStatus(s) {
+        let cls = /Completed/.test(s)
+          ? "green"
+          : /Cancel/.test(s)
+            ? "red"
+            : /Proposed|Payment/.test(s)
+              ? "gold"
+              : /Started|On The Way/.test(s)
+                ? "purple"
+                : "";
+        return `<span class="badge ${cls}">${escapeHtml(s || "Request Received")}</span>`;
+      }
+      function renderDashboard() {
+        const b = data.bookings;
+        const rev = b
+          .filter((x) => x.status === "Completed")
+          .reduce((s, x) => s + Number(x.total || 0), 0);
+        const stats = [
+          ["Today", b.length],
+          [
+            "Pending",
+            b.filter((x) => /Request|Pending|Proposed/.test(x.status || ""))
+              .length,
+          ],
+          [
+            "Confirmed",
+            b.filter((x) => /Confirmed|Scheduled/.test(x.status || "")).length,
+          ],
+          [
+            "In Progress",
+            b.filter((x) => /On The Way|Started/.test(x.status || "")).length,
+          ],
+          ["Completed", b.filter((x) => x.status === "Completed").length],
+          ["Revenue", money(rev)],
+        ];
+        $("#dashboardView").innerHTML =
+          `<div class="grid three">${stats.map((s) => `<div class="panel stat"><div class="inner"><span>${s[0]}</span><b>${s[1]}</b></div></div>`).join("")}</div><div style="height:16px"></div><div class="panel"><div class="inner"><div class="section-head"><div><h2>Jobs Today</h2><p>Quick actions without opening a long admin page.</p></div><button class="primary" data-tab="bookings">View Bookings</button></div><div class="list">${b.slice(0, 5).map(bookingCard).join("") || '<p class="small-text">No bookings yet.</p>'}</div></div></div>`;
+      }
+      function bookingCard(b) {
+        return `<article class="booking-card"><div><h3>${escapeHtml(b.customerName || "Customer")} ${badgeStatus(b.status)}</h3><p>${escapeHtml(b.vehicleInfo || b.vehicleType || "Vehicle")} • ${escapeHtml(b.packageName || "Package")}<br>${escapeHtml(b.appointmentDate || "Date pending")} ${escapeHtml(b.appointmentTime || "")} • ${escapeHtml(b.address || "Address pending")}</p></div><div><p><b>Total:</b> ${money(b.total)}<br><b>Balance:</b> ${money(b.balance)}<br><b>Payment:</b> ${escapeHtml(b.balanceAction || "Not requested")}</p></div><div class="actions"><button class="ghost mini" data-open-booking="${b.id}">Open</button><button class="ok mini" data-status="${b.id}|Price Confirmed">Confirm</button><button class="primary mini" data-status="${b.id}|Technician On The Way">On The Way</button><button class="gold mini" data-payment-due="${b.id}">Due Now</button></div></article>`;
+      }
+      function renderBookings() {
+        const statuses = [
+          "All",
+          "Request Received",
+          "Price Confirmed",
+          "Appointment Scheduled",
+          "Schedule Change Proposed",
+          "Technician On The Way",
+          "Service Started",
+          "Payment Required",
+          "Completed",
+          "Canceled",
+        ];
+        let list = data.bookings.filter(
+          (b) => filter === "All" || b.status === filter,
+        );
+        $("#bookingsView").innerHTML =
+          `<div class="section-head"><div><h2>Bookings</h2><p>Manage quotes, schedule changes, GPS status, on-site extras, balance due and final receipt.</p></div></div><div class="filters">${statuses.map((s) => `<button class="filter ${filter === s ? "active" : ""}" data-filter="${s}">${s}</button>`).join("")}</div><div class="list">${list.map(bookingCard).join("") || '<div class="notice">No bookings under this filter.</div>'}</div>`;
+      }
+      function renderScanner() {
+        const logs = (data.qrLogs || []).slice(0, 8);
+        const scannedPanel = scannerServiceHtml();
+        const gpsLabel = gpsWatchId ? "Stop GPS Sharing" : "GPS Off";
+        $("#scannerView").innerHTML =
+          `<div class="section-head"><div><h2>QR Scanner</h2><p>One scanner for any appointment. Open the camera on arrival, scan the customer's secure QR, review the service, add approved extras, then complete the job here.</p></div><div class="drawer-actions"><button class="primary" id="openCameraBtn">Open Camera</button><button class="ghost" id="stopCameraBtn">Turn Camera Off</button><button class="danger" id="stopGpsBtn">${gpsLabel}</button></div></div><div class="scanner-box"><div class="panel"><div class="inner"><div class="video-wrap" id="videoWrap"><p class="small-text">Camera preview will appear here. The camera stays off until you press Open Camera.</p></div><div class="notice" style="margin-top:12px">For privacy, the camera and GPS can be turned off manually. GPS also stops automatically when the service is completed or canceled.</div></div></div><div class="panel"><div class="inner"><h3>Scanned Appointment</h3><div id="scannedServiceHost">${scannedPanel}</div></div></div></div><div style="height:16px"></div><div class="panel"><div class="inner"><h3>Scan Log</h3><div class="log">${logs.map((l) => `<div class="notice"><b>${escapeHtml(l.bookingId || "QR")}</b><br>${escapeHtml(l.result || "Scanned")} • ${escapeHtml(l.at || l.createdAt || "")}</div>`).join("") || '<p class="small-text">No scans yet.</p>'}</div></div></div>`;
+      }
+      function scannerServiceHtml() {
+        const b = data.bookings.find((x) => String(x.id) === String(scannedBookingId));
+        if (!b) return `<p class="small-text">No appointment scanned yet. Scan the secure QR from the customer's confirmation email to start the service.</p>`;
+        const extras = (b.addonNames || []).join(", ") || "None";
+        const completed = String(b.status || "") === "Completed";
+        const totals = `<div class="price-line"><span>Total</span><b>${money(b.total)}</b></div><div class="price-line"><span>Deposit</span><b>${money(b.depositPaid)}</b></div><div class="price-line"><span>Balance</span><b>${money(b.balance)}</b></div>`;
+        if (completed) {
+          return `<span class="badge gold">Final Receipt Only</span><h3>${escapeHtml(b.customerName || "Customer")}</h3><p class="small-text">This appointment is completed. The QR can only show the customer's final receipt now.</p><div class="notice"><b>Confirmation:</b> ${escapeHtml(b.id)}<br><b>Package:</b> ${escapeHtml(b.packageName || "")}<br><b>Vehicle:</b> ${escapeHtml(b.vehicleInfo || b.vehicleType || "")}<br><b>Extras:</b> ${escapeHtml(extras)}</div><div style="height:10px"></div>${totals}`;
+        }
+        return `<span class="badge green">Service Started By QR</span><h3>${escapeHtml(b.customerName || "Customer")}</h3><p class="small-text">${escapeHtml(b.vehicleInfo || b.vehicleType || "Vehicle")} • ${escapeHtml(b.packageName || "Package")}<br>${escapeHtml(b.appointmentDate || "Date pending")} ${escapeHtml(b.appointmentTime || "")}</p><div class="notice"><b>Requested service:</b> ${escapeHtml(b.packageName || "")}<br><b>Current extras:</b> ${escapeHtml(extras)}<br><b>Balance action:</b> ${escapeHtml(b.balanceAction || "Not requested")}</div><div style="height:12px"></div>${totals}<div style="height:14px"></div><div class="field-grid"><div class="field"><label>Approved Extra Service</label><input id="scannerExtraName" placeholder="Pet Hair Removal"></div><div class="field"><label>Extra Price</label><input id="scannerExtraPrice" type="number" value="50"></div></div><div class="drawer-actions"><button class="primary" data-scanner-extra="${b.id}">Add Approved Extra</button><button class="gold" data-payment-due="${b.id}">Balance Due Now</button><button class="ok" data-complete="${b.id}">Complete & Send Final Receipt</button></div><p class="small-text" style="margin-top:10px">If an extra is added on site, the final receipt is updated with the new total. The customer and owner can agree on how the extra balance will be paid.</p>`;
+      }
+      function packageCard(p) {
+        const prices = VEHICLES.map(
+          (v) =>
+            `<div class="price-line"><span>${v}</span><b>${money((p.prices || {})[v])}</b></div>`,
+        ).join("");
+        return `<article class="card pkg-card"><div class="inner"><div class="pkg-top"><div><span class="badge ${p.featured ? "green" : p.premium ? "purple" : ""}">${escapeHtml(p.badge || "Package")}</span><h3>${escapeHtml(p.name)}</h3><p class="small-text">${escapeHtml(p.description || "")}</p></div><div class="actions"><button class="ghost mini" data-edit-package="${p.id}">Edit</button><button class="danger mini" data-delete-package="${p.id}">Delete</button></div></div><div class="prices">${prices}</div><div class="features">${(p.features || []).map((f) => `<div class="feature"><i>✓</i><span>${escapeHtml(f)}</span></div>`).join("")}</div></div></article>`;
+      }
+      function renderPackages() {
+        const p = edit.packageId
+          ? data.packages.find((x) => x.id === edit.packageId)
+          : null;
+        $("#packagesView").innerHTML =
+          `<div class="section-head"><div><h2>Packages</h2><p>Cards match the customer page logic. Edit prices without touching code.</p></div><button class="primary" id="newPackageBtn">New Package</button></div><div class="pkg-grid">${data.packages.map(packageCard).join("")}</div><div style="height:16px"></div><div class="panel"><div class="inner"><h3>${p ? "Edit Package" : "Package Editor"}</h3>${packageForm(p)}</div></div>`;
+      }
+      function packageForm(p = {}) {
+        p = p || {};
+        return `<div class="field-grid"><div class="field"><label>Name</label><input id="pkgName" value="${escapeHtml(p.name || "")}"></div><div class="field"><label>Badge</label><input id="pkgBadge" value="${escapeHtml(p.badge || "")}"></div><div class="field"><label>Duration</label><input id="pkgDuration" value="${escapeHtml(p.duration || "")}"></div><div class="field"><label>Visible</label><select id="pkgVisible"><option value="true">Visible</option><option value="false">Hidden</option></select></div><div class="field wide"><label>Description</label><textarea id="pkgDescription">${escapeHtml(p.description || "")}</textarea></div>${VEHICLES.map((v) => `<div class="field"><label>${v} Price</label><input id="price_${v.replace(/[^a-z0-9]/gi, "_")}" type="number" value="${Number((p.prices || {})[v] || 0)}"></div>`).join("")}<div class="field wide"><label>Included Services, one per line</label><textarea id="pkgFeatures">${escapeHtml((p.features || []).join("\n"))}</textarea></div></div><div class="drawer-actions"><button class="primary" id="savePackageBtn">${p.id ? "Update Package" : "Save Package"}</button>${p.id ? '<button class="ghost" id="clearPackageBtn">Cancel Edit</button>' : ""}</div>`;
+      }
+      function renderAddons() {
+        const a = edit.addonId
+          ? data.addons.find((x) => x.id === edit.addonId)
+          : null;
+        $("#addonsView").innerHTML =
+          `<div class="section-head"><div><h2>Add-ons</h2><p>Manage extras that can be selected by the customer or added on site.</p></div><button class="primary" id="newAddonBtn">New Add-on</button></div><div class="grid three">${data.addons.map((a) => `<article class="card"><div class="inner"><span class="badge">${escapeHtml(a.category || "Add-on")}</span><h3>${escapeHtml(a.name)}</h3><p class="small-text">${escapeHtml(a.description || "")}</p><h3>${escapeHtml(a.label || money(a.price))}</h3><div class="actions"><button class="ghost mini" data-edit-addon="${a.id}">Edit</button><button class="danger mini" data-delete-addon="${a.id}">Delete</button></div></div></article>`).join("")}</div><div style="height:16px"></div><div class="panel"><div class="inner"><h3>${a ? "Edit Add-on" : "Add-on Editor"}</h3>${addonForm(a)}</div></div>`;
+      }
+      function addonForm(a = {}) {
+        a = a || {};
+        return `<div class="field-grid"><div class="field"><label>Name</label><input id="addonName" value="${escapeHtml(a.name || "")}"></div><div class="field"><label>Category</label><input id="addonCategory" value="${escapeHtml(a.category || "")}"></div><div class="field"><label>Base Price</label><input id="addonPrice" type="number" value="${Number(a.price || 0)}"></div><div class="field"><label>Label</label><input id="addonLabel" value="${escapeHtml(a.label || "")}"></div><div class="field"><label>Variable Price</label><select id="addonVariable"><option value="false">No</option><option value="true">Yes</option></select></div><div class="field"><label>Visible</label><select id="addonVisible"><option value="true">Visible</option><option value="false">Hidden</option></select></div><div class="field wide"><label>Description</label><textarea id="addonDescription">${escapeHtml(a.description || "")}</textarea></div></div><div class="drawer-actions"><button class="primary" id="saveAddonBtn">${a.id ? "Update Add-on" : "Save Add-on"}</button>${a.id ? '<button class="ghost" id="clearAddonBtn">Cancel Edit</button>' : ""}</div>`;
+      }
+      function renderGallery() {
+        const g = edit.galleryId
+          ? data.gallery.find((x) => x.id === edit.galleryId)
+          : null;
+        if (g) {
+          galleryDraft.mainImage =
+            g.mainImage || g.image || g.beforeFileId || "";
+          galleryDraft.secondImage = g.secondImage || g.afterFileId || "";
+        }
+        $("#galleryView").innerHTML =
+          `<div class="section-head"><div><h2>Gallery / Results</h2><p>Upload from phone gallery or take directly from the camera. No URL fields for customers or staff.</p></div></div><div class="panel"><div class="inner"><h3>${g ? "Edit Result" : "Create Result"}</h3><div class="field-grid"><div class="field"><label>Title</label><input id="galTitle" value="${escapeHtml(g?.title || "")}"></div><div class="field"><label>Category</label><select id="galCategory"><option>Interior</option><option>Exterior</option><option>Wheels</option><option>Seats</option><option>Engine Bay</option><option>Paint Correction</option><option>Premium Detail</option></select></div><div class="field"><label>Vehicle</label><input id="galVehicle" value="${escapeHtml(g?.vehicle || "")}"></div><div class="field"><label>Related Service</label><input id="galService" value="${escapeHtml(g?.service || "")}"></div><div class="field wide"><label>Description</label><textarea id="galDescription">${escapeHtml(g?.description || "")}</textarea></div><div class="field"><label>Photo Mode</label><select id="galMode"><option value="single">Single Result Photo</option><option value="pair">Before / After Pair</option></select></div><div class="field"><label>Visible On Customer Page</label><select id="galVisible"><option value="true">Visible</option><option value="false">Hidden</option></select></div></div><div style="height:14px"></div><div class="grid two"><div class="upload-box"><b>Main Photo</b><input id="galMainFile" type="file" accept="image/*" capture="environment"><p class="small-text">Choose from phone gallery or open camera.</p></div><div class="upload-box"><b>Second Photo Optional</b><input id="galSecondFile" type="file" accept="image/*" capture="environment"><p class="small-text">Use only when this result needs a before/after pair.</p></div></div><div style="height:12px"></div><div class="preview-grid" id="galPreview">${galleryDraft.mainImage ? `<img src="${galleryDraft.mainImage}">` : ""}${galleryDraft.secondImage ? `<img src="${galleryDraft.secondImage}">` : ""}</div><div class="drawer-actions"><button class="primary" id="saveGalleryBtn">${g ? "Update Result" : "Save Result"}</button>${g ? '<button class="ghost" id="clearGalleryBtn">Cancel Edit</button>' : ""}</div></div></div><div style="height:16px"></div><div class="gallery-grid">${data.gallery.map((x) => `<article class="card gallery-card"><img src="${x.mainImage || x.image || x.beforeFileId || ""}" onerror="this.style.display='none'" alt="${escapeHtml(x.title)}"><div class="inner"><span class="badge">${escapeHtml(x.category || "Result")}</span><h3>${escapeHtml(x.title)}</h3><p class="small-text">${escapeHtml(x.description || "")}</p><div class="actions"><button class="ghost mini" data-edit-gallery="${x.id}">Edit</button><button class="danger mini" data-delete-gallery="${x.id}">Delete</button></div></div></article>`).join("") || '<div class="notice">No gallery results yet.</div>'}</div>`;
+        if (g?.category) $("#galCategory").value = g.category;
+        if (g?.mode) $("#galMode").value = g.mode;
+        if (g?.visible === false) $("#galVisible").value = "false";
+      }
+      function renderReviews() {
+        const list = data.reviews;
+        $("#reviewsView").innerHTML =
+          `<div class="section-head"><div><h2>Reviews</h2><p>Approve, reject or feature reviews before they appear publicly.</p></div></div><div class="grid three">${list.map((r) => `<article class="card"><div class="inner"><span class="badge ${r.status === "approved" ? "green" : r.status === "rejected" ? "red" : "gold"}">${escapeHtml(r.status || "pending")}</span><h3>${"★".repeat(Number(r.rating || 5))}</h3><p class="small-text">“${escapeHtml(r.text)}”</p><b>${escapeHtml(r.name)}</b><p class="small-text">${escapeHtml(r.service || "Mobile Detail")}</p><div class="actions"><button class="ok mini" data-review="${r.id}|approved">Approve</button><button class="danger mini" data-review="${r.id}|rejected">Reject</button><button class="ghost mini" data-feature-review="${r.id}">${r.featured ? "Unfeature" : "Feature"}</button></div></div></article>`).join("")}</div>`;
+      }
+      function renderCoupons() {
+        $("#couponsView").innerHTML =
+          `<div class="section-head"><div><h2>Coupons</h2><p>Create codes like FIRST20 or FULL149.</p></div><button class="primary" id="addCouponBtn">Add Coupon</button></div><div class="list">${data.coupons.map((c, i) => `<div class="booking-card"><div><h3>${escapeHtml(c.code)} ${c.active !== false ? '<span class="badge green">Active</span>' : '<span class="badge red">Off</span>'}</h3><p>${escapeHtml(c.type)} • ${escapeHtml(c.value)} ${c.expires ? "• Expires " + escapeHtml(c.expires) : ""}</p></div><div></div><div class="actions"><button class="danger mini" data-delete-coupon="${i}">Delete</button></div></div>`).join("")}</div><div style="height:16px"></div><div class="panel"><div class="inner"><h3>Coupon Editor</h3><div class="field-grid"><div class="field"><label>Code</label><input id="couponCode" placeholder="FIRST20"></div><div class="field"><label>Type</label><select id="couponType"><option>Percent</option><option>Fixed Amount</option><option>Fixed Sedan Full Detail</option></select></div><div class="field"><label>Value</label><input id="couponValue" type="number" value="20"></div><div class="field"><label>Expiration</label><input id="couponExpires" type="date"></div><div class="field"><label>Active</label><select id="couponActive"><option value="true">Active</option><option value="false">Off</option></select></div></div></div></div>`;
+      }
+      function renderAvailability() {
+        const a = data.availability || {};
+        $("#availabilityView").innerHTML =
+          `<div class="section-head"><div><h2>Availability</h2><p>Mark working days and start/end hours. Service area stays general for Jacksonville.</p></div></div><div class="panel"><div class="inner"><div class="day-grid">${DAYS.map((d) => `<label class="check-row"><input type="checkbox" class="availDay" value="${d}" ${(a.days || []).includes(d) ? "checked" : ""}><span>${d}</span></label>`).join("")}</div><div style="height:16px"></div><div class="field-grid"><div class="field"><label>Start Time</label><input id="availStart" type="time" value="${escapeHtml(a.startTime || "08:00")}"></div><div class="field"><label>End Time</label><input id="availEnd" type="time" value="${escapeHtml(a.endTime || "17:00")}"></div><div class="field wide"><label>Service Area</label><input id="serviceAreaText" value="${escapeHtml(a.serviceAreaText || data.settings.serviceAreaText || "Jacksonville & surrounding areas")}"></div></div><div style="height:14px"></div><button class="primary" id="saveAvailabilityBtn">Save Availability</button></div></div>`;
+      }
+      function renderStaff() {
+        const s = edit.staffId
+          ? data.staff.find((x) => x.id === edit.staffId)
+          : null;
+        $("#staffView").innerHTML =
+          `<div class="section-head"><div><h2>Staff</h2><p>Edit existing staff without duplicating them. Assign permissions by role.</p></div><button class="primary" id="newStaffBtn">New Staff</button></div><div class="grid two"><div class="panel"><div class="inner"><h3>${s ? "Edit Staff" : "Staff Editor"}</h3>${staffForm(s)}</div></div><div class="list">${data.staff.map((x) => `<article class="booking-card"><div><h3>${escapeHtml(x.name)} ${x.active !== false ? '<span class="badge green">Active</span>' : '<span class="badge red">Off</span>'}</h3><p>${escapeHtml(x.role)} • ${escapeHtml(x.email)}<br>${(x.permissions || []).length} permissions</p></div><div></div><div class="actions"><button class="ghost mini" data-edit-staff="${x.id}">Edit</button><button class="danger mini" data-delete-staff="${x.id}">Delete</button></div></article>`).join("")}</div></div>`;
+      }
+      function staffForm(s = {}) {
+        s = s || {};
+        return `<div class="field-grid"><div class="field"><label>Name</label><input id="staffName" value="${escapeHtml(s.name || "")}"></div><div class="field"><label>Email</label><input id="staffEmail" value="${escapeHtml(s.email || "")}"></div><div class="field"><label>Role</label><input id="staffRole" value="${escapeHtml(s.role || "Detailer")}"></div><div class="field"><label>Active</label><select id="staffActive"><option value="true">Active</option><option value="false">Off</option></select></div><div class="field wide"><label>Services</label><input id="staffServices" value="${escapeHtml((s.services || []).join(", "))}" placeholder="Full Detail, Premium Detail"></div><div class="wide"><label>Permissions</label><div style="height:8px"></div><div class="day-grid">${PERMISSIONS.map((p) => `<label class="check-row"><input type="checkbox" class="staffPerm" value="${p}" ${(s.permissions || []).includes(p) ? "checked" : ""}><span>${p}</span></label>`).join("")}</div></div></div><div class="drawer-actions"><button class="primary" id="saveStaffBtn">${s.id ? "Update Staff" : "Save Staff"}</button>${s.id ? '<button class="ghost" id="clearStaffBtn">Cancel Edit</button>' : ""}</div>`;
+      }
+      function renderSettings() {
+        const s = data.settings;
+        $("#settingsView").innerHTML =
+          `<div class="section-head"><div><h2>Settings & Payments</h2><p>Business info, Instagram, deposits and payment options.</p></div></div><div class="grid two"><div class="panel"><div class="inner"><h3>Business Settings</h3><div class="field-grid"><div class="field"><label>Business Name</label><input id="setBusiness" value="${escapeHtml(s.businessName || "")}"></div><div class="field"><label>Phone</label><input id="setPhone" value="${escapeHtml(s.phone || "")}"></div><div class="field"><label>Email</label><input id="setEmail" value="${escapeHtml(s.email || "")}"></div><div class="field"><label>Instagram Handle</label><input id="setInstagramHandle" value="${escapeHtml(s.instagramHandle || "")}"></div><div class="field wide"><label>Instagram Link</label><input id="setInstagramUrl" value="${escapeHtml(s.instagramUrl || "")}"></div><div class="field wide"><label>Google Review Link</label><input id="setGoogleReviewUrl" value="${escapeHtml(s.googleReviewUrl || "")}"></div><div class="field wide"><label>Service Area</label><input id="setServiceArea" value="${escapeHtml(s.serviceAreaText || "Jacksonville & surrounding areas")}"></div></div></div></div><div class="panel"><div class="inner"><h3>Deposit & Balance</h3><div class="field-grid"><div class="field"><label>Deposit Required</label><select id="setDepositRequired"><option value="true">Yes</option><option value="false">No</option></select></div><div class="field"><label>Deposit Percent</label><input id="setDepositPercent" type="number" value="${Number(s.depositPercent || 10)}"></div><div class="field"><label>Travel Fee Default</label><input id="setTravelFee" type="number" value="${Number(s.travelFeeDefault || 15)}"></div><div class="field"><label>Default Balance Action</label><select id="setBalanceAction"><option>After Completion</option><option>Due Now</option><option>Manual</option></select></div><div class="field wide"><label>Payment Note</label><textarea id="setPaymentNote">${escapeHtml(s.paymentNote || "")}</textarea></div></div></div></div></div><div style="height:16px"></div><div class="panel"><div class="inner"><h3>Payment Methods</h3><div class="grid three"><div class="pay-card"><label class="check-row"><input type="checkbox" class="payMethod" value="Cash" ${(s.paymentMethods || []).includes("Cash") ? "checked" : ""}><span>Cash</span></label><label class="check-row"><input type="checkbox" class="payMethod" value="Zelle" ${(s.paymentMethods || []).includes("Zelle") ? "checked" : ""}><span>Zelle</span></label><div class="field"><label>Zelle Name</label><input id="setZelleName" value="${escapeHtml(s.zelleName || "")}"></div><div class="field"><label>Zelle Phone / Email</label><input id="setZelleAccount" value="${escapeHtml(s.zelleAccount || "")}"></div></div><div class="pay-card"><label class="check-row"><input type="checkbox" class="payMethod" value="Stripe" ${(s.paymentMethods || []).includes("Stripe") ? "checked" : ""}><span>Stripe</span></label><div class="field"><label>Stripe Publishable Key</label><input id="setStripeKey" value="${escapeHtml(s.stripePublishableKey || "")}"></div><div class="field"><label>Stripe Payment Link</label><input id="setStripeLink" value="${escapeHtml(s.stripePaymentLink || "")}"></div></div><div class="pay-card"><label class="check-row"><input type="checkbox" class="payMethod" value="Square" ${(s.paymentMethods || []).includes("Square") ? "checked" : ""}><span>Square</span></label><div class="field"><label>Square Payment Link</label><input id="setSquareLink" value="${escapeHtml(s.squarePaymentLink || "")}"></div><div class="field"><label>Invoice / Other Payment Link</label><input id="setInvoiceLink" value="${escapeHtml(s.invoiceLink || "")}"></div></div></div><div style="height:14px"></div><button class="primary" id="saveSettingsBtn">Save Settings</button></div></div>`;
+        $("#setDepositRequired").value = String(s.depositRequired !== false);
+        $("#setBalanceAction").value =
+          s.defaultBalanceAction || "After Completion";
+      }
+      function openBooking(id) {
+        selectedId = id;
+        const b = data.bookings.find((x) => x.id === id);
+        if (!b) return;
+        $("#bookingDetail").innerHTML =
+          `<div class="section-head"><div><span class="badge">${escapeHtml(b.id)}</span><h2>${escapeHtml(b.customerName || "Customer")}</h2><p>${escapeHtml(b.vehicleInfo || b.vehicleType || "Vehicle")} • ${escapeHtml(b.packageName || "Package")}</p></div><button class="ghost" id="closeModal">Close</button></div><div class="grid two"><div class="panel"><div class="inner"><h3>Service Info</h3><p class="small-text"><b>Status:</b> ${escapeHtml(b.status || "")}<br><b>Date:</b> ${escapeHtml(b.appointmentDate || "")} ${escapeHtml(b.appointmentTime || "")}<br><b>Address:</b> ${escapeHtml(b.address || "")} ${escapeHtml(b.city || "")}<br><b>Phone:</b> ${escapeHtml(b.phone || "")}<br><b>Email:</b> ${escapeHtml(b.email || "")}</p><div class="drawer-actions"><button class="ok" data-status="${b.id}|Price Confirmed">Confirm Price</button><button class="primary" data-status="${b.id}|Technician On The Way">On The Way + GPS</button><button class="gold" data-payment-due="${b.id}">Balance Due Now</button><button class="danger" data-status="${b.id}|Canceled">Cancel</button></div></div></div><div class="panel"><div class="inner"><h3>Totals</h3><div class="price-line"><span>Total</span><b>${money(b.total)}</b></div><div class="price-line"><span>Deposit</span><b>${money(b.depositPaid)}</b></div><div class="price-line"><span>Balance</span><b>${money(b.balance)}</b></div><div class="price-line"><span>Action</span><b>${escapeHtml(b.balanceAction || "Not requested")}</b></div></div></div></div><div style="height:16px"></div><div class="grid two"><div class="panel"><div class="inner"><h3>Propose New Date / Time</h3><div class="field-grid"><div class="field"><label>New Date</label><input id="propDate" type="date"></div><div class="field"><label>New Time</label><input id="propTime" type="time"></div><div class="field wide"><label>Reason for change</label><textarea id="propReason" placeholder="Explain why this time is recommended"></textarea></div></div><div style="height:12px"></div><button class="primary" data-propose="${b.id}">Send Schedule Option</button></div></div><div class="panel"><div class="inner"><h3>On-site workflow</h3><p class="small-text">Extra services and final completion are handled from the QR Scanner after the customer's secure QR is scanned on arrival.</p><p class="small-text">Use the single Scan QR button in the top-right corner to open the scanner for any appointment.</p></div></div></div>`;
+        $("#bookingModal").classList.add("open");
+      }
+      function updateBooking(id, patch) {
+        const i = data.bookings.findIndex((x) => x.id === id);
+        if (i < 0) return;
+        data.bookings[i] = { ...data.bookings[i], ...patch };
+        writeLS("aa_bookings_demo", data.bookings);
+        renderActive();
+        if ($("#bookingModal").classList.contains("open")) openBooking(id);
+      }
+      function setStatus(id, status) {
+        const patch = { status };
+        if (status === "Technician On The Way") {
+          patch.balanceAction = patch.balanceAction || "Not requested";
+          startGpsShare(id);
+        }
+        if (status === "Service Started") patch.startedAt = new Date().toISOString();
+        if (status === "Completed") {
+          patch.completedAt = new Date().toISOString();
+          patch.balanceAction = "After Completion";
+          stopGpsShare("Service completed.");
+          stopCamera();
+        }
+        if (status === "Canceled") {
+          stopGpsShare("Service canceled.");
+          stopCamera();
+        }
+        updateBooking(id, patch);
+        api("updateBookingStatus", { id, status }).catch(() => {});
+        toast("Updated: " + status);
+      }
+      function startGpsShare(id) {
+        if (!navigator.geolocation) {
+          toast("GPS is not available on this device.");
+          return;
+        }
+        stopGpsShare();
+        gpsBookingId = id;
+        gpsLastSent = 0;
+        gpsWatchId = navigator.geolocation.watchPosition(
+          (pos) => {
+            const now = Date.now();
+            const payload = {
+              id,
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+              accuracy: pos.coords.accuracy,
+            };
+            data.tracking = [
+              ...(data.tracking || []).filter((t) => String(t.bookingId) !== String(id)),
+              { bookingId: id, ...payload, at: new Date().toLocaleString(), status: "On The Way" },
+            ];
+            if (now - gpsLastSent > 8000) {
+              gpsLastSent = now;
+              api("saveTracking", payload).catch(() => {});
+            }
+          },
+          () => toast("GPS permission was not granted."),
+          { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 },
+        );
+        toast("GPS sharing started for customer tracking.");
+        if (active === "scanner") renderScanner();
+      }
+      function stopGpsShare(message) {
+        if (gpsWatchId !== null) {
+          try { navigator.geolocation.clearWatch(gpsWatchId); } catch (e) {}
+        }
+        const oldId = gpsBookingId;
+        gpsWatchId = null;
+        gpsBookingId = "";
+        gpsLastSent = 0;
+        if (oldId) api("stopTracking", { id: oldId }).catch(() => {});
+        if (message) toast(message + " GPS sharing stopped.");
+        if (active === "scanner") renderScanner();
+      }
+      function markPaymentDue(id) {
+        updateBooking(id, { status: "Payment Required", balanceAction: "Due Now" });
+        api("updateBookingStatus", { id, status: "Payment Required" }).catch(() => {});
+        toast("Balance marked Due Now. Customer tracking will show payment required.");
+      }
+      function complete(id) {
+        stopGpsShare("Service completed.");
+        stopCamera();
+        updateBooking(id, { status: "Completed", completedAt: new Date().toISOString(), balanceAction: "After Completion" });
+        scannedBookingId = id;
+        api("completeService", { id }).catch(() => {});
+        if (active === "scanner") renderScanner();
+        toast("Service completed and final receipt action triggered.");
+      }
+      function parseQrValue(raw) {
+        raw = String(raw || "").trim();
+        if (!raw) return "";
+        try { raw = decodeURIComponent(raw); } catch (e) {}
+        try {
+          if (/^https?:\/\//i.test(raw)) {
+            const u = new URL(raw);
+            return u.searchParams.get("qr") || u.searchParams.get("token") || u.searchParams.get("code") || u.searchParams.get("track") || u.searchParams.get("id") || raw;
+          }
+        } catch (e) {}
+        return raw.replace(/^qr:/i, "").trim();
+      }
+      function findBookingByQrValue(value) {
+        const clean = parseQrValue(value);
+        return data.bookings.find((x) => String(x.qrData || "") === clean || String(x.id || "") === clean) || null;
+      }
+      async function startByCode(raw) {
+        const token = parseQrValue(raw);
+        if (!token) { toast("No QR value found."); return; }
+        let b = findBookingByQrValue(token);
+        let apiResult = null;
+        try { apiResult = await api("validateQrStartService", { qr: token }); } catch (e) {}
+        if (apiResult && apiResult.bookingId) b = data.bookings.find((x) => String(x.id) === String(apiResult.bookingId)) || b;
+        if (!b) {
+          toast("Secure QR not found in current bookings.");
+          return;
+        }
+        scannedBookingId = b.id;
+        stopCamera();
+        if (String(b.status || "") === "Completed") {
+          data.qrLogs = [{ id: "QR-" + Date.now(), bookingId: b.id, result: "Final receipt only", at: new Date().toLocaleString() }, ...(data.qrLogs || [])];
+          renderScanner();
+          toast("This QR now opens final receipt only.");
+          return;
+        }
+        b.status = "Service Started";
+        b.startedAt = b.startedAt || new Date().toISOString();
+        updateBooking(b.id, b);
+        data.qrLogs = [{ id: "QR-" + Date.now(), bookingId: b.id, result: "Service started by secure QR", at: new Date().toLocaleString() }, ...(data.qrLogs || [])];
+        renderScanner();
+        toast("Service opened from secure QR.");
+      }
+      async function openCamera() {
+        const wrap = $("#videoWrap");
+        try {
+          if (!("mediaDevices" in navigator)) {
+            toast("Camera not available on this device.");
+            return;
+          }
+          stopCamera();
+          stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+          wrap.innerHTML = '<video id="qrVideo" autoplay playsinline muted></video>';
+          $("#qrVideo").srcObject = stream;
+          toast("Camera opened. Point it at the customer confirmation QR.");
+          if ("BarcodeDetector" in window) {
+            detector = new BarcodeDetector({ formats: ["qr_code"] });
+            scanTimer = setInterval(scanFrame, 650);
+          } else {
+            scanTimer = setInterval(scanFrameCanvas, 650);
+          }
+          if (active === "scanner") renderScanner();
+        } catch (e) {
+          toast("Camera permission failed or was denied.");
+        }
+      }
+      async function scanFrame() {
+        try {
+          const v = $("#qrVideo");
+          if (!v || !detector) return;
+          const codes = await detector.detect(v);
+          if (codes && codes.length) startByCode(codes[0].rawValue || "");
+        } catch (e) {}
+      }
+      async function ensureJsQr() {
+        if (window.jsQR) return true;
+        if (!/^https?:/i.test(location.protocol)) return false;
+        await new Promise((resolve, reject) => {
+          const s = document.createElement("script");
+          s.src = "https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js";
+          s.onload = resolve;
+          s.onerror = reject;
+          document.head.appendChild(s);
+        }).catch(() => null);
+        return !!window.jsQR;
+      }
+      async function scanFrameCanvas() {
+        try {
+          const v = $("#qrVideo");
+          if (!v || !v.videoWidth || !(await ensureJsQr())) return;
+          const c = document.createElement("canvas");
+          c.width = v.videoWidth;
+          c.height = v.videoHeight;
+          const ctx = c.getContext("2d");
+          ctx.drawImage(v, 0, 0, c.width, c.height);
+          const img = ctx.getImageData(0, 0, c.width, c.height);
+          const code = window.jsQR(img.data, c.width, c.height);
+          if (code && code.data) startByCode(code.data);
+        } catch (e) {}
+      }
+      function stopCamera() {
+        if (scanTimer) clearInterval(scanTimer);
+        scanTimer = null;
+        detector = null;
+        if (stream) {
+          stream.getTracks().forEach((t) => t.stop());
+          stream = null;
+        }
+        const wrap = $("#videoWrap");
+        if (wrap) wrap.innerHTML = '<p class="small-text">Camera is off.</p>';
+      }
+      async function compressFile(file, max = 1350, q = 0.78) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          const rd = new FileReader();
+          rd.onload = () => {
+            img.onload = () => {
+              let w = img.width,
+                h = img.height;
+              if (Math.max(w, h) > max) {
+                const r = max / Math.max(w, h);
+                w = Math.round(w * r);
+                h = Math.round(h * r);
+              }
+              const c = document.createElement("canvas");
+              c.width = w;
+              c.height = h;
+              c.getContext("2d").drawImage(img, 0, 0, w, h);
+              resolve(c.toDataURL("image/jpeg", q));
+            };
+            img.onerror = reject;
+            img.src = rd.result;
+          };
+          rd.onerror = reject;
+          rd.readAsDataURL(file);
+        });
+      }
+      async function galleryFile(which, file) {
+        if (!file) return;
+        try {
+          galleryDraft[which] = await compressFile(file);
+          const p = $("#galPreview");
+          if (p)
+            p.innerHTML = `${galleryDraft.mainImage ? `<img src="${galleryDraft.mainImage}">` : ""}${galleryDraft.secondImage ? `<img src="${galleryDraft.secondImage}">` : ""}`;
+        } catch (e) {
+          toast("Could not read image.");
+        }
+      }
+      function savePackage() {
+        const prices = {};
+        VEHICLES.forEach(
+          (v) =>
+            (prices[v] = Number(
+              $("#price_" + v.replace(/[^a-z0-9]/gi, "_")).value || 0,
+            )),
+        );
+        const id = edit.packageId || "pkg-" + Date.now();
+        const obj = {
+          id,
+          name: $("#pkgName").value || "Package",
+          badge: $("#pkgBadge").value || "",
+          duration: $("#pkgDuration").value || "",
+          visible: $("#pkgVisible").value === "true",
+          description: $("#pkgDescription").value || "",
+          features: $("#pkgFeatures")
+            .value.split("\n")
+            .map((x) => x.trim())
+            .filter(Boolean),
+          prices,
+        };
+        const i = data.packages.findIndex((x) => x.id === id);
+        if (i >= 0) data.packages[i] = obj;
+        else data.packages.push(obj);
+        edit.packageId = "";
+        persistLocal();
+        api("savePackages", {
+          packagesJson: JSON.stringify(data.packages),
+        }).catch(() => {});
+        renderPackages();
+        toast("Package saved.");
+      }
+      function saveAddon() {
+        const id = edit.addonId || "addon-" + Date.now();
+        const obj = {
+          id,
+          name: $("#addonName").value || "Add-on",
+          category: $("#addonCategory").value || "",
+          price: Number($("#addonPrice").value || 0),
+          label: $("#addonLabel").value || "",
+          variable: $("#addonVariable").value === "true",
+          visible: $("#addonVisible").value === "true",
+          description: $("#addonDescription").value || "",
+        };
+        const i = data.addons.findIndex((x) => x.id === id);
+        if (i >= 0) data.addons[i] = obj;
+        else data.addons.push(obj);
+        edit.addonId = "";
+        persistLocal();
+        api("saveAddons", { addonsJson: JSON.stringify(data.addons) }).catch(
+          () => {},
+        );
+        renderAddons();
+        toast("Add-on saved.");
+      }
+      function saveGallery() {
+        if (!galleryDraft.mainImage) {
+          toast("Add a main photo first.");
+          return;
+        }
+        const id = edit.galleryId || "gal-" + Date.now();
+        const obj = {
+          id,
+          title: $("#galTitle").value || "Detail Result",
+          category: $("#galCategory").value || "Result",
+          vehicle: $("#galVehicle").value || "",
+          service: $("#galService").value || "",
+          description: $("#galDescription").value || "",
+          mode: $("#galMode").value,
+          visible: $("#galVisible").value === "true",
+          mainImage: galleryDraft.mainImage,
+          secondImage: galleryDraft.secondImage,
+        };
+        const i = data.gallery.findIndex((x) => x.id === id);
+        if (i >= 0) data.gallery[i] = obj;
+        else data.gallery.unshift(obj);
+        edit.galleryId = "";
+        galleryDraft = { mainImage: "", secondImage: "" };
+        persistLocal();
+        api("saveGallery", {
+          galleryJson: JSON.stringify(
+            data.gallery.map((x) => ({
+              ...x,
+              beforeFileId: "",
+              afterFileId: "",
+            })),
+          ),
+        }).catch(() => {});
+        renderGallery();
+        toast("Gallery result saved.");
+      }
+      function saveStaff() {
+        const id = edit.staffId || "S-" + Date.now();
+        const obj = {
+          id,
+          name: $("#staffName").value || "Staff",
+          email: $("#staffEmail").value || "",
+          role: $("#staffRole").value || "Detailer",
+          services: $("#staffServices")
+            .value.split(",")
+            .map((x) => x.trim())
+            .filter(Boolean),
+          active: $("#staffActive").value === "true",
+          permissions: $$(".staffPerm:checked").map((x) => x.value),
+        };
+        const i = data.staff.findIndex((x) => x.id === id);
+        if (i >= 0) data.staff[i] = obj;
+        else data.staff.push(obj);
+        edit.staffId = "";
+        persistLocal();
+        api("saveStaff", { staffJson: JSON.stringify(data.staff) }).catch(
+          () => {},
+        );
+        renderStaff();
+        toast("Staff saved.");
+      }
+      function saveAvailability() {
+        data.availability = {
+          days: $$(".availDay:checked").map((x) => x.value),
+          startTime: $("#availStart").value,
+          endTime: $("#availEnd").value,
+          serviceAreaText: $("#serviceAreaText").value,
+        };
+        persistLocal();
+        api("saveAvailability", {
+          availabilityJson: JSON.stringify(data.availability),
+        }).catch(() => {});
+        toast("Availability saved.");
+      }
+      function saveSettings() {
+        data.settings = {
+          ...data.settings,
+          businessName: $("#setBusiness").value,
+          phone: $("#setPhone").value,
+          email: $("#setEmail").value,
+          instagramHandle: $("#setInstagramHandle").value,
+          instagramUrl: $("#setInstagramUrl").value,
+          googleReviewUrl: $("#setGoogleReviewUrl").value,
+          serviceAreaText: $("#setServiceArea").value,
+          depositRequired: $("#setDepositRequired").value === "true",
+          depositPercent: Number($("#setDepositPercent").value || 0),
+          travelFeeDefault: Number($("#setTravelFee").value || 0),
+          defaultBalanceAction: $("#setBalanceAction").value,
+          paymentNote: $("#setPaymentNote").value,
+          paymentMethods: $$(".payMethod:checked").map((x) => x.value),
+          zelleName: $("#setZelleName").value,
+          zelleAccount: $("#setZelleAccount").value,
+          stripePublishableKey: $("#setStripeKey").value,
+          stripePaymentLink: $("#setStripeLink").value,
+          squarePaymentLink: $("#setSquareLink").value,
+          invoiceLink: $("#setInvoiceLink").value,
+        };
+        persistLocal();
+        api("saveSettings", {
+          settingsJson: JSON.stringify(data.settings),
+        }).catch(() => {});
+        toast("Settings saved.");
+      }
+      function saveCoupon() {
+        const c = {
+          code: $("#couponCode").value.trim().toUpperCase(),
+          type: $("#couponType").value,
+          value: Number($("#couponValue").value || 0),
+          expires: $("#couponExpires").value,
+          active: $("#couponActive").value === "true",
+        };
+        if (!c.code) {
+          toast("Enter a coupon code.");
+          return;
+        }
+        data.coupons.push(c);
+        persistLocal();
+        api("saveCoupons", { couponsJson: JSON.stringify(data.coupons) }).catch(
+          () => {},
+        );
+        renderCoupons();
+        toast("Coupon added.");
+      }
+      function propose(id) {
+        const date = $("#propDate").value,
+          time = $("#propTime").value,
+          reason = $("#propReason").value;
+        if (!date || !time || !reason) {
+          toast("Add date, time and reason.");
+          return;
+        }
+        const proposal = {
+          date,
+          time,
+          reason,
+          status: "pending",
+          createdAt: new Date().toISOString(),
+        };
+        updateBooking(id, { status: "Schedule Change Proposed", proposal });
+        api("proposeSchedule", { id, date, time, reason }).catch(() => {});
+        toast("Schedule option sent to customer tracking.");
+      }
+      function addExtra(id) {
+        addExtraToBooking(id, $("#extraName")?.value || "Extra Service", Number($("#extraPrice")?.value || 0));
+      }
+      function addScannerExtra(id) {
+        const b = data.bookings.find((x) => String(x.id) === String(id));
+        if (!b || String(b.id) !== String(scannedBookingId) || String(b.status || "") === "Completed") {
+          toast("Scan the customer's QR before adding on-site extras.");
+          return;
+        }
+        const name = $("#scannerExtraName")?.value || "Extra Service";
+        const price = Number($("#scannerExtraPrice")?.value || 0);
+        addExtraToBooking(id, name, price);
+        renderScanner();
+      }
+      function addExtraToBooking(id, name, price) {
+        const b = data.bookings.find((x) => String(x.id) === String(id));
+        if (!b) return;
+        b.addonNames = [...(b.addonNames || []), name || "Extra Service"];
+        b.total = Number(b.total || 0) + Number(price || 0);
+        b.balance = Number(b.balance || 0) + Number(price || 0);
+        b.status = "Extra Services Added";
+        updateBooking(id, b);
+        api("addExtraService", { id, addonName: name || "Extra Service", price: Number(price || 0) }).catch(() => {});
+        toast("Extra service added and balance updated.");
+      }
+      function setButtonBusy(btn, label) {
+        if (!btn || btn.classList.contains("busy") || btn.classList.contains("tab") || btn.classList.contains("filter")) return;
+        const old = btn.dataset.oldText || btn.textContent;
+        btn.dataset.oldText = old;
+        btn.classList.add("busy");
+        btn.disabled = true;
+        if (label) btn.firstChild ? btn.firstChild.textContent = label : (btn.textContent = label);
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.classList.remove("busy");
+          if (btn.dataset.oldText) btn.textContent = btn.dataset.oldText;
+          delete btn.dataset.oldText;
+        }, 1200);
+      }
+      document.addEventListener("click", (e) => {
+        const actionButton = e.target.closest("button");
+        if (actionButton && !actionButton.matches(".tab,.filter")) setButtonBusy(actionButton, "Working");
+      }, true);
+      document.addEventListener("click", (e) => {
+        const tab = e.target.closest("[data-tab]")?.dataset.tab;
+        if (tab) {
+          show(tab);
+          return;
+        }
+        const fl = e.target.closest("[data-filter]")?.dataset.filter;
+        if (fl) {
+          filter = fl;
+          renderBookings();
+          return;
+        }
+        const op = e.target.closest("[data-open-booking]")?.dataset.openBooking;
+        if (op) {
+          openBooking(op);
+          return;
+        }
+        const st = e.target.closest("[data-status]")?.dataset.status;
+        if (st) {
+          const [id, status] = st.split("|");
+          setStatus(id, status);
+          return;
+        }
+        const due = e.target.closest("[data-payment-due]")?.dataset.paymentDue;
+        if (due) {
+          markPaymentDue(due);
+          return;
+        }
+        const comp = e.target.closest("[data-complete]")?.dataset.complete;
+        if (comp) {
+          complete(comp);
+          return;
+        }
+        if (e.target.id === "closeModal" || e.target.id === "bookingModal") {
+          $("#bookingModal").classList.remove("open");
+          return;
+        }
+        if (e.target.id === "openCameraBtn") {
+          openCamera();
+          return;
+        }
+        if (e.target.id === "stopCameraBtn") {
+          stopCamera();
+          toast("Camera turned off.");
+          return;
+        }
+        if (e.target.id === "stopGpsBtn") {
+          stopGpsShare("GPS turned off.");
+          return;
+        }
+        if (e.target.id === "manualStartBtn") {
+          startByCode($("#manualQr")?.value || "");
+          return;
+        }
+        if (e.target.id === "savePackageBtn") {
+          savePackage();
+          return;
+        }
+        if (e.target.id === "newPackageBtn") {
+          edit.packageId = "";
+          renderPackages();
+          return;
+        }
+        if (e.target.id === "clearPackageBtn") {
+          edit.packageId = "";
+          renderPackages();
+          return;
+        }
+        const ep = e.target.closest("[data-edit-package]")?.dataset.editPackage;
+        if (ep) {
+          edit.packageId = ep;
+          renderPackages();
+          return;
+        }
+        const dp = e.target.closest("[data-delete-package]")?.dataset
+          .deletePackage;
+        if (dp) {
+          data.packages = data.packages.filter((x) => x.id !== dp);
+          persistLocal();
+          renderPackages();
+          return;
+        }
+        if (e.target.id === "saveAddonBtn") {
+          saveAddon();
+          return;
+        }
+        if (e.target.id === "newAddonBtn") {
+          edit.addonId = "";
+          renderAddons();
+          return;
+        }
+        if (e.target.id === "clearAddonBtn") {
+          edit.addonId = "";
+          renderAddons();
+          return;
+        }
+        const ea = e.target.closest("[data-edit-addon]")?.dataset.editAddon;
+        if (ea) {
+          edit.addonId = ea;
+          renderAddons();
+          return;
+        }
+        const da = e.target.closest("[data-delete-addon]")?.dataset.deleteAddon;
+        if (da) {
+          data.addons = data.addons.filter((x) => x.id !== da);
+          persistLocal();
+          renderAddons();
+          return;
+        }
+        if (e.target.id === "saveGalleryBtn") {
+          saveGallery();
+          return;
+        }
+        if (e.target.id === "clearGalleryBtn") {
+          edit.galleryId = "";
+          galleryDraft = { mainImage: "", secondImage: "" };
+          renderGallery();
+          return;
+        }
+        const eg = e.target.closest("[data-edit-gallery]")?.dataset.editGallery;
+        if (eg) {
+          edit.galleryId = eg;
+          renderGallery();
+          return;
+        }
+        const dg = e.target.closest("[data-delete-gallery]")?.dataset
+          .deleteGallery;
+        if (dg) {
+          data.gallery = data.gallery.filter((x) => x.id !== dg);
+          persistLocal();
+          renderGallery();
+          return;
+        }
+        const rv = e.target.closest("[data-review]")?.dataset.review;
+        if (rv) {
+          const [id, status] = rv.split("|");
+          const r = data.reviews.find((x) => x.id === id);
+          if (r) {
+            r.status = status;
+            persistLocal();
+            api("updateReviewStatus", { id, status }).catch(() => {});
+            renderReviews();
+          }
+          return;
+        }
+        const fr = e.target.closest("[data-feature-review]")?.dataset
+          .featureReview;
+        if (fr) {
+          const r = data.reviews.find((x) => x.id === fr);
+          if (r) {
+            r.featured = !r.featured;
+            persistLocal();
+            renderReviews();
+          }
+          return;
+        }
+        if (e.target.id === "addCouponBtn") {
+          saveCoupon();
+          return;
+        }
+        const dc = e.target.closest("[data-delete-coupon]")?.dataset
+          .deleteCoupon;
+        if (dc !== undefined) {
+          data.coupons.splice(Number(dc), 1);
+          persistLocal();
+          renderCoupons();
+          return;
+        }
+        if (e.target.id === "saveAvailabilityBtn") {
+          saveAvailability();
+          return;
+        }
+        if (e.target.id === "saveStaffBtn") {
+          saveStaff();
+          return;
+        }
+        if (e.target.id === "newStaffBtn") {
+          edit.staffId = "";
+          renderStaff();
+          return;
+        }
+        if (e.target.id === "clearStaffBtn") {
+          edit.staffId = "";
+          renderStaff();
+          return;
+        }
+        const es = e.target.closest("[data-edit-staff]")?.dataset.editStaff;
+        if (es) {
+          edit.staffId = es;
+          renderStaff();
+          return;
+        }
+        const ds = e.target.closest("[data-delete-staff]")?.dataset.deleteStaff;
+        if (ds) {
+          data.staff = data.staff.filter((x) => x.id !== ds);
+          persistLocal();
+          renderStaff();
+          return;
+        }
+        if (e.target.id === "saveSettingsBtn") {
+          saveSettings();
+          return;
+        }
+        const pr = e.target.closest("[data-propose]")?.dataset.propose;
+        if (pr) {
+          propose(pr);
+          return;
+        }
+        const sex = e.target.closest("[data-scanner-extra]")?.dataset.scannerExtra;
+        if (sex) {
+          addScannerExtra(sex);
+          return;
+        }
+        const ex = e.target.closest("[data-extra]")?.dataset.extra;
+        if (ex) {
+          addExtra(ex);
+          return;
+        }
+        if (e.target.id === "refreshBtn") {
+          load();
+          return;
+        }
+        if (e.target.id === "saveAllBtn") {
+          if (active === "settings") saveSettings();
+          else if (active === "availability") saveAvailability();
+          else {
+            persistLocal();
+            toast("Saved locally for demo.");
+          }
+        }
+      });
+      document.addEventListener("change", (e) => {
+        if (e.target.id === "galMainFile")
+          galleryFile("mainImage", e.target.files[0]);
+        if (e.target.id === "galSecondFile")
+          galleryFile("secondImage", e.target.files[0]);
+      });
+      async function load() {
+        try {
+          const res = await api("getAdminData");
+          if (res && res.ok) {
+            data = { ...data, ...res };
+          }
+        } catch (e) {}
+        hydrate();
+        renderTabs();
+        renderActive();
+        toast("Demo ready.");
+      }
+      load();
+    </script>
+  </body>
 </html>
