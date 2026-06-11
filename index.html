@@ -1159,6 +1159,7 @@
       const $$ = (s) => Array.from(document.querySelectorAll(s));
       let active = "home";
       let step = 0;
+      let reserveBusy = false;
       let data = {
         packages: [],
         addons: [],
@@ -1454,6 +1455,37 @@
         try {
           localStorage.setItem(k, JSON.stringify(v));
         } catch (e) {}
+      }
+      function makeSecureToken() {
+        try {
+          const bytes = new Uint8Array(16);
+          crypto.getRandomValues(bytes);
+          return "AQR-" + Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("").toUpperCase();
+        } catch (e) {
+          return "AQR-" + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 10).toUpperCase();
+        }
+      }
+      function clientPageUrl() {
+        return location.href.split("#")[0].split("?")[0];
+      }
+      function qrUrlFromToken(token) {
+        return clientPageUrl() + "?qr=" + encodeURIComponent(token || "");
+      }
+      function parseQrValue(value) {
+        let raw = String(value || "").trim();
+        if (!raw) return "";
+        try { raw = decodeURIComponent(raw); } catch (e) {}
+        try {
+          if (/^https?:\/\//i.test(raw)) {
+            const u = new URL(raw);
+            return u.searchParams.get("qr") || u.searchParams.get("token") || u.searchParams.get("code") || u.searchParams.get("track") || u.searchParams.get("id") || raw;
+          }
+        } catch (e) {}
+        return raw.replace(/^qr:/i, "").trim();
+      }
+      function findBookingByQrLocal(value) {
+        const clean = parseQrValue(value);
+        return bookingStore().find((x) => String(x.id) === clean || String(x.qrData || "") === clean) || null;
       }
       function api(action, params = {}) {
         return new Promise((resolve, reject) => {
@@ -1805,6 +1837,23 @@
         writeLS("aa_bookings_demo", list);
       }
       async function reserve() {
+        if (reserveBusy) return;
+        reserveBusy = true;
+        const reserveBtn = $("#nextStep");
+        const reserveBtnText = reserveBtn ? reserveBtn.textContent : "";
+        if (reserveBtn) {
+          reserveBtn.disabled = true;
+          reserveBtn.textContent = "Sending…";
+          reserveBtn.style.opacity = ".68";
+        }
+        const releaseReserve = () => {
+          reserveBusy = false;
+          if (reserveBtn) {
+            reserveBtn.disabled = false;
+            reserveBtn.textContent = reserveBtnText || "Reserve Now";
+            reserveBtn.style.opacity = "";
+          }
+        };
         saveForm();
         if (
           !booking.customerName ||
@@ -1815,6 +1864,7 @@
           alert("Please complete name, phone, email and address.");
           step = 3;
           renderBook();
+          releaseReserve();
           return;
         }
         if (
@@ -1827,6 +1877,7 @@
           );
           step = 5;
           renderBook();
+          releaseReserve();
           return;
         }
         const id = "AA-" + Math.floor(10000 + Math.random() * 90000);
@@ -1843,7 +1894,7 @@
           depositPaid: 0,
           balance: total(),
           photoCount: (booking.photos || []).length,
-          qrData: id,
+          qrData: makeSecureToken(),
           timeline: [
             {
               status: "Request Received",
@@ -1853,12 +1904,13 @@
           ],
           balanceAction: "Not requested",
         };
+        const secureQrUrl = qrUrlFromToken(b.qrData);
         saveBookingLocal(b);
         api("createBooking", {
           bookingJson: JSON.stringify({ ...b, photos: [] }),
         }).catch(() => {});
         $("#stepHost").innerHTML =
-          `<div class="step-card active"><span class="badge">Booking Received</span><h2>${id}</h2><p>Your request was received. Keep this confirmation code and QR ready for arrival.</p><div class="qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=${encodeURIComponent(id)}" alt="Confirmation QR"><div class="qr-code-text">${id}</div></div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px"><button class="primary" data-track-id="${id}">Track My Service</button><button class="ghost" data-go="home">Back Home</button></div></div>`;
+          `<div class="step-card active"><span class="badge">Booking Received</span><h2>${id}</h2><p>Your request was received. Keep this secure QR ready for arrival. After completion, the same QR opens only the final receipt.</p><div class="qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=${encodeURIComponent(secureQrUrl)}" alt="Secure service QR"><div class="qr-code-text">${id}</div></div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px"><button class="primary" data-track-id="${id}">Track My Service</button><button class="ghost" data-go="home">Back Home</button></div></div>`;
       }
       function renderGallery() {
         const items = gallery();
@@ -1876,11 +1928,22 @@
               "",
             )}</div><div style="height:20px"></div><div class="panel"><div class="inner"><span class="badge">Leave A Review</span><h3 style="margin-top:10px">How did your vehicle look?</h3><div class="field-grid"><div class="field"><label>Name</label><input id="revName" placeholder="Your name"></div><div class="field"><label>Service</label><input id="revService" placeholder="Full Detail"></div><div class="field"><label>Rating</label><select id="revRating"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></div><div class="field wide"><label>Review</label><textarea id="revText" placeholder="Tell us about your experience"></textarea></div></div><div style="height:12px"></div><button class="primary" id="sendReview">Send Review</button></div></div>`;
       }
-      function renderTrack(result) {
+      function renderTrack(result, secureQrMode = false) {
+        if (secureQrMode) {
+          $("#trackView").innerHTML =
+            `<div class="track-card panel"><div class="inner"><span class="badge">Secure Service Access</span><h2>Auto Armor service access.</h2><p>This QR only opens the customer service view. No admin tools or internal business information is shown here.</p><div id="trackResult">${result || ""}</div></div></div>`;
+          return;
+        }
         $("#trackView").innerHTML =
           `<div class="track-card panel"><div class="inner"><span class="badge">Service Tracking</span><h2>Track your detail.</h2><p>Enter your confirmation code to see service status, schedule changes, payment requests and final receipt.</p><div style="height:14px"></div><div class="field-grid"><div class="field"><label>Confirmation Code</label><input id="trackId" placeholder="AA-12345" value="${escapeHtml(new URLSearchParams(location.search).get("track") || "")}"></div><div class="field" style="align-self:end"><button class="primary" id="trackBtn">Search</button></div></div><div id="trackResult">${result || ""}</div></div></div>`;
       }
-      function trackHtml(b, tracking) {
+
+      function receiptHtml(b) {
+        const extras = (b.addonNames || []).join(", ") || "None";
+        return `<div style="height:18px"></div><div class="panel"><div class="inner"><span class="badge gold">Final Receipt</span><h2>Service completed.</h2><p>This secure QR now shows only the final receipt for this appointment.</p><div class="summary-line"><span>Confirmation</span><b>${escapeHtml(b.id || "")}</b></div><div class="summary-line"><span>Package</span><b>${escapeHtml(b.packageName || "Mobile Detail")}</b></div><div class="summary-line"><span>Vehicle</span><b>${escapeHtml(b.vehicleInfo || b.vehicleType || "Vehicle")}</b></div><div class="summary-line"><span>Extras</span><b>${escapeHtml(extras)}</b></div><div class="summary-line"><span>Subtotal</span><b>${money(b.subtotal || b.total)}</b></div><div class="summary-line"><span>Discount</span><b>${money(b.discount || 0)}</b></div><div class="summary-line"><span>Travel Fee</span><b>${money(b.travelFee || 0)}</b></div><div class="summary-line"><span>Total</span><b>${money(b.total)}</b></div><div class="summary-line"><span>Deposit Paid</span><b>${money(b.depositPaid)}</b></div><div class="summary-line"><span>Balance</span><b>${money(b.balance)}</b></div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px"><button class="primary" data-go="reviews">Leave A Review</button><a class="ghost" href="tel:9046018480">Call Auto Armor</a></div></div></div>`;
+      }
+      function trackHtml(b, tracking, fromSecureQr = false) {
+        if (fromSecureQr && String(b.status || "") === "Completed") return receiptHtml(b);
         const status = b.status || "Request Received";
         const doneIndex = Math.max(
           0,
@@ -1894,8 +1957,16 @@
           b.balanceAction === "Due Now" || status === "Payment Required"
             ? `<div class="payment-alert"><b>Payment action required:</b> Balance due now: ${money(b.balance || 0)}.<div style="margin-top:10px"><a class="primary" href="#" onclick="alert('Demo payment button. Stripe, Square, Zelle or invoice link can be connected in settings.');return false">Pay Balance</a></div></div>`
             : "";
-        const qr = `<div class="qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=${encodeURIComponent(b.id)}" alt="Confirmation QR"><div class="qr-code-text">${escapeHtml(b.id)}</div></div>`;
-        return `<div style="height:18px"></div><div class="panel"><div class="inner"><h3>${escapeHtml(b.packageName || "Mobile Detail")}</h3><p>${escapeHtml(b.vehicleInfo || b.vehicleType || "Vehicle")} • ${escapeHtml(b.appointmentDate || "Date pending")} ${escapeHtml(b.appointmentTime || "")}</p>${qr}${proposal}${pay}<div class="summary-line"><span>Total</span><b>${money(b.total)}</b></div><div class="summary-line"><span>Balance</span><b>${money(b.balance)}</b></div><div class="timeline">${TRACK_STEPS.map((s, i) => `<div class="timeline-step ${i <= doneIndex || s === status ? "done" : ""}"><div class="dot">${i + 1}</div><div><b>${s}</b><p>${s === status ? "Current status" : "Status update"}</p></div></div>`).join("")}</div></div></div>`;
+        const qrLink = qrUrlFromToken(b.qrData || b.id);
+        const qr = `<div class="qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=${encodeURIComponent(qrLink)}" alt="Secure service QR"><div class="qr-code-text">${escapeHtml(b.id)}</div></div>`;
+        const lat = tracking && Number(tracking.lat);
+        const lng = tracking && Number(tracking.lng);
+        const gps = status === "Technician On The Way" && lat && lng
+          ? `<div class="payment-alert"><b>Technician GPS is active:</b> Your technician is on the way. Last location update: ${escapeHtml(tracking.at || "just now")}.<div style="height:12px"></div><iframe title="Technician live location" loading="lazy" referrerpolicy="no-referrer-when-downgrade" style="width:100%;height:230px;border:0;border-radius:18px;display:block;background:#000" src="https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.015}%2C${lat - 0.015}%2C${lng + 0.015}%2C${lat + 0.015}&layer=mapnik&marker=${lat}%2C${lng}"></iframe><a class="ghost" style="margin-top:10px;display:inline-flex" target="_blank" rel="noopener" href="https://www.google.com/maps?q=${lat},${lng}">Open GPS</a></div>`
+          : status === "Technician On The Way"
+            ? `<div class="payment-alert"><b>Technician is on the way.</b> GPS will appear here as soon as the technician shares the live location from the admin phone.</div>`
+            : "";
+        return `<div style="height:18px"></div><div class="panel"><div class="inner"><h3>${escapeHtml(b.packageName || "Mobile Detail")}</h3><p>${escapeHtml(b.vehicleInfo || b.vehicleType || "Vehicle")} • ${escapeHtml(b.appointmentDate || "Date pending")} ${escapeHtml(b.appointmentTime || "")}</p>${qr}${gps}${proposal}${pay}<div class="summary-line"><span>Total</span><b>${money(b.total)}</b></div><div class="summary-line"><span>Balance</span><b>${money(b.balance)}</b></div><div class="timeline">${TRACK_STEPS.map((s, i) => `<div class="timeline-step ${i <= doneIndex || s === status ? "done" : ""}"><div class="dot">${i + 1}</div><div><b>${s}</b><p>${s === status ? "Current status" : "Status update"}</p></div></div>`).join("")}</div></div></div>`;
       }
       async function searchTrack() {
         const id = ($("#trackId")?.value || "").trim();
@@ -1910,8 +1981,24 @@
           }
         } catch (e) {}
         $("#trackResult").innerHTML = b
-          ? trackHtml(b, tracking)
+          ? trackHtml(b, tracking, false)
           : `<div class="notice" style="margin-top:14px">No service found with that confirmation code.</div>`;
+      }
+      async function searchQrToken(token) {
+        token = parseQrValue(token);
+        if (!token) return;
+        let b = findBookingByQrLocal(token);
+        let tracking = null;
+        try {
+          const res = await api("getQrBooking", { qr: token });
+          if (res && res.ok) {
+            b = { ...(b || {}), ...res.booking };
+            tracking = res.tracking || null;
+          }
+        } catch (e) {}
+        $("#trackResult").innerHTML = b
+          ? trackHtml(b, tracking, true)
+          : `<div class="notice" style="margin-top:14px">This secure QR could not be found. Please contact Auto Armor directly.</div>`;
       }
       function submitReview() {
         const r = {
@@ -2060,7 +2147,14 @@
           })
           .catch(() => {});
         const q = new URLSearchParams(location.search);
-        if (q.get("track")) {
+        if (q.get("qr")) {
+          active = "track";
+          $$(".view").forEach((v) => v.classList.remove("active"));
+          $("#trackView").classList.add("active");
+          nav();
+          renderTrack(`<div class="notice" style="margin-top:14px">Loading secure service access...</div>`, true);
+          setTimeout(() => searchQrToken(q.get("qr")), 80);
+        } else if (q.get("track")) {
           active = "track";
           $$(".view").forEach((v) => v.classList.remove("active"));
           $("#trackView").classList.add("active");
