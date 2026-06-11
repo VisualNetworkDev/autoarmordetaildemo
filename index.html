@@ -1076,12 +1076,7 @@
           padding: 0 14px;
         }
       }
-    
-button[disabled], .primary[disabled], .ghost[disabled], .danger[disabled], .ok[disabled], .gold[disabled]{cursor:not-allowed;opacity:.62;filter:saturate(.75)}
-button.is-loading{position:relative;pointer-events:none;opacity:.78;color:transparent!important}
-button.is-loading::after{content:"";position:absolute;left:50%;top:50%;width:17px;height:17px;margin:-8.5px 0 0 -8.5px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:aaSpin .75s linear infinite}
-@keyframes aaSpin{to{transform:rotate(360deg)}}
-</style>
+    </style>
   </head>
   <body>
     <div class="app">
@@ -1115,8 +1110,6 @@ button.is-loading::after{content:"";position:absolute;left:50%;top:50%;width:17p
     <script>
       const API_URL =
         "https://script.google.com/macros/s/AKfycbz5MfcLAb7X0xLrqVkMwcLQ0EAawxQz1rlIDqqalNpkjspiuTIgF6WMdXp4ZP-x3MiauA/exec";
-      const API_ENABLED = /(^|\.)github\.io$/i.test(location.hostname);
-      const PREVIEW_MODE = !API_ENABLED;
       const DEMO_IMAGES = {
         hero: "https://images.unsplash.com/photo-1600706432502-77a0e2e32732?auto=format&fit=crop&w=1800&q=82",
         wash: "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&w=1300&q=82",
@@ -1451,35 +1444,6 @@ button.is-loading::after{content:"";position:absolute;left:50%;top:50%;width:17p
         n = Number(n || 0);
         return n ? "$" + n.toFixed(0) : "Quote";
       }
-
-      function setButtonLoading(btn, on, label) {
-        if (!btn) return;
-        if (on) {
-          btn.dataset.originalText = btn.dataset.originalText || btn.textContent;
-          btn.disabled = true;
-          btn.classList.add("is-loading");
-          if (label) btn.setAttribute("aria-label", label);
-        } else {
-          btn.disabled = false;
-          btn.classList.remove("is-loading");
-          if (btn.dataset.originalText) {
-            btn.textContent = btn.dataset.originalText;
-            delete btn.dataset.originalText;
-          }
-        }
-      }
-      async function withButtonLoading(btn, label, fn) {
-        if (btn && btn.disabled) return;
-        setButtonLoading(btn, true, label || "Working");
-        try {
-          return await fn();
-        } catch (err) {
-          console.error(err);
-          alert(err && err.message ? err.message : "Action failed. Try again.");
-        } finally {
-          setButtonLoading(btn, false);
-        }
-      }
       function readLS(k, f) {
         try {
           return JSON.parse(localStorage.getItem(k) || "") || f;
@@ -1524,9 +1488,6 @@ button.is-loading::after{content:"";position:absolute;left:50%;top:50%;width:17p
         return bookingStore().find((x) => String(x.id) === clean || String(x.qrData || "") === clean) || null;
       }
       function api(action, params = {}) {
-        if (!API_ENABLED) {
-          return Promise.resolve({ ok: false, preview: true, skipped: true, action });
-        }
         return new Promise((resolve, reject) => {
           if (!API_URL) {
             reject(new Error("missing api"));
@@ -1536,24 +1497,26 @@ button.is-loading::after{content:"";position:absolute;left:50%;top:50%;width:17p
           const q = new URLSearchParams({ action, callback: cb, ...params });
           const s = document.createElement("script");
           let done = false;
-          const cleanup = () => {
-            try { s.remove(); } catch (e) {}
-            setTimeout(() => {
-              try { delete window[cb]; } catch (e) {}
-            }, 60000);
-          };
           const timer = setTimeout(() => {
             if (done) return;
             done = true;
             window[cb] = function () {};
-            cleanup();
+            setTimeout(() => {
+              try {
+                delete window[cb];
+              } catch (e) {}
+            }, 60000);
+            s.remove();
             reject(new Error("API timeout"));
           }, 30000);
           window[cb] = (res) => {
             if (done) return;
             done = true;
             clearTimeout(timer);
-            cleanup();
+            try {
+              delete window[cb];
+            } catch (e) {}
+            s.remove();
             resolve(res);
           };
           s.onerror = () => {
@@ -1561,42 +1524,17 @@ button.is-loading::after{content:"";position:absolute;left:50%;top:50%;width:17p
             done = true;
             clearTimeout(timer);
             window[cb] = function () {};
-            cleanup();
+            setTimeout(() => {
+              try {
+                delete window[cb];
+              } catch (e) {}
+            }, 60000);
+            s.remove();
             reject(new Error("API network error"));
           };
           s.src = API_URL + "?" + q.toString();
           document.body.appendChild(s);
         });
-      }
-
-      function postApi(action, params = {}) {
-        if (!API_ENABLED || !API_URL) return;
-        try {
-          const frameName = "aa_post_" + Math.random().toString(36).slice(2);
-          const iframe = document.createElement("iframe");
-          iframe.name = frameName;
-          iframe.style.display = "none";
-          document.body.appendChild(iframe);
-          const form = document.createElement("form");
-          form.method = "POST";
-          form.action = API_URL;
-          form.target = frameName;
-          form.style.display = "none";
-          const add = (name, value) => {
-            const input = document.createElement("input");
-            input.type = "hidden";
-            input.name = name;
-            input.value = String(value ?? "");
-            form.appendChild(input);
-          };
-          add("action", action);
-          Object.entries(params).forEach(([k, v]) => add(k, typeof v === "object" ? JSON.stringify(v) : v));
-          document.body.appendChild(form);
-          form.submit();
-          setTimeout(() => { form.remove(); iframe.remove(); }, 90000);
-        } catch (err) {
-          console.warn("Background upload skipped:", err);
-        }
       }
       function packages() {
         return (data.packages?.length ? data.packages : seedPackages).filter(
@@ -1970,17 +1908,9 @@ button.is-loading::after{content:"";position:absolute;left:50%;top:50%;width:17p
         saveBookingLocal(b);
         api("createBooking", {
           bookingJson: JSON.stringify({ ...b, photos: [] }),
-        }).then(() => {
-          if ((booking.photos || []).length) {
-            postApi("saveBookingPhotos", { id, photosJson: JSON.stringify(booking.photos) });
-          }
-        }).catch(() => {
-          if ((booking.photos || []).length) {
-            postApi("saveBookingPhotos", { id, photosJson: JSON.stringify(booking.photos) });
-          }
-        });
+        }).catch(() => {});
         $("#stepHost").innerHTML =
-          `<div class="step-card active"><span class="badge">Booking Received</span><h2>${id}</h2><p>Your request was received. Keep this secure QR ready for arrival. After completion, the same QR opens only the final receipt.</p><div class="qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=${encodeURIComponent(secureQrUrl)}" alt="Secure service QR"><div class="qr-code-text">SECURE ARRIVAL QR</div></div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px"><button class="primary" data-track-id="${id}">Track My Service</button><button class="ghost" data-go="home">Back Home</button></div></div>`;
+          `<div class="step-card active"><span class="badge">Booking Received</span><h2>${id}</h2><p>Your request was received. Keep this secure QR ready for arrival. After completion, the same QR opens only the final receipt.</p><div class="qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=${encodeURIComponent(secureQrUrl)}" alt="Secure service QR"><div class="qr-code-text">${id}</div></div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px"><button class="primary" data-track-id="${id}">Track My Service</button><button class="ghost" data-go="home">Back Home</button></div></div>`;
       }
       function renderGallery() {
         const items = gallery();
@@ -2028,7 +1958,7 @@ button.is-loading::after{content:"";position:absolute;left:50%;top:50%;width:17p
             ? `<div class="payment-alert"><b>Payment action required:</b> Balance due now: ${money(b.balance || 0)}.<div style="margin-top:10px"><a class="primary" href="#" onclick="alert('Demo payment button. Stripe, Square, Zelle or invoice link can be connected in settings.');return false">Pay Balance</a></div></div>`
             : "";
         const qrLink = qrUrlFromToken(b.qrData || b.id);
-        const qr = `<div class="qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=${encodeURIComponent(qrLink)}" alt="Secure service QR"><div class="qr-code-text">SECURE ARRIVAL QR</div></div>`;
+        const qr = `<div class="qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=${encodeURIComponent(qrLink)}" alt="Secure service QR"><div class="qr-code-text">${escapeHtml(b.id)}</div></div>`;
         const lat = tracking && Number(tracking.lat);
         const lng = tracking && Number(tracking.lng);
         const gps = status === "Technician On The Way" && lat && lng
@@ -2112,7 +2042,7 @@ button.is-loading::after{content:"";position:absolute;left:50%;top:50%;width:17p
         api("respondScheduleProposal", { id, response }).catch(() => {});
         searchTrack();
       }
-      document.addEventListener("click", async (e) => {
+      document.addEventListener("click", (e) => {
         const goId = e.target.closest("[data-go]")?.dataset.go;
         if (goId) {
           go(goId);
@@ -2164,7 +2094,7 @@ button.is-loading::after{content:"";position:absolute;left:50%;top:50%;width:17p
           if (step < 5) {
             step++;
             renderBook();
-          } else await reserve();
+          } else reserve();
           return;
         }
         const tid = e.target.closest("[data-track-id]")?.dataset.trackId;
@@ -2177,11 +2107,11 @@ button.is-loading::after{content:"";position:absolute;left:50%;top:50%;width:17p
           return;
         }
         if (e.target.id === "trackBtn") {
-          await withButtonLoading(e.target, "Searching", () => searchTrack());
+          searchTrack();
           return;
         }
         if (e.target.id === "sendReview") {
-          await withButtonLoading(e.target, "Sending Review", () => submitReview());
+          submitReview();
           return;
         }
         const acc = e.target.closest("[data-accept-proposal]")?.dataset
@@ -2200,19 +2130,7 @@ button.is-loading::after{content:"";position:absolute;left:50%;top:50%;width:17p
       document.addEventListener("input", (e) => {
         if (e.target.id === "couponInput") {
           booking.coupon = e.target.value;
-          // Do not re-render the summary while typing. Re-rendering replaced the input
-          // after every letter and forced the user to tap the coupon field again.
-        }
-      });
-      document.addEventListener("change", (e) => {
-        if (e.target.id === "couponInput") {
-          booking.coupon = e.target.value;
           renderSummary();
-          const restored = $("#couponInput");
-          if (restored) {
-            restored.focus();
-            restored.setSelectionRange(restored.value.length, restored.value.length);
-          }
         }
       });
       document.addEventListener("change", (e) => {
