@@ -1,159 +1,2082 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Auto Armor | Mobile Detailing</title>
-<meta name="theme-color" content="#020305" />
-<style>
-:root {
-  --bg:#020305; --bg2:#070a10; --panel:rgba(9,13,20,.88); --panel2:rgba(14,19,28,.82);
-  --line:rgba(108,184,255,.24); --line2:rgba(255,255,255,.11); --text:#f7fbff; --muted:#9eafc2; --soft:#dbe8f7;
-  --blue:#097cff; --blue2:#63c7ff; --purple:#8b5cff; --silver:#e6edf5; --gold:#dec06f; --danger:#ff6477; --ok:#5af0b7;
-  --r:26px; --r2:18px; --shadow:0 34px 110px rgba(0,0,0,.66);
-}
-*{box-sizing:border-box;margin:0;padding:0} html,body{min-height:100%;overflow:hidden} body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
-body:before{content:"";position:fixed;inset:0;z-index:-4;background:radial-gradient(circle at 12% -8%,rgba(9,124,255,.22),transparent 33%),radial-gradient(circle at 96% 2%,rgba(139,92,255,.16),transparent 30%),linear-gradient(180deg,#07090e 0%,#020305 62%,#000 100%)}
-body:after{content:"";position:fixed;inset:-80px;z-index:-3;opacity:.48;background-image:linear-gradient(45deg,rgba(255,255,255,.028) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.028) 50%,rgba(255,255,255,.028) 75%,transparent 75%),linear-gradient(-45deg,rgba(99,199,255,.028) 25%,transparent 25%,transparent 50%,rgba(99,199,255,.02) 50%,rgba(99,199,255,.02) 75%,transparent 75%);background-size:34px 34px,34px 34px;filter:contrast(120%)}
-button,input,select,textarea{font:inherit;color:inherit} button{border:0;cursor:pointer} a{color:inherit;text-decoration:none} img{display:block;max-width:100%} select option{background:#090e17;color:#fff}
-input,select,textarea{width:100%;min-height:50px;border:1px solid var(--line);background:linear-gradient(180deg,#0a1019,#060a10);color:#fff;border-radius:16px;padding:13px 14px;outline:none;font-size:16px} textarea{resize:vertical;min-height:96px} label{font-weight:900;font-size:13px;color:#cfe0f1} .field{display:grid;gap:7px} .hint{color:var(--muted);font-size:14px;line-height:1.48} .small{font-size:13px;color:var(--muted)}
-.app{height:100dvh;display:grid;grid-template-rows:auto 1fr;max-width:1720px;margin:0 auto;padding:14px;gap:14px}
-.header{height:76px;border:1px solid var(--line);border-radius:24px;background:rgba(2,4,8,.78);backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:space-between;padding:12px 14px;box-shadow:0 18px 55px rgba(0,0,0,.38)}
-.brand{display:flex;align-items:center;gap:12px;min-width:0} .mark{width:48px;height:48px;border:1px solid rgba(99,199,255,.48);border-radius:16px;background:linear-gradient(145deg,#07111f,#101929);display:grid;place-items:center;box-shadow:inset 0 0 26px rgba(9,124,255,.22),0 0 24px rgba(9,124,255,.16)} .mark svg{width:28px;height:28px}
-.brand h1{font-size:22px;line-height:.96;letter-spacing:.02em;text-transform:uppercase} .brand p{font-size:12px;color:var(--blue2);font-weight:900;letter-spacing:.18em;text-transform:uppercase;margin-top:3px}
-.nav{display:flex;gap:7px;align-items:center} .nav button{background:transparent;color:#a8b7c8;border:1px solid transparent;border-radius:14px;padding:11px 13px;font-size:13px;font-weight:1000;text-transform:uppercase;letter-spacing:.02em} .nav button.active,.nav button:hover{color:#fff;background:rgba(9,124,255,.14);border-color:rgba(99,199,255,.22)}
-.actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap} .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:43px;padding:10px 15px;border-radius:15px;border:1px solid var(--line);background:rgba(12,18,27,.86);font-weight:1000;font-size:14px;box-shadow:0 10px 26px rgba(0,0,0,.22)} .btn.primary{border-color:transparent;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#02070d} .btn.purple{border-color:transparent;background:linear-gradient(135deg,var(--blue),var(--purple))} .btn.gold{border-color:transparent;background:linear-gradient(135deg,#f7df91,var(--gold));color:#1d1404} .btn.ghost{background:rgba(255,255,255,.045)} .btn.small{min-height:38px;padding:8px 11px;border-radius:13px;font-size:13px}
-.stage{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:14px} .main,.side{min-height:0;overflow:auto;scrollbar-width:none} .main::-webkit-scrollbar,.side::-webkit-scrollbar,.scroll-x::-webkit-scrollbar{display:none}
-.view{display:none;min-height:100%;animation:fade .25s ease} .view.active{display:block} @keyframes fade{from{opacity:.5;transform:translateY(6px)}to{opacity:1;transform:none}}
-.panel,.hero,.card,.pkg,.review,.gallery-card,.track-card{border:1px solid var(--line);background:linear-gradient(155deg,rgba(11,16,24,.92),rgba(4,7,12,.94));border-radius:var(--r);box-shadow:var(--shadow)} .panel{padding:18px}
-.hero{min-height:calc(100dvh - 112px);position:relative;overflow:hidden;display:grid;align-content:end;padding:38px;isolation:isolate} .hero:before{content:"";position:absolute;inset:0;z-index:-2;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.92)),linear-gradient(90deg,rgba(0,0,0,.88),rgba(0,0,0,.18)),url('https://unsplash.com/photos/CsZjHjFN3N8/download?force=true') center/cover no-repeat;filter:saturate(.92) contrast(1.12)} .hero:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(135deg,rgba(99,199,255,.14),transparent 42%,rgba(139,92,255,.10))}
-.eyebrow,.badge{display:inline-flex;width:max-content;max-width:100%;align-items:center;gap:8px;border:1px solid rgba(99,199,255,.32);background:rgba(9,124,255,.10);color:var(--blue2);border-radius:999px;padding:7px 10px;font-size:12px;font-weight:1000;text-transform:uppercase;letter-spacing:.08em} .badge.purple{color:#d5c7ff;border-color:rgba(139,92,255,.44);background:rgba(139,92,255,.12)}
-.hero h2{margin-top:16px;font-size:clamp(46px,6vw,86px);line-height:.88;letter-spacing:-.08em;text-transform:uppercase;max-width:860px} .hero h2 span{display:block;color:var(--blue2);text-shadow:0 0 34px rgba(99,199,255,.34)} .hero p{margin-top:18px;max-width:680px;font-size:18px;line-height:1.48;color:#eef6ff}
-.trust{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:24px} .trust div{padding:12px;border:1px solid var(--line2);background:rgba(0,0,0,.34);border-radius:18px;font-weight:950;font-size:13px;color:var(--soft)} .trust b{display:block;color:#fff;font-size:16px}
-.side{display:grid;gap:14px} .side-card{border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(155deg,rgba(12,18,28,.88),rgba(3,6,11,.92));padding:16px;overflow:hidden} .side-card h3{font-size:21px;letter-spacing:-.03em} .side-card p{margin-top:7px} .side-photo{height:178px;border-radius:20px;overflow:hidden;border:1px solid var(--line2);margin-top:12px} .side-photo img{width:100%;height:100%;object-fit:cover}
-.process{display:grid;grid-template-columns:repeat(4,1fr);gap:10px} .process .card{padding:16px;min-height:135px} .num{font-size:32px;color:var(--blue2);font-weight:1000} .card h3{font-size:17px;margin-top:7px} .card p{margin-top:6px;color:var(--muted);font-size:14px;line-height:1.45}
-.section-head{display:flex;align-items:end;justify-content:space-between;gap:14px;margin:0 0 14px} .section-head h2,.view>h2{font-size:34px;letter-spacing:-.055em} .section-head p{max-width:560px;color:var(--muted);font-size:15px;line-height:1.45}
-.pkg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px} .pkg{padding:15px;display:grid;gap:13px;position:relative;overflow:hidden} .pkg.featured{border-color:rgba(99,199,255,.68);box-shadow:0 0 0 1px rgba(99,199,255,.14),0 24px 80px rgba(9,124,255,.18)} .pkg.premium{border-color:rgba(139,92,255,.58)} .pkg-img{height:168px;border-radius:21px;border:1px solid var(--line2);overflow:hidden;background:#060a10} .pkg-img img{width:100%;height:100%;object-fit:cover;filter:saturate(.95) contrast(1.08)} .pkg-title{display:flex;justify-content:space-between;gap:12px;align-items:flex-start} .pkg h3{font-size:27px;line-height:1;letter-spacing:-.045em;text-transform:uppercase} .pkg .desc{font-size:15px;color:var(--soft);margin-top:5px} .from{text-align:right;font-size:12px;color:var(--muted);font-weight:900} .from b{display:block;color:#fff;font-size:31px;letter-spacing:-.06em}
-.price-list{display:grid;gap:0} .row{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid rgba(255,255,255,.09);padding:8px 0;color:var(--soft);font-size:15px} .row strong{font-size:17px;color:#fff} .feature-list{display:grid;gap:8px} .feature{display:flex;align-items:flex-start;gap:9px;color:var(--soft);font-size:15px;line-height:1.35} .dot{flex:0 0 19px;width:19px;height:19px;border:1px solid rgba(99,199,255,.55);background:radial-gradient(circle,rgba(99,199,255,.32),rgba(9,124,255,.08));border-radius:7px;display:grid;place-items:center;margin-top:1px} .dot:after{content:"";width:7px;height:4px;border-left:2px solid #dff5ff;border-bottom:2px solid #dff5ff;transform:rotate(-45deg);margin-top:-2px}
-.book-wrap{display:grid;grid-template-columns:280px minmax(0,1fr);gap:14px} .steps{display:grid;gap:8px} .step{text-align:left;border:1px solid var(--line2);background:rgba(255,255,255,.04);border-radius:17px;padding:12px;color:#a9b9ca;font-weight:1000} .step.active{color:#fff;border-color:rgba(99,199,255,.55);background:rgba(9,124,255,.14)} .book-card{padding:18px;border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(155deg,rgba(12,18,28,.9),rgba(4,7,12,.94))} .choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px} .choice{border:1px solid var(--line2);border-radius:19px;background:rgba(255,255,255,.045);padding:14px;text-align:left;min-height:92px;display:grid;gap:7px;position:relative} .choice.active{border-color:rgba(99,199,255,.75);box-shadow:inset 0 0 0 1px rgba(99,199,255,.18),0 18px 42px rgba(9,124,255,.12)} .choice b{font-size:16px} .choice span{color:var(--muted);font-size:13px} .choice-mark{position:absolute;right:12px;top:12px;width:22px;height:22px;border-radius:9px;border:1px solid var(--line);background:#050910} .choice.active .choice-mark{background:linear-gradient(135deg,var(--blue),var(--blue2));border:0} .choice.active .choice-mark:after{content:"";position:absolute;left:7px;top:5px;width:7px;height:4px;border-left:2px solid #00101e;border-bottom:2px solid #00101e;transform:rotate(-45deg)} .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px} .full{grid-column:1/-1}
-.upload-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px} .upload{border:1px dashed rgba(99,199,255,.38);border-radius:18px;background:rgba(9,124,255,.055);padding:14px;min-height:94px;display:grid;place-items:center;text-align:center;gap:6px;position:relative;overflow:hidden} .upload input{position:absolute;inset:0;opacity:0;cursor:pointer} .summary{display:grid;gap:4px} .total{font-size:20px;color:#fff} .policy{display:flex;align-items:flex-start;gap:12px;border:1px solid rgba(99,199,255,.24);border-radius:18px;background:rgba(9,124,255,.08);padding:14px;margin-top:12px} .policy input{width:22px;min-height:22px;accent-color:#1193ff;flex:0 0 22px;margin-top:2px}
-.gallery-grid{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:14px} .gallery-card{overflow:hidden} .gallery-card.big{grid-row:span 2} .gallery-media{height:210px;position:relative;overflow:hidden} .gallery-card.big .gallery-media{height:450px} .gallery-media img{width:100%;height:100%;object-fit:cover;filter:saturate(.95) contrast(1.08)} .gallery-body{padding:14px} .gallery-body h3{font-size:21px} .gallery-body p{margin-top:5px}
-.review-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px} .review{padding:18px} .stars{color:#ffd978;letter-spacing:2px;font-size:18px;margin-bottom:10px} .review p{font-size:16px;line-height:1.48;color:#e7f1fb} .review b{display:block;margin-top:12px}
-.track-wrap{display:grid;grid-template-columns:380px 1fr;gap:14px} .qr{border-radius:22px;background:#fff;padding:12px;width:190px;margin:12px auto} .qr img{width:100%} .status-list{display:grid;gap:10px} .status{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line2);background:rgba(255,255,255,.04);border-radius:18px;padding:12px} .node{width:22px;height:22px;border-radius:50%;border:1px solid var(--line);background:#07101a;flex:0 0 22px;margin-top:2px} .status.done .node{background:linear-gradient(135deg,var(--blue),var(--blue2));border:0;box-shadow:0 0 22px rgba(99,199,255,.25)} .proposal{border:1px solid rgba(222,192,111,.42);background:rgba(222,192,111,.10);border-radius:18px;padding:14px;margin-bottom:12px}
-.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#07101a;border:1px solid var(--line);border-radius:16px;padding:12px 15px;box-shadow:var(--shadow);z-index:50;transition:.25s} .toast.show{opacity:1;transform:translate(-50%,0)}
-@media(max-width:1180px){.stage{grid-template-columns:1fr}.side{display:none}.pkg-grid,.gallery-grid,.review-grid{grid-template-columns:1fr 1fr}.hero{min-height:560px}.trust{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:760px){.app{padding:8px;gap:8px}.header{height:auto;align-items:flex-start;border-radius:22px;gap:10px;flex-wrap:wrap}.brand h1{font-size:19px}.nav{order:3;width:100%;overflow:auto;scrollbar-width:none}.nav::-webkit-scrollbar{display:none}.nav button{white-space:nowrap;padding:10px 11px}.actions .phone-hide{display:none}.main{padding-bottom:2px}.hero{min-height:calc(100dvh - 152px);padding:22px;border-radius:22px}.hero h2{font-size:48px}.hero p{font-size:16px}.trust{grid-template-columns:1fr 1fr}.process,.pkg-grid,.choice-grid,.form-grid,.upload-grid,.gallery-grid,.review-grid,.track-wrap,.book-wrap{grid-template-columns:1fr}.steps{display:flex;overflow:auto;scrollbar-width:none}.step{min-width:max-content}.pkg-img{height:190px}.gallery-card.big .gallery-media,.gallery-media{height:250px}.section-head{align-items:flex-start;flex-direction:column}.section-head h2{font-size:30px}}
-</style>
-</head>
-<body>
-<div class="app">
-  <header class="header">
-    <a class="brand" data-go="home" href="#">
-      <div class="mark"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2 21 6v6c0 5.2-3.7 8.4-9 10-5.3-1.6-9-4.8-9-10V6l9-4Z" stroke="#63c7ff" stroke-width="1.8"/><path d="M7 12h10M9 16l6-8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></div>
-      <div><h1>Auto Armor</h1><p>Mobile Detailing</p></div>
-    </a>
-    <nav class="nav" id="nav"></nav>
-    <div class="actions"><a class="btn ghost phone-hide" href="tel:9046018480">Call / Text</a><button class="btn primary" data-go="book">Book Now</button></div>
-  </header>
-  <div class="stage">
-    <main class="main" id="main">
-      <section class="view active" id="homeView"></section>
-      <section class="view" id="packagesView"></section>
-      <section class="view" id="bookView"></section>
-      <section class="view" id="galleryView"></section>
-      <section class="view" id="reviewsView"></section>
-      <section class="view" id="trackView"></section>
-    </main>
-    <aside class="side" id="sidePanel"></aside>
-  </div>
-</div>
-<div class="toast" id="toast"></div>
-<script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbz5MfcLAb7X0xLrqVkMwcLQ0EAawxQz1rlIDqqalNpkjspiuTIgF6WMdXp4ZP-x3MiauA/exec';
-const IMG = {'polish': 'https://unsplash.com/photos/CsZjHjFN3N8/download?force=true', 'interior': 'https://unsplash.com/photos/U4IaoKF5aj4/download?force=true', 'buffer': 'https://unsplash.com/photos/cw1914zDHUs/download?force=true', 'paint': 'https://unsplash.com/photos/wTW51lUpC6k/download?force=true', 'wash': 'https://unsplash.com/photos/phP5Qa0CauQ/download?force=true', 'wheel': 'https://unsplash.com/photos/8k_T1EwTySs/download?force=true', 'lux': 'https://unsplash.com/photos/F6romjSOMRU/download?force=true', 'cloth': 'https://images.unsplash.com/photo-1732357624591-f2137085659b?auto=format&fit=crop&w=1400&q=80'};
-const views = [
-  ['home','Home'],['packages','Packages'],['book','Book Now'],['gallery','Results'],['reviews','Reviews'],['track','Track']
-];
-let active='home', step=0;
-let data = { packages: [], addons: [], reviews: [], gallery: [], coupons: [], settings: {} };
-let bookingMemory = [];
-let state = {vehicle:'Sedan', packageId:'full', addons:[], coupon:'', photos:0};
-const seedPackages = [
-  {id:'basic', name:'Basic Refresh', badge:'Routine Maintenance', description:'Perfect for maintenance cleaning.', duration:'1.5–2 hours', featured:false, premium:false, image:IMG.wash, prices:{'Sedan':99,'Small SUV':119,'Large SUV / Truck':139,'Large Truck':159,'Motorcycle':79,'RV':0,'Boat / Trailer':0}, features:['Exterior hand wash','Wheels & tire shine','Quick interior vacuum','Dash & surface wipe down','Interior windows']},
-  {id:'full', name:'Full Detail', badge:'Most Popular', description:'The most requested inside-and-out detail.', duration:'3–4 hours', featured:true, premium:false, image:IMG.interior, prices:{'Sedan':179,'Small SUV':199,'Large SUV / Truck':229,'Large Truck':249,'Motorcycle':129,'RV':0,'Boat / Trailer':0}, features:['Everything in Basic Refresh','Deep interior vacuum','Door jambs cleaned','Interior UV protectant','Premium spray wax','Trim & tire shine']},
-  {id:'premium', name:'Premium Detail', badge:'Showroom Level Clean', description:'A premium detail built for a luxury finish.', duration:'5–6 hours', featured:false, premium:true, image:IMG.paint, prices:{'Sedan':249,'Small SUV':279,'Large SUV / Truck':299,'Large Truck':349,'Motorcycle':179,'RV':0,'Boat / Trailer':0}, features:['Everything in Full Detail','Shampoo seats & carpets','Leather cleaning & conditioning','Clay bar treatment','Light engine bay cleaning']},
-  {id:'specialty', name:'Specialty Vehicle', badge:'Request Quote', description:'Motorcycles, RVs, boats, trailers and custom work.', duration:'Manual review', featured:false, premium:false, image:IMG.wheel, prices:{'Sedan':0,'Small SUV':0,'Large SUV / Truck':0,'Large Truck':0,'Motorcycle':175,'RV':300,'Boat / Trailer':0}, features:['Oversized vehicle review','Photo-based estimate','Custom service plan','Final price confirmed before service']}
-];
-const seedAddons = [
-  {id:'pet',name:'Pet Hair Removal',label:'$25–$75',price:25,variable:true,description:'Extra extraction for seats, carpets and cargo areas.'},
-  {id:'stain',name:'Stain Removal',label:'$25+',price:25,variable:true,description:'Spot treatment for visible stains.'},
-  {id:'odor',name:'Odor Elimination',label:'$50',price:50,description:'Odor treatment for smoke, food, pets or moisture.'},
-  {id:'headlight',name:'Headlight Restoration',label:'$75',price:75,description:'Restore faded headlights.'},
-  {id:'engine',name:'Engine Bay Detail',label:'$50',price:50,description:'Light engine bay cleaning.'},
-  {id:'wax',name:'Wax Protection',label:'Starting at $100',price:100,variable:true,description:'Added paint protection and gloss.'},
-  {id:'ceramic',name:'Ceramic Coating',label:'Starting at $250',price:250,variable:true,description:'Premium paint protection.'},
-  {id:'paint',name:'Paint Correction',label:'Starting at $300',price:300,variable:true,description:'Gloss correction and defect reduction.'}
-];
-const seedReviews = [
-  {name:'Marcus T.',rating:5,service:'Full Detail',text:'The interior came back cleaner than when I bought it. Easy booking and great communication.'},
-  {name:'Ashley R.',rating:5,service:'Premium Detail',text:'They came to my workplace and the finish looked amazing. Worth every dollar.'},
-  {name:'David M.',rating:5,service:'Basic Refresh',text:'Fast, professional and the truck looked sharp again. I will book again.'}
-];
-const vehicles = ['Sedan','Small SUV','Large SUV / Truck','Large Truck','Motorcycle','RV','Boat / Trailer'];
-const $ = s => document.querySelector(s);
-const $$ = s => [...document.querySelectorAll(s)];
-const money = n => Number(n||0) ? '$' + Number(n).toFixed(0) : 'Quote';
-function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2400); }
-function api(action, params={}){
-  return new Promise((resolve,reject)=>{
-    const cb = 'aa_cb_' + Math.random().toString(36).slice(2);
-    const q = new URLSearchParams({action, callback:cb, ...params});
-    const s = document.createElement('script');
-    const timer = setTimeout(()=>{cleanup(); reject(new Error('timeout'));}, 9000);
-    function cleanup(){ clearTimeout(timer); delete window[cb]; s.remove(); }
-    window[cb] = res => {cleanup(); resolve(res);};
-    s.onerror = () => {cleanup(); reject(new Error('network'));};
-    s.src = API_URL + '?' + q.toString();
-    document.body.appendChild(s);
-  });
-}
-function pkgs(){ return (data.packages && data.packages.length ? data.packages : seedPackages).filter(p=>p.visible!==false); }
-function addons(){ return (data.addons && data.addons.length ? data.addons : seedAddons).filter(a=>a.visible!==false); }
-function reviews(){ const r=(data.reviews&&data.reviews.length?data.reviews:seedReviews).filter(x=>!x.status||String(x.status).toLowerCase()==='approved'); return r.length?r:seedReviews; }
-function pkg(){ return pkgs().find(p=>p.id===state.packageId) || pkgs()[0]; }
-function basePrice(){ return Number((pkg().prices||{})[state.vehicle] || 0); }
-function selectedAddons(){ return addons().filter(a=>state.addons.includes(a.id)); }
-function subtotal(){ return basePrice() + selectedAddons().reduce((s,a)=>s+Number(a.price||0),0); }
-function discount(){ const c=String(state.coupon||'').toUpperCase(); if(c==='FIRST20') return Math.round(subtotal()*0.20); if(c==='FULL149' && pkg().id==='full' && state.vehicle==='Sedan') return Math.max(0, subtotal()-149); return 0; }
-function travelFee(){ return 15; }
-function total(){ return Math.max(0, subtotal()-discount()+travelFee()); }
-function deposit(){ return Math.round(total()*0.10); }
-function go(id){ active=id; $$('.view').forEach(v=>v.classList.remove('active')); $('#' + id + 'View').classList.add('active'); renderNav(); renderActive(); $('#main').scrollTop=0; }
-function renderNav(){ $('#nav').innerHTML=views.map(v=>`<button class="${v[0]===active?'active':''}" data-go="${v[0]}">${v[1]}</button>`).join(''); }
-function packageImage(p){ return p.image || (p.id==='basic'?IMG.wash:p.id==='full'?IMG.interior:p.id==='premium'?IMG.paint:IMG.wheel); }
-function packageCard(p){ const price=(p.prices||{})[state.vehicle] || (p.prices||{}).Sedan || 0; return `<article class="pkg ${p.featured?'featured':''} ${p.premium?'premium':''}"><div class="pkg-img"><img loading="lazy" src="${packageImage(p)}" alt="${p.name}"></div><div class="pkg-title"><div><span class="badge ${p.premium?'purple':''}">${p.badge||''}</span><h3>${p.name}</h3><p class="desc">${p.description||''}</p></div><div class="from">from<b>${money(price)}</b></div></div><div class="price-list">${vehicles.slice(0,4).map(v=>`<div class="row"><span>${v}</span><strong>${money((p.prices||{})[v])}</strong></div>`).join('')}</div><div class="feature-list">${(p.features||[]).map(f=>`<div class="feature"><span class="dot"></span><span>${f}</span></div>`).join('')}</div><button class="btn ${p.featured?'primary':'ghost'}" data-select-pkg="${p.id}">Select Package</button></article>`; }
-function renderHome(){ $('#homeView').innerHTML = `<div class="hero"><span class="eyebrow">Jacksonville's Premier Mobile Detailing Service</span><h2>Clean inside. <span>Shine outside.</span></h2><p>We come to you with professional mobile detailing, flexible scheduling, premium products and a booking flow made for fast quotes.</p><div class="actions"><button class="btn primary" data-go="book">Book Mobile Detail</button><button class="btn ghost" data-go="packages">View Packages</button><a class="btn ghost" href="tel:9046018480">Call / Text</a></div><div class="trust"><div><b>Save Time</b>We come to you</div><div><b>Fully Insured</b>Professional service</div><div><b>Premium Finish</b>High-end result</div><div><b>Jacksonville Area</b>Mobile service</div><div><b>Guaranteed</b>Satisfaction focused</div></div></div>`; }
-function renderSide(){ $('#sidePanel').innerHTML = `<div class="side-card"><span class="badge">Why Auto Armor</span><h3>Mobile detailing that feels organized before arrival.</h3><p class="hint">Customers can book online, upload vehicle photos, receive a QR confirmation, track service status and leave a review after completion.</p><div class="side-photo"><img src="${IMG.lux}" alt="Detailer finishing luxury vehicle"></div></div><div class="side-card"><h3>Simple process</h3><div class="process" style="grid-template-columns:1fr"><div class="card"><span class="num">1</span><h3>Choose service</h3><p>Vehicle, package and add-ons.</p></div><div class="card"><span class="num">2</span><h3>Pick schedule</h3><p>Requested day and time.</p></div><div class="card"><span class="num">3</span><h3>We come to you</h3><p>Service status and QR confirmation.</p></div></div></div><div class="side-card"><h3>Follow the work</h3><p class="hint">See recent detailing results and connect on Instagram.</p><a class="btn primary" style="margin-top:12px" href="https://www.instagram.com/autoarmor.de" target="_blank" rel="noopener">Open Instagram</a></div>`; }
-function renderPackages(){ $('#packagesView').innerHTML = `<div class="panel"><div class="section-head"><div><span class="badge">Detailing Packages</span><h2>Choose the right clean.</h2></div><p>Package pricing updates by vehicle type. Specialty vehicles and heavy conditions can be quoted after photo review.</p></div><div class="choice-grid" style="margin-bottom:14px">${vehicles.map(v=>`<button class="choice ${state.vehicle===v?'active':''}" data-vehicle="${v}"><span class="choice-mark"></span><b>${v}</b><span>${v.includes('RV')||v.includes('Boat')?'Request quote':'Instant estimate'}</span></button>`).join('')}</div><div class="pkg-grid">${pkgs().map(packageCard).join('')}</div></div>`; }
-function renderBook(){ const p=pkg(); const titles=['Vehicle','Package','Add-ons','Service Details','Photos','Review']; $('#bookView').innerHTML = `<div class="book-wrap"><aside class="steps">${titles.map((t,i)=>`<button class="step ${step===i?'active':''}" data-step="${i}">${i+1}. ${t}</button>`).join('')}</aside><section class="book-card">${bookStep()}<div class="actions" style="margin-top:16px">${step>0?'<button class="btn ghost" data-prev>Back</button>':''}${step<5?'<button class="btn primary" data-next>Continue</button>':'<button class="btn primary" id="reserveBtn">Reserve Now</button>'}</div></section></div>`; renderSummaryBox(); }
-function bookStep(){ if(step===0) return `<span class="badge">Step 1</span><h2 style="margin:10px 0 8px">Choose Your Vehicle</h2><p class="hint" style="margin-bottom:14px">The estimate updates based on vehicle type.</p><div class="choice-grid">${vehicles.map(v=>`<button class="choice ${state.vehicle===v?'active':''}" data-vehicle="${v}"><span class="choice-mark"></span><b>${v}</b><span>${v==='RV'?'Starting at $300':v==='Boat / Trailer'?'Call for quote':v==='Motorcycle'?'Starting at $175':'Package pricing'}</span></button>`).join('')}</div>`;
- if(step===1) return `<span class="badge">Step 2</span><h2 style="margin:10px 0 8px">Choose Your Package</h2><div class="pkg-grid" style="grid-template-columns:repeat(2,1fr)">${pkgs().map(p=>`<article class="pkg ${state.packageId===p.id?'featured':''}"><div class="pkg-img"><img src="${packageImage(p)}" alt="${p.name}"></div><div class="pkg-title"><div><span class="badge">${p.badge||''}</span><h3>${p.name}</h3><p class="desc">${p.duration||''}</p></div><div class="from">estimate<b>${money((p.prices||{})[state.vehicle])}</b></div></div><button class="btn ${state.packageId===p.id?'primary':'ghost'}" data-select-pkg="${p.id}">${state.packageId===p.id?'Selected':'Select'}</button></article>`).join('')}</div>`;
- if(step===2) return `<span class="badge">Step 3</span><h2 style="margin:10px 0 8px">Add Extra Services</h2><p class="hint" style="margin-bottom:14px">Variable add-ons are estimates. Final price may be adjusted after vehicle inspection.</p><div class="choice-grid">${addons().map(a=>`<button class="choice ${state.addons.includes(a.id)?'active':''}" data-addon="${a.id}"><span class="choice-mark"></span><b>${a.name}</b><span>${a.label||money(a.price)} · ${a.description||''}</span></button>`).join('')}</div>`;
- if(step===3) return `<span class="badge">Step 4</span><h2 style="margin:10px 0 8px">Address & Availability</h2><div class="form-grid"><div class="field"><label>Full Name</label><input id="customerName" required></div><div class="field"><label>Phone</label><input id="phone" inputmode="tel" required></div><div class="field"><label>Email</label><input id="email" type="email" required></div><div class="field"><label>Vehicle Details</label><input id="vehicleInfo" placeholder="Year, make, model"></div><div class="field full"><label>Service Address</label><input id="address" required></div><div class="field"><label>City</label><input id="city" value="Jacksonville"></div><div class="field"><label>Service Location</label><select id="locationType"><option>Home</option><option>Work</option><option>Apartment</option><option>Business Parking Lot</option><option>Other</option></select></div><div class="field"><label>Desired Date</label><input id="apptDate" type="date" required></div><div class="field"><label>Preferred Time</label><select id="apptTime"><option>8:00 AM</option><option>10:00 AM</option><option>12:00 PM</option><option>2:00 PM</option><option>4:00 PM</option></select></div><div class="field full"><label>Notes</label><textarea id="notes" placeholder="Heavy pet hair, stains, gated community, workplace instructions..."></textarea></div></div><p class="hint" style="margin-top:12px">Serving Jacksonville & surrounding areas. Travel fee may apply depending on distance. Fully mobile setup available.</p>`;
- if(step===4) return `<span class="badge">Step 5</span><h2 style="margin:10px 0 8px">Vehicle Photos</h2><p class="hint" style="margin-bottom:14px">Photos help confirm the service level before arrival. Images are compressed before upload.</p><div class="upload-grid">${['Exterior','Interior front','Interior back','Trunk','Seats / stains','Pet hair','Wheels'].map(x=>`<label class="upload"><b>${x}</b><span class="hint">Tap to add</span><input type="file" accept="image/*"></label>`).join('')}</div>`;
- return `<span class="badge">Step 6</span><h2 style="margin:10px 0 8px">Review & Reserve</h2><div id="summaryBox"></div><div class="field" style="margin-top:12px"><label>Coupon Code</label><div class="actions"><input id="couponCode" placeholder="FIRST20" value="${state.coupon}"><button class="btn ghost" id="applyCoupon">Apply</button></div></div><div class="policy"><input id="agreePolicy" type="checkbox"><div><b>Service agreement, deposit and cancellation terms</b><p class="hint">Deposit is applied to the final balance. Appointment requests are confirmed after review. Same-day cancellations, inaccessible vehicles, unsafe conditions or major condition changes may affect deposit, travel fee or final price. Estimate is based on selected vehicle, package, add-ons and photos.</p></div></div>`; }
-function renderSummaryBox(){ const box=$('#summaryBox'); if(!box) return; box.innerHTML = `<div class="summary"><div class="row"><span>Vehicle</span><strong>${state.vehicle}</strong></div><div class="row"><span>Package</span><strong>${pkg().name}</strong></div><div class="row"><span>Add-ons</span><strong>${selectedAddons().length?selectedAddons().map(a=>a.name).join(', '):'None'}</strong></div><div class="row"><span>Subtotal</span><strong>${money(subtotal())}</strong></div><div class="row"><span>Coupon</span><strong>${discount()?'-'+money(discount()):'None'}</strong></div><div class="row"><span>Travel Fee</span><strong>${money(travelFee())}</strong></div><div class="row"><span>Deposit</span><strong>${money(deposit())}</strong></div><div class="row total"><span>Estimated Total</span><strong>${money(total())}</strong></div></div>`; }
-function renderGallery(){ const defaults=[
- ['Paint Correction Finish','Premium Detail',IMG.buffer,'Machine polish and gloss-focused finish.'],['Interior Reset','Full Detail',IMG.interior,'Seats, panels, vents and trim cleaned for a sharp cabin.'],['Wheel & Tire Detail','Basic Refresh',IMG.wheel,'Wheel faces, tires and trim refreshed.'],['Exterior Foam Wash','Basic Refresh',IMG.wash,'Safe hand wash for routine maintenance.'],['Luxury Finish','Premium Detail',IMG.lux,'Final wipe down for a deep reflective finish.']
-]; const rows=(data.gallery||[]).filter(g=>g.visible!==false && (g.beforeFileId||g.afterFileId)).map(g=>[g.title,g.service,g.afterFileId||g.beforeFileId,g.description]); const list=rows.length?rows:defaults; $('#galleryView').innerHTML=`<div class="panel"><div class="section-head"><div><span class="badge">Results Gallery</span><h2>Real detail-focused visuals.</h2></div><p>Some results show transformation pairs. Others show finished service photos from detail work.</p></div><div class="gallery-grid">${list.map((g,i)=>`<article class="gallery-card ${i===0?'big':''}"><div class="gallery-media"><img loading="lazy" src="${g[2]}" alt="${g[0]}"></div><div class="gallery-body"><span class="badge ${i===0?'purple':''}">${g[1]||'Detail Service'}</span><h3>${g[0]}</h3><p class="hint">${g[3]||''}</p></div></article>`).join('')}</div></div>`; }
-function renderReviews(){ const list=reviews(); $('#reviewsView').innerHTML=`<div class="panel"><div class="section-head"><div><span class="badge">Customer Reviews</span><h2>What customers say.</h2></div></div><div class="review-grid">${list.map(r=>`<article class="review"><div class="stars">${'★'.repeat(Number(r.rating||5))}</div><p>“${r.text}”</p><b>${r.name}</b><span class="small">${r.service||'Detail Service'}</span></article>`).join('')}</div><div class="panel" style="margin-top:14px;box-shadow:none"><h2 style="font-size:26px">Share Your Experience</h2><div class="form-grid" style="margin-top:12px"><div class="field"><label>Name</label><input id="reviewName"></div><div class="field"><label>Rating</label><select id="reviewRating"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></div><div class="field full"><label>Service</label><input id="reviewService" placeholder="Full Detail"></div><div class="field full"><label>Review</label><textarea id="reviewText"></textarea></div></div><button class="btn primary" id="sendReview" style="margin-top:12px">Post Review</button></div></div>`; }
-async function renderTrack(id=''){ let b = bookingMemory.find(x=>x.id.toUpperCase()===String(id).toUpperCase()) || bookingMemory[0]; if(id){ try{ const res=await api('getBooking',{id}); if(res.ok) b=res.booking; }catch(e){} } const statuses=['Request Received','Price Confirmed','Appointment Scheduled','Technician On The Way','Service Started','Final Review','Completed']; let html=`<div class="track-wrap"><div class="panel"><span class="badge">Service Tracking</span><h2 style="margin:10px 0">Track Your Detail</h2><div class="field"><label>Confirmation Number</label><input id="trackCode" placeholder="AA-12345" value="${id||''}"></div><button class="btn primary" id="trackBtn" style="margin-top:10px;width:100%">Track Service</button><p class="hint" style="margin-top:12px">Use the confirmation number from your booking email or QR.</p></div>`; if(!b){ $('#trackView').innerHTML=html+`<div class="panel"><h2>No service found yet.</h2><p class="hint">Create a booking request first, then your QR and status timeline will appear here.</p></div></div>`; return; } const activeIndex=Math.max(0,statuses.indexOf(b.status)); const proposal=b.proposal&&b.proposal.status==='pending'?`<div class="proposal"><h3>New appointment time available</h3><p class="hint"><b>${b.proposal.date} at ${b.proposal.time}</b><br>${b.proposal.reason||''}</p><div class="actions"><button class="btn primary small" data-proposal="accepted" data-id="${b.id}">Accept</button><button class="btn ghost small" data-proposal="canceled" data-id="${b.id}">Cancel</button><a class="btn gold small" href="tel:9046018480">Call</a></div></div>`:''; html+=`<div class="track-card panel">${proposal}<div class="qr"><img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(b.qrData||b.id)}" alt="Service QR"></div><div class="summary"><div class="row"><span>Confirmation</span><strong>${b.id}</strong></div><div class="row"><span>Package</span><strong>${b.packageName}</strong></div><div class="row"><span>Date / Time</span><strong>${b.appointmentDate||'Pending'} · ${b.appointmentTime||''}</strong></div><div class="row total"><span>Total</span><strong>${money(b.total)}</strong></div></div><div class="status-list" style="margin-top:14px">${statuses.map((s,i)=>`<div class="status ${i<=activeIndex?'done':''}"><span class="node"></span><div><b>${s}</b><p class="hint">${i<=activeIndex?'Updated':'Pending'}</p></div></div>`).join('')}</div><div class="actions" style="margin-top:14px"><button class="btn small" data-go="reviews">Leave Review</button><a class="btn small ghost" href="tel:9046018480">Call / Text</a></div></div></div>`; $('#trackView').innerHTML=html; }
-function renderActive(){ if(active==='home') renderHome(); if(active==='packages') renderPackages(); if(active==='book') renderBook(); if(active==='gallery') renderGallery(); if(active==='reviews') renderReviews(); if(active==='track') renderTrack(new URLSearchParams(location.search).get('track')||''); renderSide(); }
-async function compress(file){ return new Promise(res=>{ const reader=new FileReader(); const img=new Image(); reader.onload=e=>{ img.onload=()=>{ const c=document.createElement('canvas'); const max=1400; const scale=Math.min(1,max/Math.max(img.width,img.height)); c.width=img.width*scale; c.height=img.height*scale; c.getContext('2d').drawImage(img,0,0,c.width,c.height); res(c.toDataURL('image/jpeg',.78)); }; img.src=e.target.result; }; reader.readAsDataURL(file); }); }
-async function reserve(){ renderSummaryBox(); if(!$('#agreePolicy')?.checked){toast('Please accept the service terms.');return} const need=['customerName','phone','email','address','apptDate']; for(const id of need){ if(!$('#'+id)?.value.trim()){toast('Please complete required details.');step=3;renderBook();return} } const id='AA-'+Math.floor(10000+Math.random()*90000); const b={id,qrData:id,status:'Request Received',createdAt:new Date().toISOString(),customerName:$('#customerName').value,phone:$('#phone').value,email:$('#email').value,vehicleType:state.vehicle,vehicleInfo:$('#vehicleInfo').value,packageId:pkg().id,packageName:pkg().name,addonNames:selectedAddons().map(a=>a.name),addons:selectedAddons(),coupon:state.coupon,subtotal:subtotal(),discount:discount(),travelFee:travelFee(),total:total(),depositPaid:deposit(),balance:total()-deposit(),address:$('#address').value,city:$('#city').value,locationType:$('#locationType').value,appointmentDate:$('#apptDate').value,appointmentTime:$('#apptTime').value,notes:$('#notes').value,photoCount:state.photos}; bookingMemory.unshift(b); api('createBooking',{bookingJson:JSON.stringify(b)}).catch(()=>{}); toast('Booking request received: '+id); go('track'); setTimeout(()=>renderTrack(id),0); }
-document.addEventListener('click', e=>{ const g=e.target.closest('[data-go]'); if(g){ e.preventDefault(); go(g.dataset.go); return; } const v=e.target.closest('[data-vehicle]'); if(v){ state.vehicle=v.dataset.vehicle; renderActive(); return; } const sp=e.target.closest('[data-select-pkg]'); if(sp){ state.packageId=sp.dataset.selectPkg; if(active==='packages') go('book'); else renderActive(); return; } const add=e.target.closest('[data-addon]'); if(add){ state.addons=state.addons.includes(add.dataset.addon)?state.addons.filter(x=>x!==add.dataset.addon):[...state.addons,add.dataset.addon]; renderActive(); return; } const st=e.target.closest('[data-step]'); if(st){ step=Number(st.dataset.step); renderBook(); return; } if(e.target.closest('[data-next]')){ if(step<5) step++; renderBook(); return; } if(e.target.closest('[data-prev]')){ if(step>0) step--; renderBook(); return; } if(e.target.id==='applyCoupon'){ state.coupon=$('#couponCode').value.trim().toUpperCase(); renderSummaryBox(); toast(state.coupon?'Coupon checked.':'No coupon entered.'); return; } if(e.target.id==='reserveBtn'){ reserve(); return; } if(e.target.id==='trackBtn'){ renderTrack($('#trackCode').value.trim()); return; } if(e.target.id==='sendReview'){ const text=$('#reviewText').value.trim(); if(!text){toast('Write your review first.');return} const r={id:'R-'+Date.now(),name:$('#reviewName').value||'Customer',rating:Number($('#reviewRating').value||5),service:$('#reviewService').value||'Detail Service',text,status:'pending',featured:false,createdAt:new Date().toISOString()}; api('submitReview',{reviewJson:JSON.stringify(r)}).catch(()=>{}); toast('Thank you for sharing your experience.'); $('#reviewText').value=''; return; } const pr=e.target.closest('[data-proposal]'); if(pr){ const b=bookingMemory.find(x=>x.id===pr.dataset.id); api('respondScheduleProposal',{id:pr.dataset.id,response:pr.dataset.proposal}).catch(()=>{}); if(b){ if(pr.dataset.proposal==='accepted'){ b.appointmentDate=b.proposal.date; b.appointmentTime=b.proposal.time; b.status='Appointment Scheduled'; } else b.status='Canceled'; } toast(pr.dataset.proposal==='accepted'?'New time accepted.':'Request canceled.'); renderTrack(pr.dataset.id); } });
-document.addEventListener('change', async e=>{ if(e.target.type==='file' && e.target.files[0]){ const wrap=e.target.closest('.upload'); wrap.querySelector('span').textContent='Preparing photo...'; await compress(e.target.files[0]); state.photos++; wrap.querySelector('span').textContent='Photo ready'; toast('Photo ready.'); } });
-async function init(){ renderNav(); renderActive(); try{ const res=await api('getPublicData'); if(res.ok){ data=res; renderActive(); } }catch(e){} const track=new URLSearchParams(location.search).get('track'); if(track){ go('track'); renderTrack(track); } } init();
-</script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Auto Armor | Mobile Detailing</title>
+    <meta name="theme-color" content="#020305" />
+    <style>
+      :root {
+        --bg: #020305;
+        --bg2: #060910;
+        --panel: rgba(8, 13, 22, 0.88);
+        --panel2: rgba(14, 20, 31, 0.82);
+        --line: rgba(91, 178, 255, 0.24);
+        --line2: rgba(255, 255, 255, 0.11);
+        --text: #f6fbff;
+        --muted: #a6b5c7;
+        --soft: #dce9f8;
+        --blue: #087cff;
+        --blue2: #5fc9ff;
+        --purple: #895bff;
+        --silver: #e8eef5;
+        --gold: #d8bf75;
+        --red: #ff6578;
+        --green: #58edb3;
+        --r: 26px;
+        --shadow: 0 30px 100px rgba(0, 0, 0, 0.72);
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        background: #020305;
+        color: var(--text);
+      }
+      body {
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          Arial,
+          sans-serif;
+        letter-spacing: 0.01em;
+      }
+      body:before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -5;
+        background:
+          radial-gradient(
+            circle at 12% -8%,
+            rgba(8, 124, 255, 0.18),
+            transparent 32%
+          ),
+          radial-gradient(
+            circle at 88% 0%,
+            rgba(137, 91, 255, 0.14),
+            transparent 30%
+          ),
+          linear-gradient(180deg, #07090f 0%, #020305 70%, #000 100%);
+      }
+      body:after {
+        content: "";
+        position: fixed;
+        inset: -70px;
+        z-index: -4;
+        opacity: 0.36;
+        background-image:
+          linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0.022) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(255, 255, 255, 0.022) 50%,
+            rgba(255, 255, 255, 0.022) 75%,
+            transparent 75%
+          ),
+          linear-gradient(
+            -45deg,
+            rgba(95, 201, 255, 0.024) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(95, 201, 255, 0.016) 50%,
+            rgba(95, 201, 255, 0.016) 75%,
+            transparent 75%
+          );
+        background-size:
+          36px 36px,
+          36px 36px;
+        filter: contrast(145%);
+      }
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+        color: inherit;
+      }
+      button {
+        border: 0;
+        cursor: pointer;
+        background: none;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      select option {
+        background: #070d16;
+        color: #fff;
+      }
+      input,
+      select,
+      textarea {
+        width: 100%;
+        min-height: 50px;
+        border: 1px solid var(--line);
+        outline: none;
+        border-radius: 16px;
+        background: linear-gradient(180deg, #0d1420, #060a11);
+        color: #fff;
+        padding: 13px 14px;
+        font-size: 16px;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+      }
+      textarea {
+        resize: vertical;
+        min-height: 105px;
+      }
+      label {
+        font-size: 13px;
+        font-weight: 900;
+        color: #d9e6f5;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .app {
+        height: 100%;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        max-width: 1280px;
+        margin: 0 auto;
+        border-left: 1px solid rgba(255, 255, 255, 0.06);
+        border-right: 1px solid rgba(255, 255, 255, 0.06);
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.035),
+          rgba(255, 255, 255, 0.01)
+        );
+      }
+      .header {
+        position: relative;
+        z-index: 20;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 18px;
+        align-items: center;
+        padding: 14px clamp(16px, 3vw, 34px);
+        border-bottom: 1px solid var(--line);
+        background: rgba(3, 6, 11, 0.86);
+        backdrop-filter: blur(16px);
+        box-shadow: 0 20px 80px rgba(0, 0, 0, 0.42);
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: max-content;
+      }
+      .shield {
+        width: 46px;
+        height: 46px;
+        border: 1px solid rgba(95, 201, 255, 0.52);
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(
+          145deg,
+          rgba(8, 124, 255, 0.18),
+          rgba(0, 0, 0, 0.35)
+        );
+        box-shadow: 0 0 28px rgba(8, 124, 255, 0.2);
+      }
+      .shield svg {
+        width: 28px;
+        height: 28px;
+        stroke: var(--blue2);
+      }
+      .brand b {
+        display: block;
+        font-size: 21px;
+        line-height: 1;
+        font-weight: 1000;
+        letter-spacing: 0.02em;
+      }
+      .brand span {
+        display: block;
+        color: var(--blue2);
+        font-size: 12px;
+        font-weight: 1000;
+        letter-spacing: 0.22em;
+        margin-top: 5px;
+      }
+      .nav {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        overflow: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        padding: 4px 0;
+      }
+      .nav::-webkit-scrollbar {
+        display: none;
+      }
+      .nav button {
+        min-width: max-content;
+        padding: 12px 15px;
+        border-radius: 14px;
+        color: #d7e5f4;
+        font-size: 13px;
+        font-weight: 1000;
+        text-transform: uppercase;
+        letter-spacing: 0.055em;
+        border: 1px solid transparent;
+      }
+      .nav button.active {
+        border-color: rgba(95, 201, 255, 0.55);
+        background: linear-gradient(
+          180deg,
+          rgba(8, 124, 255, 0.25),
+          rgba(8, 124, 255, 0.1)
+        );
+        box-shadow: 0 0 22px rgba(8, 124, 255, 0.16);
+      }
+      .header-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .pill-btn,
+      .primary,
+      .ghost,
+      .danger,
+      .ok {
+        min-height: 46px;
+        padding: 0 18px;
+        border-radius: 16px;
+        font-weight: 1000;
+        text-transform: uppercase;
+        letter-spacing: 0.055em;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        white-space: nowrap;
+      }
+      .primary {
+        background: linear-gradient(135deg, var(--blue), #0d65dd);
+        box-shadow: 0 18px 48px rgba(8, 124, 255, 0.28);
+      }
+      .ghost {
+        border: 1px solid var(--line2);
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .pill-btn {
+        border: 1px solid var(--line);
+        background: rgba(10, 18, 30, 0.7);
+      }
+      .danger {
+        background: linear-gradient(135deg, #ff4e68, #b51732);
+      }
+      .ok {
+        background: linear-gradient(135deg, #25c987, #0d8b68);
+      }
+      .main {
+        overflow: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        scroll-behavior: smooth;
+      }
+      .main::-webkit-scrollbar {
+        display: none;
+      }
+      .view {
+        display: none;
+        min-height: 100%;
+        padding: clamp(18px, 3vw, 34px);
+      }
+      .view.active {
+        display: block;
+        animation: lift 0.36s ease both;
+      }
+      @keyframes lift {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .grid {
+        display: grid;
+        gap: 18px;
+      }
+      .two {
+        grid-template-columns: minmax(0, 1.3fr) minmax(310px, 0.7fr);
+      }
+      .three {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .four {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+      .panel,
+      .card {
+        border: 1px solid var(--line);
+        border-radius: var(--r);
+        background: linear-gradient(
+          180deg,
+          rgba(11, 17, 27, 0.9),
+          rgba(5, 9, 15, 0.84)
+        );
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        position: relative;
+      }
+      .panel:before,
+      .card:before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: linear-gradient(
+          135deg,
+          rgba(95, 201, 255, 0.08),
+          transparent 26%,
+          rgba(137, 91, 255, 0.05)
+        );
+        opacity: 0.7;
+      }
+      .inner {
+        position: relative;
+        padding: 22px;
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(95, 201, 255, 0.38);
+        border-radius: 999px;
+        padding: 8px 11px;
+        background: rgba(8, 124, 255, 0.12);
+        color: var(--blue2);
+        font-size: 12px;
+        font-weight: 1000;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      h1 {
+        font-size: clamp(44px, 8vw, 92px);
+        line-height: 0.91;
+        text-transform: uppercase;
+        letter-spacing: -0.055em;
+        font-weight: 1000;
+        margin: 20px 0 14px;
+        max-width: 820px;
+      }
+      h1 .blue {
+        display: block;
+        color: var(--blue);
+        text-shadow: 0 0 34px rgba(8, 124, 255, 0.24);
+      }
+      h2 {
+        font-size: clamp(30px, 4vw, 48px);
+        line-height: 1;
+        text-transform: uppercase;
+        letter-spacing: -0.035em;
+        font-weight: 1000;
+        margin: 12px 0;
+      }
+      h3 {
+        font-size: 22px;
+        line-height: 1.05;
+        font-weight: 1000;
+        margin-bottom: 8px;
+      }
+      p {
+        color: var(--muted);
+        line-height: 1.6;
+        font-size: 16px;
+      }
+      .lead {
+        font-size: 20px;
+        color: #f0f6ff;
+        max-width: 760px;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .hero {
+        min-height: 560px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+        gap: 20px;
+        align-items: stretch;
+      }
+      .hero-art {
+        min-height: 440px;
+        border-radius: var(--r);
+        overflow: hidden;
+        border: 1px solid var(--line);
+        position: relative;
+        background: #050910;
+        box-shadow: var(--shadow);
+      }
+      .hero-art img {
+        height: 100%;
+        object-fit: cover;
+        filter: saturate(0.95) contrast(1.08) brightness(0.72);
+      }
+      .hero-art:after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(
+            90deg,
+            rgba(2, 3, 5, 0.92),
+            rgba(2, 3, 5, 0.2) 48%,
+            rgba(2, 3, 5, 0.75)
+          ),
+          radial-gradient(
+            circle at 75% 20%,
+            rgba(8, 124, 255, 0.24),
+            transparent 38%
+          );
+      }
+      .hero-copy {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: clamp(24px, 5vw, 54px);
+        z-index: 2;
+      }
+      .hero-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 26px;
+      }
+      .hero-actions button,
+      .hero-actions a {
+        min-width: 160px;
+      }
+      .statbar {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 1px;
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .stat {
+        padding: 17px 16px;
+        background: rgba(6, 10, 17, 0.82);
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .stat svg {
+        width: 24px;
+        height: 24px;
+        stroke: var(--blue2);
+        flex: 0 0 auto;
+      }
+      .stat b {
+        font-size: 13px;
+        text-transform: uppercase;
+      }
+      .stat small {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 2px;
+      }
+      .side-stack {
+        display: grid;
+        gap: 18px;
+      }
+      .feature-list {
+        display: grid;
+        gap: 16px;
+      }
+      .feature {
+        display: grid;
+        grid-template-columns: 42px 1fr;
+        gap: 12px;
+        align-items: start;
+      }
+      .feature .icon,
+      .mini-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 15px;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(95, 201, 255, 0.28);
+        background: rgba(8, 124, 255, 0.11);
+        color: var(--blue2);
+        font-weight: 1000;
+      }
+      .feature b {
+        display: block;
+        text-transform: uppercase;
+        font-size: 14px;
+      }
+      .feature span {
+        display: block;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.45;
+        margin-top: 4px;
+      }
+      .mini-photo {
+        height: 150px;
+        border-radius: 18px;
+        object-fit: cover;
+        margin-top: 14px;
+        filter: saturate(0.98) brightness(0.85);
+      }
+      .process {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+      }
+      .process-card {
+        padding: 18px;
+        border: 1px solid var(--line2);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.035);
+      }
+      .process-card strong {
+        font-size: 34px;
+        color: var(--blue);
+      }
+      .process-card b {
+        display: block;
+        text-transform: uppercase;
+        margin: 8px 0 5px;
+      }
+      .process-card span {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.45;
+      }
+      .section-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 18px;
+      }
+      .section-head p {
+        max-width: 660px;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 999px;
+        padding: 7px 10px;
+        font-size: 12px;
+        font-weight: 1000;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        border: 1px solid rgba(95, 201, 255, 0.38);
+        color: var(--blue2);
+        background: rgba(8, 124, 255, 0.11);
+      }
+      .badge.purple {
+        border-color: rgba(137, 91, 255, 0.5);
+        color: #c9b7ff;
+        background: rgba(137, 91, 255, 0.13);
+      }
+      .badge.gold {
+        border-color: rgba(216, 191, 117, 0.5);
+        color: var(--gold);
+        background: rgba(216, 191, 117, 0.11);
+      }
+      .package-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+      }
+      .pkg-card {
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      .pkg-card.featured {
+        border-color: rgba(8, 124, 255, 0.72);
+        box-shadow:
+          0 0 0 1px rgba(8, 124, 255, 0.36),
+          0 34px 110px rgba(8, 124, 255, 0.14);
+      }
+      .pkg-img {
+        height: 190px;
+        object-fit: cover;
+        filter: brightness(0.82) contrast(1.07);
+        border-bottom: 1px solid var(--line);
+      }
+      .pkg-body {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        flex: 1;
+      }
+      .price-list {
+        display: grid;
+        gap: 8px;
+      }
+      .price-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding-bottom: 8px;
+      }
+      .price-row span {
+        text-transform: uppercase;
+        color: #c5d5e6;
+        font-weight: 900;
+        font-size: 13px;
+      }
+      .price-row b {
+        font-size: 23px;
+      }
+      .features {
+        display: grid;
+        gap: 9px;
+        margin: 4px 0 6px;
+      }
+      .check {
+        display: grid;
+        grid-template-columns: 21px 1fr;
+        gap: 9px;
+        align-items: start;
+        color: #d5e4f3;
+        font-size: 14px;
+      }
+      .check i {
+        width: 21px;
+        height: 21px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(95, 201, 255, 0.42);
+        background: rgba(8, 124, 255, 0.11);
+        font-style: normal;
+        color: var(--blue2);
+        font-size: 12px;
+        font-weight: 1000;
+      }
+      .pkg-card .primary,
+      .pkg-card .ghost {
+        margin-top: auto;
+      }
+      .booking-shell {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 350px;
+        gap: 20px;
+      }
+      .stepper {
+        display: flex;
+        gap: 8px;
+        overflow: auto;
+        scrollbar-width: none;
+        margin-bottom: 16px;
+      }
+      .stepper::-webkit-scrollbar {
+        display: none;
+      }
+      .step-pill {
+        min-width: max-content;
+        padding: 10px 13px;
+        border: 1px solid var(--line2);
+        border-radius: 999px;
+        color: var(--muted);
+        font-weight: 1000;
+        text-transform: uppercase;
+        font-size: 12px;
+      }
+      .step-pill.active {
+        border-color: rgba(95, 201, 255, 0.55);
+        color: #fff;
+        background: rgba(8, 124, 255, 0.15);
+      }
+      .step-card {
+        display: none;
+      }
+      .step-card.active {
+        display: block;
+      }
+      .choice-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .choice {
+        border: 1px solid var(--line2);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.035);
+        padding: 16px;
+        text-align: left;
+        min-height: 94px;
+        display: grid;
+        gap: 8px;
+        position: relative;
+      }
+      .choice b {
+        font-size: 16px;
+      }
+      .choice span {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .choice.active {
+        border-color: rgba(95, 201, 255, 0.72);
+        background: linear-gradient(
+          180deg,
+          rgba(8, 124, 255, 0.18),
+          rgba(255, 255, 255, 0.035)
+        );
+        box-shadow: 0 0 24px rgba(8, 124, 255, 0.12);
+      }
+      .choice.active:after {
+        content: "✓";
+        position: absolute;
+        right: 14px;
+        top: 14px;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: var(--blue);
+        font-weight: 1000;
+        font-size: 13px;
+      }
+      .field-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+      .field {
+        display: grid;
+        gap: 7px;
+      }
+      .wide {
+        grid-column: 1/-1;
+      }
+      .summary {
+        position: sticky;
+        top: 18px;
+        display: grid;
+        gap: 14px;
+      }
+      .summary-line {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 9px 0;
+      }
+      .summary-line strong {
+        font-size: 22px;
+      }
+      .notice {
+        border: 1px solid rgba(216, 191, 117, 0.36);
+        background: rgba(216, 191, 117, 0.08);
+        border-radius: 18px;
+        padding: 14px;
+        color: #f1dfad;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .agreement {
+        display: grid;
+        gap: 12px;
+      }
+      .agree-row {
+        display: grid;
+        grid-template-columns: 28px 1fr;
+        gap: 11px;
+        align-items: start;
+        border: 1px solid var(--line2);
+        padding: 14px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.035);
+      }
+      .agree-row input {
+        width: 22px;
+        height: 22px;
+        min-height: auto;
+        margin-top: 1px;
+        accent-color: var(--blue);
+      }
+      .agree-row span {
+        font-size: 14px;
+        line-height: 1.5;
+        color: #d8e5f5;
+      }
+      .file-drop {
+        border: 1px dashed rgba(95, 201, 255, 0.45);
+        border-radius: 20px;
+        padding: 18px;
+        background: rgba(8, 124, 255, 0.06);
+        display: grid;
+        gap: 12px;
+      }
+      .photo-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+      .photo-thumb {
+        height: 105px;
+        object-fit: cover;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+      }
+      .results-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr 0.8fr;
+        gap: 18px;
+      }
+      .result-card {
+        min-height: 230px;
+      }
+      .result-card.large {
+        grid-row: span 2;
+      }
+      .result-card img {
+        height: 235px;
+        object-fit: cover;
+        filter: brightness(0.82) contrast(1.08);
+      }
+      .result-card.large img {
+        height: 390px;
+      }
+      .result-meta {
+        padding: 16px;
+      }
+      .result-meta h3 {
+        font-size: 21px;
+      }
+      .result-meta p {
+        font-size: 14px;
+      }
+      .result-card .badge {
+        margin-bottom: 9px;
+      }
+      .review-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+      .stars {
+        color: var(--gold);
+        letter-spacing: 0.08em;
+        font-size: 18px;
+        margin-bottom: 9px;
+      }
+      .review-card {
+        padding: 20px;
+      }
+      .review-card p {
+        font-size: 15px;
+      }
+      .review-card b {
+        display: block;
+        margin-top: 16px;
+      }
+      .review-card small {
+        color: var(--muted);
+      }
+      .track-card {
+        max-width: 780px;
+        margin: 0 auto;
+      }
+      .timeline {
+        display: grid;
+        gap: 10px;
+        margin-top: 16px;
+      }
+      .timeline-step {
+        display: grid;
+        grid-template-columns: 34px 1fr;
+        gap: 12px;
+        align-items: start;
+      }
+      .dot {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        border: 1px solid var(--line);
+        background: rgba(8, 124, 255, 0.1);
+        font-weight: 1000;
+        color: var(--blue2);
+      }
+      .timeline-step.done .dot {
+        background: var(--blue);
+        color: #fff;
+      }
+      .qr-box {
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: #fff;
+        padding: 12px;
+        max-width: 190px;
+        margin-top: 12px;
+      }
+      .qr-box img {
+        border-radius: 10px;
+      }
+      .qr-code-text {
+        color: #07111e;
+        text-align: center;
+        font-weight: 1000;
+        margin-top: 8px;
+      }
+      .payment-alert {
+        border: 1px solid rgba(255, 101, 120, 0.45);
+        border-radius: 18px;
+        background: rgba(255, 101, 120, 0.09);
+        padding: 14px;
+        color: #ffd9df;
+        margin-top: 12px;
+      }
+      .hidden {
+        display: none !important;
+      }
+      @media (max-width: 980px) {
+        .header {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+        .header-actions {
+          display: none;
+        }
+        .nav {
+          justify-content: flex-start;
+        }
+        .two,
+        .hero,
+        .booking-shell {
+          grid-template-columns: 1fr;
+        }
+        .side-stack {
+          grid-template-columns: 1fr 1fr;
+        }
+        .statbar {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .package-grid {
+          grid-template-columns: 1fr;
+        }
+        .results-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .result-card.large {
+          grid-row: auto;
+        }
+        .result-card.large img {
+          height: 260px;
+        }
+        .review-grid,
+        .three,
+        .four {
+          grid-template-columns: 1fr 1fr;
+        }
+        .summary {
+          position: static;
+        }
+        .choice-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (max-width: 560px) {
+        .view {
+          padding: 14px;
+        }
+        .header {
+          padding: 12px;
+        }
+        .brand b {
+          font-size: 18px;
+        }
+        .brand span {
+          font-size: 10px;
+        }
+        .shield {
+          width: 42px;
+          height: 42px;
+        }
+        .nav button {
+          font-size: 12px;
+          padding: 11px 13px;
+        }
+        .hero-art {
+          min-height: 610px;
+        }
+        .hero-copy {
+          justify-content: flex-start;
+          padding: 22px;
+        }
+        .lead {
+          font-size: 18px;
+        }
+        .hero-actions {
+          display: grid;
+        }
+        .statbar,
+        .process,
+        .side-stack,
+        .field-grid,
+        .choice-grid,
+        .results-grid,
+        .review-grid {
+          grid-template-columns: 1fr;
+        }
+        .pkg-img {
+          height: 170px;
+        }
+        .result-card img,
+        .result-card.large img {
+          height: 245px;
+        }
+        .photo-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .primary,
+        .ghost,
+        .pill-btn,
+        .danger,
+        .ok {
+          font-size: 13px;
+          min-height: 44px;
+          padding: 0 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div class="logo">
+          <div class="shield" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <path d="M12 3l8 3v5c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V6l8-3z" />
+              <path d="M8 12l2.4 2.4L16.5 8" />
+            </svg>
+          </div>
+          <div class="brand">
+            <b>AUTO ARMOR</b><span>MOBILE DETAILING</span>
+          </div>
+        </div>
+        <nav class="nav" id="nav"></nav>
+        <div class="header-actions">
+          <a class="pill-btn" href="tel:9046018480">☎ (904) 601-8480</a
+          ><button class="primary" data-go="book">Book Now</button>
+        </div>
+      </header>
+      <main class="main" id="main">
+        <section id="homeView" class="view active"></section>
+        <section id="packagesView" class="view"></section>
+        <section id="bookView" class="view"></section>
+        <section id="galleryView" class="view"></section>
+        <section id="reviewsView" class="view"></section>
+        <section id="trackView" class="view"></section>
+      </main>
+    </div>
+    <script>
+      const API_URL =
+        "https://script.google.com/macros/s/AKfycbz5MfcLAb7X0xLrqVkMwcLQ0EAawxQz1rlIDqqalNpkjspiuTIgF6WMdXp4ZP-x3MiauA/exec";
+      const DEMO_IMAGES = {
+        hero: "https://images.unsplash.com/photo-1600706432502-77a0e2e32732?auto=format&fit=crop&w=1800&q=82",
+        wash: "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&w=1300&q=82",
+        interior:
+          "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1300&q=82",
+        premium:
+          "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=1300&q=82",
+        wheel:
+          "https://images.unsplash.com/photo-1489824904134-891ab64532f1?auto=format&fit=crop&w=1300&q=82",
+        result1:
+          "https://images.unsplash.com/photo-1603386329225-868f9b1ee6c9?auto=format&fit=crop&w=1400&q=82",
+        result2:
+          "https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=1100&q=82",
+        result3:
+          "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1100&q=82",
+        result4:
+          "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1100&q=82",
+        side: "https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=900&q=82",
+      };
+      const VIEWS = [
+        ["home", "Home"],
+        ["packages", "Packages"],
+        ["book", "Book Now"],
+        ["gallery", "Results"],
+        ["reviews", "Reviews"],
+        ["track", "Track"],
+      ];
+      const VEHICLES = [
+        "Sedan",
+        "Small SUV",
+        "Large SUV / Truck",
+        "Large Truck",
+        "Motorcycle",
+        "RV",
+        "Boat / Trailer",
+      ];
+      const TRACK_STEPS = [
+        "Request Received",
+        "Price Confirmed",
+        "Appointment Scheduled",
+        "Technician On The Way",
+        "Service Started",
+        "Final Review",
+        "Completed",
+      ];
+      const $ = (s) => document.querySelector(s);
+      const $$ = (s) => Array.from(document.querySelectorAll(s));
+      let active = "home";
+      let step = 0;
+      let data = {
+        packages: [],
+        addons: [],
+        gallery: [],
+        reviews: [],
+        coupons: [],
+        settings: {},
+      };
+      let booking = {
+        vehicleType: "Sedan",
+        packageId: "full",
+        addons: [],
+        coupon: "",
+        photos: [],
+        inArea: "Yes",
+      };
+      const seedPackages = [
+        {
+          id: "basic",
+          name: "Basic Refresh",
+          badge: "Routine Maintenance",
+          description: "Perfect for maintenance cleaning.",
+          duration: "1.5–2 hours",
+          featured: false,
+          premium: false,
+          image: DEMO_IMAGES.wash,
+          prices: {
+            Sedan: 99,
+            "Small SUV": 119,
+            "Large SUV / Truck": 139,
+            "Large Truck": 159,
+            Motorcycle: 79,
+            RV: 0,
+            "Boat / Trailer": 0,
+          },
+          features: [
+            "Exterior hand wash",
+            "Wheels & tire shine",
+            "Quick interior vacuum",
+            "Dash & surface wipe down",
+            "Interior windows",
+          ],
+        },
+        {
+          id: "full",
+          name: "Full Detail",
+          badge: "Most Popular",
+          description: "The most requested inside-and-out detail.",
+          duration: "3–4 hours",
+          featured: true,
+          premium: false,
+          image: DEMO_IMAGES.interior,
+          prices: {
+            Sedan: 179,
+            "Small SUV": 199,
+            "Large SUV / Truck": 229,
+            "Large Truck": 249,
+            Motorcycle: 129,
+            RV: 0,
+            "Boat / Trailer": 0,
+          },
+          features: [
+            "Everything in Basic Refresh",
+            "Deep interior vacuum",
+            "Door jambs cleaned",
+            "Interior UV protectant",
+            "Premium spray wax",
+            "Trim & tire shine",
+          ],
+        },
+        {
+          id: "premium",
+          name: "Premium Detail",
+          badge: "Showroom Level Clean",
+          description: "A premium package built for a luxury finish.",
+          duration: "5–6 hours",
+          featured: false,
+          premium: true,
+          image: DEMO_IMAGES.premium,
+          prices: {
+            Sedan: 249,
+            "Small SUV": 279,
+            "Large SUV / Truck": 299,
+            "Large Truck": 349,
+            Motorcycle: 179,
+            RV: 0,
+            "Boat / Trailer": 0,
+          },
+          features: [
+            "Everything in Full Detail",
+            "Shampoo seats & carpets",
+            "Leather cleaning & conditioning",
+            "Clay bar treatment",
+            "Light engine bay cleaning",
+          ],
+        },
+        {
+          id: "specialty",
+          name: "Specialty Vehicle",
+          badge: "Request Quote",
+          description: "Motorcycles, RVs, boats, trailers and custom work.",
+          duration: "Manual review",
+          featured: false,
+          premium: false,
+          image: DEMO_IMAGES.wheel,
+          prices: {
+            Sedan: 0,
+            "Small SUV": 0,
+            "Large SUV / Truck": 0,
+            "Large Truck": 0,
+            Motorcycle: 175,
+            RV: 300,
+            "Boat / Trailer": 0,
+          },
+          features: [
+            "Photo-based estimate",
+            "Oversized vehicle review",
+            "Custom service plan",
+            "Final price confirmed before service",
+          ],
+        },
+      ];
+      const seedAddons = [
+        {
+          id: "pet",
+          name: "Pet Hair Removal",
+          description: "Deep removal from seats, carpet and cargo areas.",
+          price: 25,
+          label: "$25–$75",
+          variable: true,
+          category: "Interior",
+        },
+        {
+          id: "stain",
+          name: "Stain Removal",
+          description: "Spot treatment for seats and carpet stains.",
+          price: 25,
+          label: "$25+",
+          variable: true,
+          category: "Interior",
+        },
+        {
+          id: "odor",
+          name: "Odor Elimination",
+          description: "Treatment for smoke, food, pets or moisture smells.",
+          price: 50,
+          label: "$50",
+          variable: false,
+          category: "Interior",
+        },
+        {
+          id: "headlight",
+          name: "Headlight Restoration",
+          description: "Restore faded headlights.",
+          price: 75,
+          label: "$75",
+          variable: false,
+          category: "Exterior",
+        },
+        {
+          id: "engine",
+          name: "Engine Bay Detail",
+          description: "Light engine bay cleaning and dressing.",
+          price: 50,
+          label: "$50",
+          variable: false,
+          category: "Exterior",
+        },
+        {
+          id: "wax",
+          name: "Wax Protection",
+          description: "Added paint protection and gloss.",
+          price: 100,
+          label: "Starting at $100",
+          variable: true,
+          category: "Protection",
+        },
+        {
+          id: "ceramic",
+          name: "Ceramic Coating",
+          description: "Premium paint protection.",
+          price: 250,
+          label: "Starting at $250",
+          variable: true,
+          category: "Protection",
+        },
+        {
+          id: "paint",
+          name: "Paint Correction",
+          description: "Machine polishing and defect reduction.",
+          price: 300,
+          label: "Starting at $300",
+          variable: true,
+          category: "Correction",
+        },
+      ];
+      const seedGallery = [
+        {
+          id: "g1",
+          title: "Premium Paint Finish",
+          category: "Premium Detail",
+          service: "Paint correction",
+          vehicle: "Black sedan",
+          description: "Machine polish and gloss-focused finish.",
+          image: DEMO_IMAGES.result1,
+          visible: true,
+        },
+        {
+          id: "g2",
+          title: "Interior Reset",
+          category: "Interior",
+          service: "Full Detail",
+          vehicle: "SUV",
+          description: "Deep vacuum, trim cleanup and finished interior.",
+          image: DEMO_IMAGES.result2,
+          visible: true,
+        },
+        {
+          id: "g3",
+          title: "Wheel & Tire Detail",
+          category: "Wheels",
+          service: "Basic Refresh",
+          vehicle: "Coupe",
+          description: "Wheel faces, tires and clean exterior presentation.",
+          image: DEMO_IMAGES.result3,
+          visible: true,
+        },
+        {
+          id: "g4",
+          title: "Showroom Exterior",
+          category: "Exterior",
+          service: "Premium Detail",
+          vehicle: "Luxury vehicle",
+          description: "Clean paint, shine and protected finish.",
+          image: DEMO_IMAGES.result4,
+          visible: true,
+        },
+      ];
+      const seedReviews = [
+        {
+          id: "r1",
+          name: "Marcus T.",
+          rating: 5,
+          service: "Full Detail",
+          text: "The SUV looked brand new inside. Booking was easy and they came right to my driveway.",
+          status: "approved",
+          featured: true,
+        },
+        {
+          id: "r2",
+          name: "Ashley R.",
+          rating: 5,
+          service: "Premium Detail",
+          text: "The before and after was crazy. Seats, carpets and wheels came out much better than expected.",
+          status: "approved",
+          featured: true,
+        },
+        {
+          id: "r3",
+          name: "Daniel P.",
+          rating: 5,
+          service: "Basic Refresh",
+          text: "Fast mobile service and clean finish. The car looked sharp again without me leaving home.",
+          status: "approved",
+          featured: false,
+        },
+      ];
+      function escapeHtml(v) {
+        return String(v ?? "").replace(
+          /[&<>"']/g,
+          (m) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[m],
+        );
+      }
+      function money(n) {
+        n = Number(n || 0);
+        return n ? "$" + n.toFixed(0) : "Quote";
+      }
+      function readLS(k, f) {
+        try {
+          return JSON.parse(localStorage.getItem(k) || "") || f;
+        } catch (e) {
+          return f;
+        }
+      }
+      function writeLS(k, v) {
+        try {
+          localStorage.setItem(k, JSON.stringify(v));
+        } catch (e) {}
+      }
+      function api(action, params = {}) {
+        return new Promise((resolve, reject) => {
+          if (!API_URL) {
+            reject(new Error("missing api"));
+            return;
+          }
+          const cb = "aa_cb_" + Math.random().toString(36).slice(2);
+          const q = new URLSearchParams({ action, callback: cb, ...params });
+          const s = document.createElement("script");
+          let done = false;
+          const timer = setTimeout(() => {
+            if (done) return;
+            done = true;
+            window[cb] = function () {};
+            setTimeout(() => {
+              try {
+                delete window[cb];
+              } catch (e) {}
+            }, 60000);
+            s.remove();
+            reject(new Error("API timeout"));
+          }, 30000);
+          window[cb] = (res) => {
+            if (done) return;
+            done = true;
+            clearTimeout(timer);
+            try {
+              delete window[cb];
+            } catch (e) {}
+            s.remove();
+            resolve(res);
+          };
+          s.onerror = () => {
+            if (done) return;
+            done = true;
+            clearTimeout(timer);
+            window[cb] = function () {};
+            setTimeout(() => {
+              try {
+                delete window[cb];
+              } catch (e) {}
+            }, 60000);
+            s.remove();
+            reject(new Error("API network error"));
+          };
+          s.src = API_URL + "?" + q.toString();
+          document.body.appendChild(s);
+        });
+      }
+      function packages() {
+        return (data.packages?.length ? data.packages : seedPackages).filter(
+          (p) => p.visible !== false,
+        );
+      }
+      function addons() {
+        return (data.addons?.length ? data.addons : seedAddons).filter(
+          (a) => a.visible !== false,
+        );
+      }
+      function gallery() {
+        const custom = readLS("aa_gallery_custom", []).filter(
+          (x) => x.visible !== false,
+        );
+        const apiGallery = (data.gallery || [])
+          .filter((x) => x.visible !== false)
+          .map((x) => ({
+            ...x,
+            image: x.image || x.mainImage || x.beforeFileId || x.afterFileId,
+          }))
+          .filter((x) => x.image);
+        return custom.length
+          ? custom.concat(apiGallery)
+          : apiGallery.length
+            ? apiGallery
+            : seedGallery;
+      }
+      function reviews() {
+        const local = readLS("aa_reviews_demo", []);
+        const all = (data.reviews?.length ? data.reviews : seedReviews).concat(
+          local,
+        );
+        const approved = all.filter(
+          (r) => !r.status || String(r.status).toLowerCase() === "approved",
+        );
+        return approved.length ? approved : seedReviews;
+      }
+      function currentPackage() {
+        return (
+          packages().find((p) => p.id === booking.packageId) || packages()[0]
+        );
+      }
+      function basePrice() {
+        return Number(
+          (currentPackage().prices || {})[booking.vehicleType] || 0,
+        );
+      }
+      function selectedAddons() {
+        return addons().filter((a) => booking.addons.includes(a.id));
+      }
+      function subtotal() {
+        return (
+          basePrice() +
+          selectedAddons().reduce((s, a) => s + Number(a.price || 0), 0)
+        );
+      }
+      function discount() {
+        const c = String(booking.coupon || "")
+          .trim()
+          .toUpperCase();
+        if (c === "FIRST20") return Math.round(subtotal() * 0.2);
+        if (
+          c === "FULL149" &&
+          booking.packageId === "full" &&
+          booking.vehicleType === "Sedan"
+        )
+          return Math.max(0, subtotal() - 149);
+        return 0;
+      }
+      function travelFee() {
+        return 15;
+      }
+      function total() {
+        return Math.max(0, subtotal() - discount() + travelFee());
+      }
+      function deposit() {
+        return Math.round(total() * 0.1);
+      }
+      function nav() {
+        $("#nav").innerHTML = VIEWS.map(
+          (v) =>
+            `<button class="${active === v[0] ? "active" : ""}" data-go="${v[0]}">${v[1]}</button>`,
+        ).join("");
+      }
+      function go(id) {
+        active = id;
+        $$(".view").forEach((v) => v.classList.remove("active"));
+        $("#" + id + "View").classList.add("active");
+        nav();
+        renderActive();
+        $("#main").scrollTop = 0;
+        location.hash = id;
+      }
+      function renderActive() {
+        if (active === "home") renderHome();
+        if (active === "packages") renderPackages();
+        if (active === "book") renderBook();
+        if (active === "gallery") renderGallery();
+        if (active === "reviews") renderReviews();
+        if (active === "track") renderTrack();
+      }
+      function renderHome() {
+        $("#homeView").innerHTML = `
+    <div class="hero">
+      <div class="hero-art">
+        <img src="${DEMO_IMAGES.hero}" alt="Mobile detailing service" />
+        <div class="hero-copy">
+          <span class="eyebrow">Jacksonville Mobile Detailing</span>
+          <h1>Premier Mobile <span class="blue">Detailing Service</span></h1>
+          <p class="lead">We come to you. You relax. We make it look right.</p>
+          <div class="hero-actions"><button class="primary" data-go="book">Book Mobile Detail</button><button class="ghost" data-go="packages">View Packages</button><a class="ghost" href="tel:9046018480">Call / Text</a></div>
+        </div>
+      </div>
+      <aside class="side-stack">
+        <div class="panel"><div class="inner"><span class="badge">Why Choose Auto Armor?</span><div class="feature-list" style="margin-top:18px">
+          ${feature("Mobile Service", "We come to your home, work or approved location in Jacksonville.")}
+          ${feature("Premium Products", "Professional products selected for a clean, protected finish.")}
+          ${feature("Attention To Detail", "Interior, exterior, wheels, trim and finishing touches handled properly.")}
+          ${feature("Flexible Scheduling", "Request your preferred date and time online.")}
+        </div><img class="mini-photo" src="${DEMO_IMAGES.side}" alt="Clean detailed vehicle"></div></div>
+        <div class="panel"><div class="inner"><span class="badge gold">Service Area</span><h3 style="margin-top:12px">Jacksonville & surrounding areas</h3><p>Travel fee may apply depending on distance. Fully mobile setup available when required.</p></div></div>
+      </aside>
+    </div>
+    <div style="height:18px"></div>
+    <div class="statbar">
+      ${stat("Save Time", "We come to you")}${stat("Fully Insured", "Your vehicle is protected")}${stat("Professional Results", "Detail-focused service")}${stat("Locally Owned", "Serving Jacksonville")}${stat("100% Satisfaction", "We stand behind the work")}
+    </div>
+    <div style="height:22px"></div>
+    <div class="panel"><div class="inner"><div class="section-head"><div><span class="badge">Our Process</span><h2>Simple. Mobile. Professional.</h2></div></div><div class="process">
+      ${processCard("1", "Choose Service", "Select your vehicle, package and add-ons.")}
+      ${processCard("2", "Book Online", "Pick date, time and service location.")}
+      ${processCard("3", "We Come To You", "Track status when the service is on the way.")}
+      ${processCard("4", "Enjoy Results", "Receive final receipt and leave a review.")}
+    </div></div></div>`;
+      }
+      function feature(title, text) {
+        return `<div class="feature"><div class="icon">✦</div><div><b>${title}</b><span>${text}</span></div></div>`;
+      }
+      function stat(a, b) {
+        return `<div class="stat"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg><div><b>${a}</b><small>${b}</small></div></div>`;
+      }
+      function processCard(n, t, d) {
+        return `<div class="process-card"><strong>${n}</strong><b>${t}</b><span>${d}</span></div>`;
+      }
+      function packageCard(p, select = false) {
+        const priceRows = VEHICLES.filter(
+          (v) => Number((p.prices || {})[v] || 0) > 0,
+        )
+          .slice(0, 4)
+          .map(
+            (v) =>
+              `<div class="price-row"><span>${v}</span><b>${money((p.prices || {})[v])}</b></div>`,
+          )
+          .join("");
+        return `<article class="card pkg-card ${p.featured ? "featured" : ""}"><img class="pkg-img" src="${p.image || DEMO_IMAGES.wash}" alt="${escapeHtml(p.name)}"><div class="pkg-body"><div><span class="badge ${p.premium ? "purple" : ""}">${escapeHtml(p.badge || "Package")}</span><h3 style="margin-top:10px">${escapeHtml(p.name)}</h3><p>${escapeHtml(p.description || "")}</p></div><div class="price-list">${priceRows || '<div class="price-row"><span>Specialty</span><b>Quote</b></div>'}</div><div class="features">${(p.features || []).map((f) => `<div class="check"><i>✓</i><span>${escapeHtml(f)}</span></div>`).join("")}</div>${select ? `<button class="${booking.packageId === p.id ? "primary" : "ghost"}" data-package="${p.id}">${booking.packageId === p.id ? "Selected" : "Select Package"}</button>` : `<button class="ghost" data-go="book" data-pick-package="${p.id}">Select Package</button>`}</div></article>`;
+      }
+      function renderPackages() {
+        $("#packagesView").innerHTML =
+          `<div class="section-head"><div><span class="badge">Detailing Packages</span><h2>Clean inside. Shine outside.</h2><p>Professional packages for routine maintenance, full interior/exterior detailing and premium showroom-level work.</p></div><button class="primary" data-go="book">Book Now</button></div><div class="package-grid">${packages()
+            .slice(0, 4)
+            .map((p) => packageCard(p, false))
+            .join("")}</div>`;
+      }
+      function renderBook() {
+        const steps = [
+          "Vehicle",
+          "Package",
+          "Add-ons",
+          "Details",
+          "Photos",
+          "Summary",
+        ];
+        $("#bookView").innerHTML =
+          `<div class="booking-shell"><div class="panel"><div class="inner"><div class="section-head"><div><span class="badge">Online Booking</span><h2>Book your mobile detail.</h2><p>Get an estimate, upload vehicle photos and request your preferred appointment.</p></div></div><div class="stepper">${steps.map((s, i) => `<button class="step-pill ${i === step ? "active" : ""}" data-step="${i}">${i + 1}. ${s}</button>`).join("")}</div><div id="stepHost"></div></div></div><aside class="summary" id="summaryHost"></aside></div>`;
+        renderStep();
+        renderSummary();
+      }
+      function renderStep() {
+        const host = $("#stepHost");
+        if (step === 0) {
+          host.innerHTML = `<div class="step-card active"><h3>Choose your vehicle</h3><p>Pricing updates automatically based on vehicle type.</p><div style="height:14px"></div><div class="choice-grid">${VEHICLES.map((v) => `<button class="choice ${booking.vehicleType === v ? "active" : ""}" data-vehicle="${v}"><b>${v}</b><span>${v.includes("RV") || v.includes("Boat") ? "Specialty quote available" : "Mobile detailing price tier"}</span></button>`).join("")}</div></div>`;
+        }
+        if (step === 1) {
+          host.innerHTML = `<div class="step-card active"><h3>Choose your package</h3><p>Select the service level that fits the vehicle.</p><div style="height:14px"></div><div class="package-grid">${packages()
+            .map((p) => packageCard(p, true))
+            .join("")}</div></div>`;
+        }
+        if (step === 2) {
+          host.innerHTML = `<div class="step-card active"><h3>Add extra services</h3><p>Some add-ons are estimate-based. Final price may be adjusted after inspection.</p><div style="height:14px"></div><div class="choice-grid">${addons()
+            .map(
+              (a) =>
+                `<button class="choice ${booking.addons.includes(a.id) ? "active" : ""}" data-addon="${a.id}"><b>${escapeHtml(a.name)}</b><span>${escapeHtml(a.label || money(a.price))} • ${escapeHtml(a.category || "Add-on")}</span></button>`,
+            )
+            .join("")}</div></div>`;
+        }
+        if (step === 3) {
+          host.innerHTML = `<div class="step-card active"><h3>Service details</h3><p>Jacksonville and surrounding areas. Travel fee may apply depending on distance.</p><div style="height:14px"></div><div class="field-grid">
+    ${field("customerName", "Full Name", "text", "Your name")}${field("phone", "Phone", "tel", "(904) 000-0000")}${field("email", "Email", "email", "you@email.com")}${field("vehicleInfo", "Vehicle Info", "text", "Year, make, model, color")}
+    <div class="field wide"><label>Service Address</label><input id="address" value="${escapeHtml(booking.address || "")}" placeholder="Street address"></div>
+    <div class="field"><label>City</label><input id="city" value="${escapeHtml(booking.city || "Jacksonville")}" placeholder="Jacksonville"></div>
+    <div class="field"><label>Location Type</label><select id="locationType"><option>Home</option><option>Work</option><option>Apartment</option><option>Business Parking Lot</option><option>Other</option></select></div>
+    <div class="field"><label>Preferred Date</label><input id="appointmentDate" type="date" value="${escapeHtml(booking.appointmentDate || "")}"></div>
+    <div class="field"><label>Preferred Time</label><input id="appointmentTime" type="time" value="${escapeHtml(booking.appointmentTime || "")}"></div>
+    <div class="field wide"><label>Notes</label><textarea id="notes" placeholder="Gate code, stains, pet hair, water/electric access, special requests">${escapeHtml(booking.notes || "")}</textarea></div>
+  </div></div>`;
+          ["locationType"].forEach((id) => {
+            if (booking[id]) $("#" + id).value = booking[id];
+          });
+        }
+        if (step === 4) {
+          host.innerHTML = `<div class="step-card active"><h3>Vehicle photos</h3><p>Upload photos from your phone gallery or take them directly from the camera. This helps confirm the service and estimate.</p><div style="height:14px"></div><div class="file-drop"><input id="vehiclePhotos" type="file" accept="image/*" capture="environment" multiple><p>Suggested: exterior, interior front, interior back, trunk, seats/stains, pet hair and wheels.</p><div class="photo-grid" id="photoPreview">${(booking.photos || []).map((src) => `<img class="photo-thumb" src="${src}" alt="Vehicle photo">`).join("")}</div></div></div>`;
+        }
+        if (step === 5) {
+          host.innerHTML = `<div class="step-card active"><h3>Agreement, cancellation & deposit</h3><div class="agreement">
+    <div class="notice"><b>Estimate notice:</b> Some prices may change after visual inspection, heavy condition, oversized vehicles, excessive pet hair, stains, odor, or added services requested on site.</div>
+    <label class="agree-row"><input type="checkbox" id="agreeService" ${booking.agreeService ? "checked" : ""}><span>I understand this is a mobile detailing request and the final price may be confirmed by Auto Armor before service starts.</span></label>
+    <label class="agree-row"><input type="checkbox" id="agreeCancel" ${booking.agreeCancel ? "checked" : ""}><span>I understand cancellations or reschedules should be requested as early as possible. Same-day cancellations may affect deposit eligibility.</span></label>
+    <label class="agree-row"><input type="checkbox" id="agreeDeposit" ${booking.agreeDeposit ? "checked" : ""}><span>I understand a deposit may be required to hold the appointment and is applied to the final balance.</span></label>
+  </div></div>`;
+        }
+        host.insertAdjacentHTML(
+          "beforeend",
+          `<div style="height:18px"></div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="ghost" id="backStep" ${step === 0 ? 'disabled style="opacity:.45"' : ""}>Back</button><button class="primary" id="nextStep">${step === 5 ? "Reserve Now" : "Next Step"}</button></div>`,
+        );
+      }
+      function field(id, label, type, ph) {
+        return `<div class="field"><label>${label}</label><input id="${id}" type="${type}" value="${escapeHtml(booking[id] || "")}" placeholder="${escapeHtml(ph)}"></div>`;
+      }
+      function renderSummary() {
+        $("#summaryHost").innerHTML =
+          `<div class="panel"><div class="inner"><span class="badge">Estimate</span><h3 style="margin-top:10px">${escapeHtml(currentPackage().name)}</h3><div class="summary-line"><span>Vehicle</span><b>${escapeHtml(booking.vehicleType)}</b></div><div class="summary-line"><span>Base package</span><b>${money(basePrice())}</b></div><div class="summary-line"><span>Add-ons</span><b>${money(selectedAddons().reduce((s, a) => s + Number(a.price || 0), 0))}</b></div><div class="summary-line"><span>Travel fee</span><b>${money(travelFee())}</b></div><div class="summary-line"><span>Discount</span><b>-${money(discount())}</b></div><div class="summary-line"><span>Total estimate</span><strong>${money(total())}</strong></div><div class="summary-line"><span>Deposit estimate</span><b>${money(deposit())}</b></div><div class="field"><label>Coupon Code</label><input id="couponInput" value="${escapeHtml(booking.coupon || "")}" placeholder="FIRST20"></div><div class="notice">Reserve now or request final quote. Balance can be requested before or after service completion depending on the job.</div></div></div>`;
+      }
+      function saveForm() {
+        [
+          "customerName",
+          "phone",
+          "email",
+          "vehicleInfo",
+          "address",
+          "city",
+          "locationType",
+          "appointmentDate",
+          "appointmentTime",
+          "notes",
+        ].forEach((id) => {
+          const el = $("#" + id);
+          if (el) booking[id] = el.value;
+        });
+        const c = $("#couponInput");
+        if (c) booking.coupon = c.value;
+        ["agreeService", "agreeCancel", "agreeDeposit"].forEach((id) => {
+          const el = $("#" + id);
+          if (el) booking[id] = el.checked;
+        });
+      }
+      async function compressFile(file, max = 1300, q = 0.78) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          const rd = new FileReader();
+          rd.onload = () => {
+            img.onload = () => {
+              let w = img.width,
+                h = img.height;
+              if (Math.max(w, h) > max) {
+                const r = max / Math.max(w, h);
+                w = Math.round(w * r);
+                h = Math.round(h * r);
+              }
+              const c = document.createElement("canvas");
+              c.width = w;
+              c.height = h;
+              c.getContext("2d").drawImage(img, 0, 0, w, h);
+              resolve(c.toDataURL("image/jpeg", q));
+            };
+            img.onerror = reject;
+            img.src = rd.result;
+          };
+          rd.onerror = reject;
+          rd.readAsDataURL(file);
+        });
+      }
+      async function handlePhotos(e) {
+        const files = Array.from(e.target.files || []).slice(0, 8);
+        for (const f of files) {
+          try {
+            booking.photos.push(await compressFile(f));
+          } catch (err) {}
+        }
+        renderStep();
+      }
+      function bookingStore() {
+        return readLS("aa_bookings_demo", []);
+      }
+      function saveBookingLocal(b) {
+        const list = bookingStore();
+        const i = list.findIndex((x) => x.id === b.id);
+        if (i >= 0) list[i] = b;
+        else list.push(b);
+        writeLS("aa_bookings_demo", list);
+      }
+      async function reserve() {
+        saveForm();
+        if (
+          !booking.customerName ||
+          !booking.phone ||
+          !booking.email ||
+          !booking.address
+        ) {
+          alert("Please complete name, phone, email and address.");
+          step = 3;
+          renderBook();
+          return;
+        }
+        if (
+          !booking.agreeService ||
+          !booking.agreeCancel ||
+          !booking.agreeDeposit
+        ) {
+          alert(
+            "Please accept the service, cancellation and deposit agreement.",
+          );
+          step = 5;
+          renderBook();
+          return;
+        }
+        const id = "AA-" + Math.floor(10000 + Math.random() * 90000);
+        const b = {
+          ...booking,
+          id,
+          status: "Request Received",
+          packageName: currentPackage().name,
+          addonNames: selectedAddons().map((a) => a.name),
+          subtotal: subtotal(),
+          discount: discount(),
+          travelFee: travelFee(),
+          total: total(),
+          depositPaid: 0,
+          balance: total(),
+          photoCount: (booking.photos || []).length,
+          qrData: id,
+          timeline: [
+            {
+              status: "Request Received",
+              at: new Date().toISOString(),
+              note: "Booking request created.",
+            },
+          ],
+          balanceAction: "Not requested",
+        };
+        saveBookingLocal(b);
+        api("createBooking", {
+          bookingJson: JSON.stringify({ ...b, photos: [] }),
+        }).catch(() => {});
+        $("#stepHost").innerHTML =
+          `<div class="step-card active"><span class="badge">Booking Received</span><h2>${id}</h2><p>Your request was received. Keep this confirmation code and QR ready for arrival.</p><div class="qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=${encodeURIComponent(id)}" alt="Confirmation QR"><div class="qr-code-text">${id}</div></div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px"><button class="primary" data-track-id="${id}">Track My Service</button><button class="ghost" data-go="home">Back Home</button></div></div>`;
+      }
+      function renderGallery() {
+        const items = gallery();
+        $("#galleryView").innerHTML =
+          `<div class="section-head"><div><span class="badge">Results Gallery</span><h2>Detail-focused visuals.</h2><p>Finished work, transformations and premium results from detailing services.</p></div><button class="primary" data-go="book">Book Now</button></div><div class="results-grid">${items.map((g, i) => `<article class="card result-card ${i === 0 ? "large" : ""}"><img src="${g.image || g.mainImage || DEMO_IMAGES.result1}" alt="${escapeHtml(g.title)}"><div class="result-meta"><span class="badge ${i === 0 ? "purple" : ""}">${escapeHtml(g.category || g.service || "Result")}</span><h3>${escapeHtml(g.title || "Detail Result")}</h3><p>${escapeHtml(g.description || "Finished detailing result.")}</p></div></article>`).join("")}</div>`;
+      }
+      function renderReviews() {
+        $("#reviewsView").innerHTML =
+          `<div class="section-head"><div><span class="badge">Customer Reviews</span><h2>Real feedback from mobile details.</h2></div></div><div class="review-grid">${reviews()
+            .map(
+              (r) =>
+                `<article class="card review-card"><div class="stars">${"★".repeat(Number(r.rating || 5))}</div><p>“${escapeHtml(r.text)}”</p><b>${escapeHtml(r.name)}</b><small>${escapeHtml(r.service || "Mobile Detail")}</small></article>`,
+            )
+            .join(
+              "",
+            )}</div><div style="height:20px"></div><div class="panel"><div class="inner"><span class="badge">Leave A Review</span><h3 style="margin-top:10px">How did your vehicle look?</h3><div class="field-grid"><div class="field"><label>Name</label><input id="revName" placeholder="Your name"></div><div class="field"><label>Service</label><input id="revService" placeholder="Full Detail"></div><div class="field"><label>Rating</label><select id="revRating"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></div><div class="field wide"><label>Review</label><textarea id="revText" placeholder="Tell us about your experience"></textarea></div></div><div style="height:12px"></div><button class="primary" id="sendReview">Send Review</button></div></div>`;
+      }
+      function renderTrack(result) {
+        $("#trackView").innerHTML =
+          `<div class="track-card panel"><div class="inner"><span class="badge">Service Tracking</span><h2>Track your detail.</h2><p>Enter your confirmation code to see service status, schedule changes, payment requests and final receipt.</p><div style="height:14px"></div><div class="field-grid"><div class="field"><label>Confirmation Code</label><input id="trackId" placeholder="AA-12345" value="${escapeHtml(new URLSearchParams(location.search).get("track") || "")}"></div><div class="field" style="align-self:end"><button class="primary" id="trackBtn">Search</button></div></div><div id="trackResult">${result || ""}</div></div></div>`;
+      }
+      function trackHtml(b, tracking) {
+        const status = b.status || "Request Received";
+        const doneIndex = Math.max(
+          0,
+          TRACK_STEPS.findIndex((s) => s === status),
+        );
+        const proposal =
+          b.proposal && b.proposal.status === "pending"
+            ? `<div class="notice"><b>Schedule update requested:</b><br>New date: ${escapeHtml(b.proposal.date)} • New time: ${escapeHtml(b.proposal.time)}<br>Reason: ${escapeHtml(b.proposal.reason || "Schedule adjustment")}<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><button class="ok" data-accept-proposal="${b.id}">Accept New Time</button><button class="danger" data-cancel-proposal="${b.id}">Cancel Booking</button><a class="ghost" href="tel:9046018480">Call Owner</a></div></div>`
+            : "";
+        const pay =
+          b.balanceAction === "Due Now" || status === "Payment Required"
+            ? `<div class="payment-alert"><b>Payment action required:</b> Balance due now: ${money(b.balance || 0)}.<div style="margin-top:10px"><a class="primary" href="#" onclick="alert('Demo payment button. Stripe, Square, Zelle or invoice link can be connected in settings.');return false">Pay Balance</a></div></div>`
+            : "";
+        const qr = `<div class="qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data=${encodeURIComponent(b.id)}" alt="Confirmation QR"><div class="qr-code-text">${escapeHtml(b.id)}</div></div>`;
+        return `<div style="height:18px"></div><div class="panel"><div class="inner"><h3>${escapeHtml(b.packageName || "Mobile Detail")}</h3><p>${escapeHtml(b.vehicleInfo || b.vehicleType || "Vehicle")} • ${escapeHtml(b.appointmentDate || "Date pending")} ${escapeHtml(b.appointmentTime || "")}</p>${qr}${proposal}${pay}<div class="summary-line"><span>Total</span><b>${money(b.total)}</b></div><div class="summary-line"><span>Balance</span><b>${money(b.balance)}</b></div><div class="timeline">${TRACK_STEPS.map((s, i) => `<div class="timeline-step ${i <= doneIndex || s === status ? "done" : ""}"><div class="dot">${i + 1}</div><div><b>${s}</b><p>${s === status ? "Current status" : "Status update"}</p></div></div>`).join("")}</div></div></div>`;
+      }
+      async function searchTrack() {
+        const id = ($("#trackId")?.value || "").trim();
+        if (!id) return;
+        let b = bookingStore().find((x) => String(x.id) === id);
+        let tracking = null;
+        try {
+          const res = await api("getBooking", { id });
+          if (res && res.ok) {
+            b = { ...b, ...res.booking };
+            tracking = res.tracking || null;
+          }
+        } catch (e) {}
+        $("#trackResult").innerHTML = b
+          ? trackHtml(b, tracking)
+          : `<div class="notice" style="margin-top:14px">No service found with that confirmation code.</div>`;
+      }
+      function submitReview() {
+        const r = {
+          id: "R-" + Date.now(),
+          name: $("#revName").value || "Customer",
+          service: $("#revService").value || "Mobile Detail",
+          rating: Number($("#revRating").value || 5),
+          text: $("#revText").value || "",
+          status: "pending",
+          featured: false,
+        };
+        if (!r.text.trim()) {
+          alert("Please write your review.");
+          return;
+        }
+        const list = readLS("aa_reviews_demo", []);
+        list.push(r);
+        writeLS("aa_reviews_demo", list);
+        api("submitReview", { reviewJson: JSON.stringify(r) }).catch(() => {});
+        alert("Thank you for sharing your experience.");
+        $("#revName").value = "";
+        $("#revText").value = "";
+      }
+      async function respondProposal(id, response) {
+        const list = bookingStore();
+        const i = list.findIndex((x) => x.id === id);
+        if (i >= 0) {
+          const b = list[i];
+          if (response === "accepted") {
+            b.status = "Appointment Scheduled";
+            b.appointmentDate = b.proposal.date;
+            b.appointmentTime = b.proposal.time;
+            b.proposal.status = "accepted";
+          } else {
+            b.status = "Canceled";
+            b.proposal.status = "canceled";
+          }
+          list[i] = b;
+          writeLS("aa_bookings_demo", list);
+        }
+        api("respondScheduleProposal", { id, response }).catch(() => {});
+        searchTrack();
+      }
+      document.addEventListener("click", (e) => {
+        const goId = e.target.closest("[data-go]")?.dataset.go;
+        if (goId) {
+          go(goId);
+          return;
+        }
+        const p = e.target.closest("[data-pick-package]")?.dataset.pickPackage;
+        if (p) {
+          booking.packageId = p;
+          go("book");
+          step = 1;
+          renderBook();
+          return;
+        }
+        const st = e.target.closest("[data-step]")?.dataset.step;
+        if (st !== undefined) {
+          saveForm();
+          step = Number(st);
+          renderBook();
+          return;
+        }
+        const v = e.target.closest("[data-vehicle]")?.dataset.vehicle;
+        if (v) {
+          booking.vehicleType = v;
+          renderBook();
+          return;
+        }
+        const pack = e.target.closest("[data-package]")?.dataset.package;
+        if (pack) {
+          booking.packageId = pack;
+          renderBook();
+          return;
+        }
+        const ad = e.target.closest("[data-addon]")?.dataset.addon;
+        if (ad) {
+          booking.addons = booking.addons.includes(ad)
+            ? booking.addons.filter((x) => x !== ad)
+            : booking.addons.concat(ad);
+          renderBook();
+          return;
+        }
+        if (e.target.id === "backStep") {
+          saveForm();
+          step = Math.max(0, step - 1);
+          renderBook();
+          return;
+        }
+        if (e.target.id === "nextStep") {
+          saveForm();
+          if (step < 5) {
+            step++;
+            renderBook();
+          } else reserve();
+          return;
+        }
+        const tid = e.target.closest("[data-track-id]")?.dataset.trackId;
+        if (tid) {
+          go("track");
+          setTimeout(() => {
+            $("#trackId").value = tid;
+            searchTrack();
+          }, 40);
+          return;
+        }
+        if (e.target.id === "trackBtn") {
+          searchTrack();
+          return;
+        }
+        if (e.target.id === "sendReview") {
+          submitReview();
+          return;
+        }
+        const acc = e.target.closest("[data-accept-proposal]")?.dataset
+          .acceptProposal;
+        if (acc) {
+          respondProposal(acc, "accepted");
+          return;
+        }
+        const can = e.target.closest("[data-cancel-proposal]")?.dataset
+          .cancelProposal;
+        if (can) {
+          respondProposal(can, "canceled");
+          return;
+        }
+      });
+      document.addEventListener("input", (e) => {
+        if (e.target.id === "couponInput") {
+          booking.coupon = e.target.value;
+          renderSummary();
+        }
+      });
+      document.addEventListener("change", (e) => {
+        if (e.target.id === "vehiclePhotos") handlePhotos(e);
+      });
+      async function init() {
+        nav();
+        api("getPublicData")
+          .then((res) => {
+            if (res && res.ok) {
+              data = { ...data, ...res };
+              renderActive();
+            }
+          })
+          .catch(() => {});
+        const q = new URLSearchParams(location.search);
+        if (q.get("track")) {
+          active = "track";
+          $$(".view").forEach((v) => v.classList.remove("active"));
+          $("#trackView").classList.add("active");
+          nav();
+          renderTrack();
+          setTimeout(searchTrack, 80);
+        } else {
+          const h = location.hash.replace("#", "");
+          if (VIEWS.some((v) => v[0] === h)) active = h;
+          $$(".view").forEach((v) => v.classList.remove("active"));
+          $("#" + active + "View").classList.add("active");
+          nav();
+          renderActive();
+        }
+      }
+      init();
+    </script>
+  </body>
 </html>
