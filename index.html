@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auto Armor | Mobile Detailing Demo</title>
+  <meta name="theme-color" content="#05070f" />
+  <style>
+    :root{
+      --bg:#05070f;
+      --panel:#0a0f1f;
+      --panel2:#0e172d;
+      --line:rgba(77,163,255,.28);
+      --line2:rgba(255,255,255,.1);
+      --text:#f4f7ff;
+      --muted:#9fb0ca;
+      --blue:#177bff;
+      --cyan:#4bc9ff;
+      --purple:#8d59ff;
+      --green:#2ee89d;
+      --yellow:#ffd66b;
+      --danger:#ff5d72;
+      --shadow:0 24px 70px rgba(0,0,0,.55);
+      --radius:24px;
+      --radius2:18px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      min-height:100vh;
+      background:
+        radial-gradient(circle at 18% -8%, rgba(23,123,255,.38), transparent 34%),
+        radial-gradient(circle at 88% 8%, rgba(141,89,255,.26), transparent 32%),
+        linear-gradient(180deg,#02030a 0%,#060915 44%,#03050c 100%);
+      color:var(--text);
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      overflow:hidden;
+    }
+    body::before{
+      content:"";
+      position:fixed;inset:0;pointer-events:none;opacity:.18;
+      background-image:
+        linear-gradient(135deg,rgba(255,255,255,.05) 25%,transparent 25%),
+        linear-gradient(225deg,rgba(255,255,255,.05) 25%,transparent 25%),
+        linear-gradient(45deg,rgba(255,255,255,.05) 25%,transparent 25%),
+        linear-gradient(315deg,rgba(255,255,255,.05) 25%,#05070f 25%);
+      background-position:10px 0,10px 0,0 0,0 0;background-size:20px 20px;background-repeat:repeat;
+    }
+    button,input,select,textarea{font:inherit;color:inherit}
+    button{border:0;cursor:pointer}
+    a{color:inherit;text-decoration:none}
+    .app{
+      width:min(1240px,100%);
+      height:100vh;
+      margin:0 auto;
+      padding:18px 18px 94px;
+      display:grid;
+      grid-template-rows:auto 1fr;
+      gap:16px;
+      position:relative;
+    }
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;gap:14px;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:rgba(6,10,22,.78);
+      backdrop-filter:blur(16px);
+      box-shadow:var(--shadow);
+    }
+    .brand{display:flex;align-items:center;gap:12px;min-width:0}
+    .logo{
+      width:45px;height:45px;border-radius:16px;
+      background:linear-gradient(135deg,#09111f,#0f2d6f 55%,#101522);
+      border:1px solid rgba(75,201,255,.45);
+      display:grid;place-items:center;
+      box-shadow:0 0 24px rgba(23,123,255,.45);
+      flex:0 0 auto;
+    }
+    .logo svg{width:30px;height:30px;filter:drop-shadow(0 0 6px rgba(75,201,255,.8))}
+    .brand-text{min-width:0}
+    .brand-text strong{display:block;font-size:15px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+    .brand-text span{display:block;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .quick-actions{display:flex;gap:8px;align-items:center}
+    .pill-btn,.primary-btn,.ghost-btn,.danger-btn,.success-btn{
+      border-radius:999px;padding:12px 16px;font-weight:900;letter-spacing:.02em;
+      transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
+      white-space:nowrap;
+    }
+    .pill-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--text)}
+    .primary-btn{background:linear-gradient(135deg,var(--blue),#0cc9ff);color:white;box-shadow:0 14px 34px rgba(23,123,255,.35)}
+    .ghost-btn{background:rgba(23,123,255,.12);border:1px solid var(--line);color:#d8edff}
+    .danger-btn{background:rgba(255,93,114,.15);border:1px solid rgba(255,93,114,.38);color:#ffd8de}
+    .success-btn{background:rgba(46,232,157,.14);border:1px solid rgba(46,232,157,.4);color:#d8ffed}
+    .pill-btn:hover,.primary-btn:hover,.ghost-btn:hover,.danger-btn:hover,.success-btn:hover{transform:translateY(-1px)}
+    .screen-wrap{position:relative;min-height:0;overflow:hidden;border-radius:32px;}
+    .screen{
+      display:none;
+      height:100%;
+      overflow:auto;
+      scrollbar-width:thin;
+      padding:18px;
+      border:1px solid var(--line);
+      border-radius:32px;
+      background:linear-gradient(180deg,rgba(10,15,31,.9),rgba(3,5,12,.86));
+      box-shadow:var(--shadow);
+      animation:fadeSlide .24s ease both;
+    }
+    .screen.active{display:block}
+    @keyframes fadeSlide{from{opacity:.4;transform:translateY(14px) scale(.99)}to{opacity:1;transform:none}}
+    .bottom-nav{
+      position:fixed;left:50%;bottom:14px;transform:translateX(-50%);
+      width:min(760px,calc(100% - 22px));
+      display:grid;grid-template-columns:repeat(6,1fr);gap:7px;
+      padding:8px;border-radius:24px;
+      background:rgba(3,6,14,.92);backdrop-filter:blur(18px);
+      border:1px solid rgba(77,163,255,.25);z-index:20;box-shadow:0 16px 45px rgba(0,0,0,.55);
+    }
+    .nav-btn{
+      padding:10px 6px;border-radius:17px;background:transparent;color:var(--muted);
+      display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:900;
+    }
+    .nav-btn span:first-child{font-size:17px}.nav-btn.active{background:linear-gradient(135deg,rgba(23,123,255,.28),rgba(75,201,255,.16));color:#fff;border:1px solid rgba(75,201,255,.25)}
+    .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;min-height:100%}
+    .hero-card,.card,.glass-card{
+      border:1px solid var(--line);
+      background:linear-gradient(180deg,rgba(14,23,45,.88),rgba(6,10,22,.72));
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      position:relative;overflow:hidden;
+    }
+    .hero-card{padding:28px;display:flex;flex-direction:column;justify-content:space-between;min-height:550px}
+    .hero-card::before,.card::before{
+      content:"";position:absolute;inset:-1px;pointer-events:none;
+      background:linear-gradient(135deg,rgba(75,201,255,.22),transparent 35%,rgba(141,89,255,.14));
+      opacity:.8;
+    }
+    .hero-content,.card-content{position:relative;z-index:1}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(75,201,255,.32);background:rgba(23,123,255,.12);padding:9px 12px;border-radius:999px;color:#dcefff;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
+    h1{font-size:clamp(44px,8vw,92px);line-height:.88;margin:22px 0 12px;text-transform:uppercase;letter-spacing:-.07em;font-style:italic;text-shadow:0 0 24px rgba(23,123,255,.38)}
+    .blue-text{color:#45a7ff}.purple-text{color:#b28cff}.muted{color:var(--muted)}
+    .lead{font-size:clamp(16px,2vw,21px);color:#cad8ef;max-width:760px;line-height:1.5}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+    .trust-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:26px}
+    .trust-item{padding:13px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);font-size:12px;color:#d7e9ff;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+    .trust-item b{display:block;font-size:22px;margin-bottom:3px;color:#56c9ff}
+    .flyer-card{min-height:550px;padding:14px;display:flex;flex-direction:column;gap:12px}
+    .flyer-card img{width:100%;height:100%;object-fit:cover;border-radius:19px;border:1px solid rgba(255,255,255,.13);filter:contrast(1.05) saturate(1.08)}
+    .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:16px}
+    .section-head h2{font-size:clamp(28px,4vw,52px);line-height:.92;text-transform:uppercase;font-style:italic;letter-spacing:-.045em}
+    .section-head p{max-width:560px;color:var(--muted);line-height:1.5}
+    .package-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    .package-card{padding:20px;border-radius:26px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(12,18,35,.95),rgba(4,7,15,.9));position:relative;overflow:hidden}
+    .package-card.featured{border-color:rgba(75,201,255,.72);box-shadow:0 0 34px rgba(23,123,255,.22)}
+    .package-card.premium{border-color:rgba(178,140,255,.65);box-shadow:0 0 34px rgba(141,89,255,.18)}
+    .badge{display:inline-block;border-radius:999px;padding:8px 10px;background:rgba(23,123,255,.18);border:1px solid rgba(75,201,255,.25);font-size:11px;font-weight:950;text-transform:uppercase;color:#dff2ff}
+    .badge.purple{background:rgba(141,89,255,.18);border-color:rgba(178,140,255,.32);color:#f0e6ff}
+    .package-card h3{font-size:30px;margin:14px 0 4px;text-transform:uppercase;font-style:italic;letter-spacing:-.04em}
+    .price-line{display:flex;align-items:flex-end;gap:8px;margin:12px 0 16px}
+    .price-line strong{font-size:42px;letter-spacing:-.08em;color:#54b7ff}.package-card.premium .price-line strong{color:#b28cff}
+    .price-line span{color:var(--muted);padding-bottom:8px;font-weight:800}
+    .feature-list{display:grid;gap:10px;margin:15px 0 18px}.feature-list li{display:flex;gap:10px;align-items:flex-start;color:#dce7f9;list-style:none;line-height:1.35}.check{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--cyan));display:grid;place-items:center;flex:0 0 22px;font-size:13px;font-weight:950}.package-card.premium .check{background:linear-gradient(135deg,var(--purple),#cbb3ff)}
+    .price-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:14px 0}.mini-price{padding:10px;border-radius:15px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09)}.mini-price span{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:900}.mini-price b{font-size:23px;color:white}
+    .booking-shell{display:grid;grid-template-columns:320px 1fr;gap:16px;min-height:100%}.summary-panel{padding:18px;align-self:start;position:sticky;top:0}.summary-panel h3,.form-panel h3{font-size:24px;text-transform:uppercase;font-style:italic;margin-bottom:10px}.form-panel{padding:20px}.steps{display:grid;gap:10px;margin-top:16px}.step-dot{display:flex;align-items:center;gap:10px;padding:12px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);color:var(--muted);font-weight:900}.step-dot.active{background:rgba(23,123,255,.16);border-color:rgba(75,201,255,.32);color:#fff}.step-num{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.1);display:grid;place-items:center}.step-dot.active .step-num{background:linear-gradient(135deg,var(--blue),var(--cyan))}
+    .form-step{display:none}.form-step.active{display:block;animation:fadeSlide .22s ease both}.option-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0}.option-card{padding:16px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);text-align:left;font-weight:900;min-height:88px}.option-card small{display:block;color:var(--muted);font-weight:700;margin-top:5px}.option-card.selected{background:linear-gradient(135deg,rgba(23,123,255,.26),rgba(75,201,255,.12));border-color:rgba(75,201,255,.48);box-shadow:0 0 24px rgba(23,123,255,.18)}
+    .field-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px}.field{display:grid;gap:7px}.field.full{grid-column:1/-1}.field label{color:#d5e8ff;font-weight:900;font-size:13px;text-transform:uppercase;letter-spacing:.04em}.field input,.field select,.field textarea{width:100%;border-radius:16px;border:1px solid rgba(255,255,255,.12);background:rgba(2,4,10,.58);padding:13px 14px;outline:none}.field textarea{min-height:100px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(75,201,255,.65);box-shadow:0 0 0 4px rgba(23,123,255,.13)}
+    .addon-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}.addon-card{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:14px;border-radius:17px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04)}.addon-card.selected{border-color:rgba(75,201,255,.5);background:rgba(23,123,255,.14)}.addon-card strong{display:block}.addon-card span{color:var(--muted);font-size:13px}.toggle{width:44px;height:24px;border-radius:999px;background:rgba(255,255,255,.16);position:relative;flex:0 0 auto}.toggle::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;left:3px;top:3px;transition:.2s}.selected .toggle{background:linear-gradient(135deg,var(--blue),var(--cyan))}.selected .toggle::after{transform:translateX(20px)}
+    .summary-line{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);color:#d8e5f7}.summary-line span:first-child{color:var(--muted)}.summary-total{font-size:28px;font-weight:950;color:#54b7ff}.notice{padding:13px;border-radius:16px;background:rgba(255,214,107,.09);border:1px solid rgba(255,214,107,.22);color:#ffedbd;line-height:1.4;margin-top:12px}.ok-box{padding:16px;border-radius:18px;background:rgba(46,232,157,.1);border:1px solid rgba(46,232,157,.3);color:#ddfff0;margin-top:14px}.warn-box{padding:16px;border-radius:18px;background:rgba(255,93,114,.1);border:1px solid rgba(255,93,114,.28);color:#ffe0e4;margin-top:14px}
+    .button-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.gallery-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.ba-card{border-radius:22px;overflow:hidden;border:1px solid var(--line);background:rgba(255,255,255,.04);position:relative}.ba-img{height:220px;background:linear-gradient(135deg,rgba(23,123,255,.35),rgba(141,89,255,.22)),url('assets/auto-armor-flyer.jpeg');background-size:cover;background-position:center;filter:saturate(1.05)}.ba-card:nth-child(2) .ba-img{background-position:34% 77%}.ba-card:nth-child(3) .ba-img{background-position:74% 80%}.ba-card:nth-child(4) .ba-img{background-position:12% 56%}.ba-content{padding:15px}.before-after-strip{position:absolute;left:12px;right:12px;top:178px;display:flex;justify-content:space-between}.before-after-strip span{padding:7px 10px;border-radius:999px;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.14);font-size:12px;font-weight:950;text-transform:uppercase}
+    .review-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.review-card{padding:17px;border-radius:20px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1)}.stars{color:#ffd66b;letter-spacing:.08em;margin-bottom:8px}.track-layout{display:grid;grid-template-columns:420px 1fr;gap:16px}.timeline{display:grid;gap:12px;margin-top:15px}.timeline-item{display:grid;grid-template-columns:28px 1fr;gap:10px;color:var(--muted)}.timeline-dot{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.2);margin-top:2px}.timeline-item.done{color:#fff}.timeline-item.done .timeline-dot{background:linear-gradient(135deg,var(--green),var(--cyan));border-color:transparent;box-shadow:0 0 20px rgba(46,232,157,.35)}.qr-box{display:grid;place-items:center;padding:16px;border-radius:20px;background:#fff;margin-top:12px}.qr-box img{width:180px;height:180px}.status-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 11px;border-radius:999px;background:rgba(23,123,255,.14);border:1px solid rgba(75,201,255,.28);color:#dff2ff;font-size:12px;font-weight:950;text-transform:uppercase}.footer-space{height:20px}
+    @media(max-width:980px){body{overflow:auto}.app{height:auto;min-height:100vh}.hero-grid,.booking-shell,.track-layout{grid-template-columns:1fr}.hero-card,.flyer-card{min-height:auto}.package-grid,.gallery-grid,.review-grid{grid-template-columns:1fr}.option-grid{grid-template-columns:repeat(2,1fr)}.field-grid{grid-template-columns:1fr}.trust-row{grid-template-columns:repeat(2,1fr)}.quick-actions .pill-btn{display:none}.summary-panel{position:relative}.screen{min-height:calc(100vh - 140px)}}
+    @media(max-width:620px){.app{padding:10px 10px 92px}.screen{padding:12px;border-radius:24px}.topbar{border-radius:24px}.brand-text strong{font-size:13px}.brand-text span{font-size:11px}.primary-btn,.ghost-btn,.pill-btn,.danger-btn,.success-btn{padding:11px 13px}.bottom-nav{grid-template-columns:repeat(6,1fr);gap:4px}.nav-btn{font-size:10px;padding:8px 2px}.hero-card{padding:20px}.trust-row,.option-grid,.addon-grid{grid-template-columns:1fr}.section-head{display:block}.field input,.field select,.field textarea{font-size:16px}.flyer-card img{max-height:520px}.topbar .primary-btn{display:none}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <a class="brand" href="#" data-open="home" aria-label="Auto Armor home">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none"><path d="M10 38c4-10 9-18 19-20h14c5 0 9 7 11 16" stroke="#54c7ff" stroke-width="4" stroke-linecap="round"/><path d="M14 38h39" stroke="#fff" stroke-width="4" stroke-linecap="round"/><circle cx="21" cy="42" r="5" fill="#177bff"/><circle cx="46" cy="42" r="5" fill="#177bff"/><path d="M29 24h13" stroke="#8d59ff" stroke-width="3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="brand-text"><strong>Auto Armor</strong><span>Mobile Detailing Demo</span></div>
+      </a>
+      <div class="quick-actions">
+        <a class="pill-btn" id="instagramTop" href="#" target="_blank" rel="noopener">Instagram</a>
+        <a class="pill-btn" href="tel:9046018480">Call / Text</a>
+        <button class="primary-btn" data-open="book">Book Now</button>
+      </div>
+    </header>
+
+    <main class="screen-wrap">
+      <section id="home" class="screen active" aria-label="Home screen">
+        <div class="hero-grid">
+          <div class="hero-card">
+            <div class="hero-content">
+              <span class="eyebrow">Jacksonville & surrounding areas</span>
+              <h1>Clean Inside.<br><span class="blue-text">Shine Outside.</span></h1>
+              <p class="lead">Premium mobile detailing built like a booking app. Choose your package, request service at your home or work, upload vehicle photos, track the technician, and receive a QR confirmation.</p>
+              <div class="hero-actions">
+                <button class="primary-btn" data-open="book">Book Mobile Detail</button>
+                <button class="ghost-btn" data-open="packages">View Packages</button>
+                <button class="ghost-btn" data-open="track">Track My Service</button>
+              </div>
+              <div class="trust-row">
+                <div class="trust-item"><b>⏱</b>Save Time</div>
+                <div class="trust-item"><b>🛡</b>Fully Insured</div>
+                <div class="trust-item"><b>✨</b>Pro Results</div>
+                <div class="trust-item"><b>📍</b>We Come To You</div>
+              </div>
+            </div>
+            <div class="notice"><strong>Demo logic included:</strong> packages, add-ons, coupons, reviews approval, QR confirmation, GPS status, tracking page, and admin-ready booking records.</div>
+          </div>
+          <div class="card flyer-card">
+            <img src="assets/auto-armor-flyer.jpeg" alt="Auto Armor service flyer reference" />
+          </div>
+        </div>
+      </section>
+
+      <section id="packages" class="screen" aria-label="Packages screen">
+        <div class="section-head">
+          <div><span class="eyebrow">Detail packages</span><h2>Choose your clean level</h2></div>
+          <p>Prices update by vehicle type during booking. Specialty vehicles and heavy conditions can be sent as quote requests.</p>
+        </div>
+        <div id="packageGrid" class="package-grid"></div>
+      </section>
+
+      <section id="book" class="screen" aria-label="Booking screen">
+        <div class="section-head">
+          <div><span class="eyebrow">Mobile booking</span><h2>Reserve your detail</h2></div>
+          <p>Fast app-style flow. The customer receives a confirmation ID and QR code after submitting the request.</p>
+        </div>
+        <div class="booking-shell">
+          <aside class="card summary-panel">
+            <div class="card-content">
+              <h3>Live Estimate</h3>
+              <div id="estimateBox"></div>
+              <div class="steps">
+                <div class="step-dot active" data-step-indicator="1"><span class="step-num">1</span>Vehicle</div>
+                <div class="step-dot" data-step-indicator="2"><span class="step-num">2</span>Package</div>
+                <div class="step-dot" data-step-indicator="3"><span class="step-num">3</span>Add-ons</div>
+                <div class="step-dot" data-step-indicator="4"><span class="step-num">4</span>Details</div>
+                <div class="step-dot" data-step-indicator="5"><span class="step-num">5</span>Confirm</div>
+              </div>
+            </div>
+          </aside>
+          <div class="card form-panel">
+            <div class="card-content">
+              <form id="bookingForm">
+                <div class="form-step active" data-step="1">
+                  <h3>Step 1 — Choose Your Vehicle</h3>
+                  <div id="vehicleOptions" class="option-grid"></div>
+                  <div class="button-row"><button type="button" class="primary-btn" data-next>Next</button></div>
+                </div>
+                <div class="form-step" data-step="2">
+                  <h3>Step 2 — Choose Your Package</h3>
+                  <div id="packageOptions" class="option-grid"></div>
+                  <div class="button-row"><button type="button" class="ghost-btn" data-prev>Back</button><button type="button" class="primary-btn" data-next>Next</button></div>
+                </div>
+                <div class="form-step" data-step="3">
+                  <h3>Step 3 — Add Extra Services</h3>
+                  <p class="muted">Variable items show as starting prices. Final pricing can be adjusted by Auto Armor after inspection.</p>
+                  <div id="addonOptions" class="addon-grid"></div>
+                  <div class="field full" style="margin-top:14px"><label for="couponInput">Coupon code</label><input id="couponInput" placeholder="Example: FIRST20" /></div>
+                  <div id="couponMessage"></div>
+                  <div class="button-row"><button type="button" class="ghost-btn" data-prev>Back</button><button type="button" class="primary-btn" data-next>Next</button></div>
+                </div>
+                <div class="form-step" data-step="4">
+                  <h3>Step 4 — Contact & Service Location</h3>
+                  <div class="field-grid">
+                    <div class="field"><label for="fullName">Full name</label><input id="fullName" required autocomplete="name" /></div>
+                    <div class="field"><label for="phone">Phone</label><input id="phone" required autocomplete="tel" /></div>
+                    <div class="field"><label for="email">Email</label><input id="email" type="email" required autocomplete="email" /></div>
+                    <div class="field"><label for="cityArea">Jacksonville area?</label><select id="cityArea"><option>Yes, Jacksonville or nearby area</option><option>No, outside Jacksonville area</option></select></div>
+                    <div class="field full"><label for="address">Service address</label><input id="address" required placeholder="Home, work, apartment, or business parking location" /></div>
+                    <div class="field"><label for="locationType">Location type</label><select id="locationType"><option>Home</option><option>Work</option><option>Apartment</option><option>Business Parking Lot</option><option>Other</option></select></div>
+                    <div class="field"><label for="date">Preferred date</label><input id="date" type="date" required /></div>
+                    <div class="field"><label for="time">Preferred time</label><input id="time" type="time" required /></div>
+                    <div class="field"><label for="vehicleInfo">Vehicle info</label><input id="vehicleInfo" placeholder="Year, make, model, color" /></div>
+                    <div class="field"><label for="photoUpload">Vehicle photos</label><input id="photoUpload" type="file" accept="image/*" multiple /></div>
+                    <div class="field full"><label for="notes">Notes / vehicle condition</label><textarea id="notes" placeholder="Pet hair, stains, odor, heavy dirt, water/electric access, gate code, parking notes, etc."></textarea></div>
+                  </div>
+                  <div class="button-row"><button type="button" class="ghost-btn" data-prev>Back</button><button type="button" class="primary-btn" data-next>Review</button></div>
+                </div>
+                <div class="form-step" data-step="5">
+                  <h3>Step 5 — Confirm Request</h3>
+                  <div id="reviewBox" class="glass-card" style="padding:16px"></div>
+                  <div class="notice">This is a demo booking request. In the real Apps Script version, this creates a Google Sheet record, sends customer/admin emails, and attaches compressed vehicle photos.</div>
+                  <div class="button-row"><button type="button" class="ghost-btn" data-prev>Back</button><button type="submit" class="primary-btn">Submit Booking Request</button></div>
+                </div>
+              </form>
+              <div id="confirmationBox"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="gallery" class="screen" aria-label="Gallery screen">
+        <div class="section-head">
+          <div><span class="eyebrow">Before / After</span><h2>Latest work</h2></div>
+          <p>Admin-controlled gallery. In the full version, the owner can upload before/after pairs and choose what appears on the public page.</p>
+        </div>
+        <div id="galleryGrid" class="gallery-grid"></div>
+      </section>
+
+      <section id="reviews" class="screen" aria-label="Reviews screen">
+        <div class="section-head">
+          <div><span class="eyebrow">Customer reviews</span><h2>Approved reviews only</h2></div>
+          <p>Customers can submit reviews here. The admin approves or rejects them before they appear on the home page.</p>
+        </div>
+        <div class="booking-shell">
+          <div class="card form-panel">
+            <div class="card-content">
+              <h3>Leave a Website Review</h3>
+              <form id="reviewForm">
+                <div class="field-grid">
+                  <div class="field"><label for="reviewName">Name</label><input id="reviewName" required /></div>
+                  <div class="field"><label for="reviewRating">Rating</label><select id="reviewRating"><option value="5">5 Stars</option><option value="4">4 Stars</option><option value="3">3 Stars</option><option value="2">2 Stars</option><option value="1">1 Star</option></select></div>
+                  <div class="field full"><label for="reviewText">Review</label><textarea id="reviewText" required placeholder="Tell us about your experience"></textarea></div>
+                </div>
+                <div class="button-row"><button class="primary-btn" type="submit">Submit for Approval</button><a id="googleReviewLink" class="ghost-btn" href="#" target="_blank" rel="noopener">Review us on Google</a></div>
+              </form>
+              <div id="reviewSubmitMessage"></div>
+            </div>
+          </div>
+          <div class="card form-panel"><div class="card-content"><h3>Live Approved Reviews</h3><div id="approvedReviews" class="review-grid" style="grid-template-columns:1fr"></div></div></div>
+        </div>
+      </section>
+
+      <section id="track" class="screen" aria-label="Track service screen">
+        <div class="section-head">
+          <div><span class="eyebrow">Service tracking</span><h2>Track your detail</h2></div>
+          <p>Use the confirmation ID from the booking confirmation or the QR code email.</p>
+        </div>
+        <div class="track-layout">
+          <div class="card form-panel"><div class="card-content">
+            <h3>Find booking</h3>
+            <div class="field"><label for="trackInput">Confirmation ID</label><input id="trackInput" placeholder="Example: AA-20260610-1234" /></div>
+            <div class="button-row"><button id="trackButton" class="primary-btn">Track Service</button></div>
+            <div id="trackMessage"></div>
+          </div></div>
+          <div class="card form-panel"><div class="card-content"><h3>Service Status</h3><div id="trackingResult"></div></div></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <nav class="bottom-nav" aria-label="App navigation">
+    <button class="nav-btn active" data-open="home"><span>🏠</span><span>Home</span></button>
+    <button class="nav-btn" data-open="packages"><span>💎</span><span>Packages</span></button>
+    <button class="nav-btn" data-open="book"><span>⚡</span><span>Book</span></button>
+    <button class="nav-btn" data-open="gallery"><span>📸</span><span>Gallery</span></button>
+    <button class="nav-btn" data-open="reviews"><span>⭐</span><span>Reviews</span></button>
+    <button class="nav-btn" data-open="track"><span>📍</span><span>Track</span></button>
+  </nav>
+
+  <script>
+    const STORAGE = {
+      bookings:'aa_demo_bookings_v1',
+      reviews:'aa_demo_reviews_v1',
+      packages:'aa_demo_packages_v1',
+      addons:'aa_demo_addons_v1',
+      coupons:'aa_demo_coupons_v1',
+      gallery:'aa_demo_gallery_v1',
+      settings:'aa_demo_settings_v1'
+    };
+    const vehicles = ['Sedan','Small SUV','Large SUV / Truck','Large Truck','Motorcycle','RV','Boat / Trailer'];
+    const defaultSettings = {
+      businessName:'Auto Armor',
+      phone:'(904) 601-8480',
+      instagramHandle:'@autoarmor.detailing',
+      instagramUrl:'https://www.instagram.com/autoarmor.detailing/',
+      googleReviewUrl:'#',
+      serviceArea:'Jacksonville & surrounding areas',
+      travelFeeText:'Travel fee may apply depending on distance.',
+      gpsEnabled:true,
+      qrEnabled:true
+    };
+    const defaultPackages = [
+      {id:'basic',name:'Basic Refresh',tagline:'Perfect for routine maintenance',badge:'Routine Clean',accent:'blue',visible:true,prices:{'Sedan':99,'Small SUV':119,'Large SUV / Truck':139,'Large Truck':159,'Motorcycle':null,'RV':null,'Boat / Trailer':null},items:['Exterior hand wash','Wheels & tire shine','Quick interior vacuum','Dash & surface wipe down','Interior windows']},
+      {id:'full',name:'Full Detail',tagline:'Most popular mobile detail',badge:'Most Popular',accent:'blue',visible:true,prices:{'Sedan':179,'Small SUV':199,'Large SUV / Truck':229,'Large Truck':249,'Motorcycle':175,'RV':300,'Boat / Trailer':null},items:['Everything in Basic Refresh','Deep interior vacuum','Door jambs cleaned','Interior UV protectant','Premium spray wax','Trim & tire shine']},
+      {id:'premium',name:'Premium Detail',tagline:'Showroom level clean',badge:'Premium',accent:'purple',visible:true,prices:{'Sedan':249,'Small SUV':279,'Large SUV / Truck':299,'Large Truck':329,'Motorcycle':null,'RV':null,'Boat / Trailer':null},items:['Everything in Full Detail','Shampoo seats & carpets','Leather cleaning & conditioning','Clay bar treatment','Light engine bay cleaning']}
+    ];
+    const defaultAddons = [
+      {id:'pet',name:'Pet Hair Removal',price:25,variable:true,label:'$25–$75',visible:true},
+      {id:'stain',name:'Stain Removal',price:25,variable:true,label:'$25+',visible:true},
+      {id:'odor',name:'Odor Elimination',price:50,variable:false,label:'$50',visible:true},
+      {id:'headlight',name:'Headlight Restoration',price:75,variable:false,label:'$75',visible:true},
+      {id:'engine',name:'Engine Bay Detail',price:50,variable:false,label:'$50',visible:true},
+      {id:'wax',name:'Wax Protection',price:100,variable:true,label:'Starting at $100',visible:true},
+      {id:'ceramic',name:'Ceramic Coating',price:250,variable:true,label:'Starting at $250',visible:true},
+      {id:'paint',name:'Paint Correction',price:300,variable:true,label:'Starting at $300',visible:true}
+    ];
+    const defaultCoupons = [
+      {code:'FIRST20',type:'percent',value:20,active:true,label:'20% off first detail'},
+      {code:'FULL149',type:'fixedToFull',value:149,active:true,label:'Full details starting at $149 demo special'},
+      {code:'VIP10',type:'percent',value:10,active:true,label:'10% VIP discount'}
+    ];
+    const defaultGallery = [
+      {title:'Interior Reset',category:'Interior',description:'Deep vacuum, wipe down, and final protection.',visible:true},
+      {title:'Wheel Shine',category:'Wheels',description:'Brake dust removal and tire shine finish.',visible:true},
+      {title:'Seat & Carpet Recovery',category:'Shampoo',description:'Before/after transformation for dirty fabric surfaces.',visible:true},
+      {title:'Premium Finish',category:'Premium Detail',description:'Glossy final result with professional protection.',visible:true}
+    ];
+    const defaultReviews = [
+      {id:'RV-1001',name:'Demo Customer',rating:5,text:'Super convenient mobile detail. The booking and updates made the whole process easy.',status:'approved',createdAt:new Date().toISOString()}
+    ];
+    const state = {step:1,vehicle:null,packageId:null,addons:[],coupon:null,photos:[]};
+
+    function readStore(key,fallback){
+      try{const raw=localStorage.getItem(key);return raw?JSON.parse(raw):structuredClone(fallback)}catch(e){return JSON.parse(JSON.stringify(fallback));}
+    }
+    function writeStore(key,value){localStorage.setItem(key,JSON.stringify(value));}
+    function ensureDefaults(){
+      if(!localStorage.getItem(STORAGE.settings)) writeStore(STORAGE.settings,defaultSettings);
+      if(!localStorage.getItem(STORAGE.packages)) writeStore(STORAGE.packages,defaultPackages);
+      if(!localStorage.getItem(STORAGE.addons)) writeStore(STORAGE.addons,defaultAddons);
+      if(!localStorage.getItem(STORAGE.coupons)) writeStore(STORAGE.coupons,defaultCoupons);
+      if(!localStorage.getItem(STORAGE.gallery)) writeStore(STORAGE.gallery,defaultGallery);
+      if(!localStorage.getItem(STORAGE.reviews)) writeStore(STORAGE.reviews,defaultReviews);
+      if(!localStorage.getItem(STORAGE.bookings)) writeStore(STORAGE.bookings,[]);
+    }
+    const currency = value => typeof value === 'number' ? `$${Math.round(value).toLocaleString()}` : 'Quote';
+    const escapeHtml = str => String(str ?? '').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    function getSettings(){return readStore(STORAGE.settings,defaultSettings)}
+    function getPackages(){return readStore(STORAGE.packages,defaultPackages).filter(p=>p.visible !== false)}
+    function getAddons(){return readStore(STORAGE.addons,defaultAddons).filter(a=>a.visible !== false)}
+    function getCoupons(){return readStore(STORAGE.coupons,defaultCoupons).filter(c=>c.active !== false)}
+    function findPackage(){return getPackages().find(p=>p.id===state.packageId)}
+    function calculateEstimate(){
+      const pkg = findPackage();
+      const base = pkg && state.vehicle ? pkg.prices[state.vehicle] : 0;
+      const addonList = getAddons().filter(a=>state.addons.includes(a.id));
+      const addonsTotal = addonList.reduce((sum,a)=>sum+(Number(a.price)||0),0);
+      let subtotal = (typeof base === 'number' ? base : 0) + addonsTotal;
+      let discount = 0;
+      let coupon = null;
+      const code = (document.getElementById('couponInput')?.value || '').trim().toUpperCase();
+      if(code){coupon = getCoupons().find(c=>c.code.toUpperCase() === code);}
+      if(coupon){
+        if(coupon.type === 'percent') discount = subtotal * (Number(coupon.value)||0) / 100;
+        if(coupon.type === 'fixed') discount = Number(coupon.value)||0;
+        if(coupon.type === 'fixedToFull' && pkg?.id === 'full') discount = Math.max(0, subtotal - Number(coupon.value));
+      }
+      const total = Math.max(0, subtotal - discount);
+      const quoteRequired = !pkg || !state.vehicle || typeof base !== 'number' || state.vehicle === 'Boat / Trailer';
+      state.coupon = coupon ? coupon.code : null;
+      return {pkg,base,addonList,addonsTotal,subtotal,discount,total,quoteRequired,coupon};
+    }
+    function renderEstimate(){
+      const e = calculateEstimate();
+      const vehicle = state.vehicle || 'Not selected';
+      const packageName = e.pkg?.name || 'Not selected';
+      document.getElementById('estimateBox').innerHTML = `
+        <div class="summary-line"><span>Vehicle</span><strong>${escapeHtml(vehicle)}</strong></div>
+        <div class="summary-line"><span>Package</span><strong>${escapeHtml(packageName)}</strong></div>
+        <div class="summary-line"><span>Base price</span><strong>${currency(e.base)}</strong></div>
+        <div class="summary-line"><span>Add-ons</span><strong>${currency(e.addonsTotal)}</strong></div>
+        <div class="summary-line"><span>Coupon</span><strong>${e.coupon ? escapeHtml(e.coupon.code) : 'None'}</strong></div>
+        <div class="summary-line"><span>Discount</span><strong>-${currency(e.discount)}</strong></div>
+        <div class="summary-line"><span>Travel fee</span><strong>May apply</strong></div>
+        <div class="summary-line"><span>Total estimate</span><strong class="summary-total">${e.quoteRequired ? 'Quote' : currency(e.total)}</strong></div>
+        <div class="notice">Final price may be adjusted after vehicle inspection, heavy condition, specialty vehicle type, or distance.</div>`;
+      const couponMessage = document.getElementById('couponMessage');
+      if(couponMessage){
+        const code = (document.getElementById('couponInput')?.value || '').trim();
+        couponMessage.innerHTML = code ? (e.coupon ? `<div class="ok-box">Coupon applied: ${escapeHtml(e.coupon.label)}</div>` : `<div class="warn-box">Invalid or inactive coupon.</div>`) : '';
+      }
+      renderReviewBox();
+    }
+    function openScreen(id){
+      document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===id));
+      document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.open===id));
+      if(id==='packages') renderPackages();
+      if(id==='gallery') renderGallery();
+      if(id==='reviews') renderReviews();
+      if(id==='track') renderTrackingFromInput();
+    }
+    function bindNavigation(){
+      document.querySelectorAll('[data-open]').forEach(el=>el.addEventListener('click',e=>{e.preventDefault();openScreen(el.dataset.open)}));
+    }
+    function renderPackages(){
+      document.getElementById('packageGrid').innerHTML = getPackages().map(p=>`
+        <article class="package-card ${p.id==='full'?'featured':''} ${p.id==='premium'?'premium':''}">
+          <span class="badge ${p.accent==='purple'?'purple':''}">${escapeHtml(p.badge)}</span>
+          <h3>${escapeHtml(p.name)}</h3><p class="muted">${escapeHtml(p.tagline)}</p>
+          <div class="price-line"><strong>${currency(p.prices.Sedan)}</strong><span>Sedan starting price</span></div>
+          <ul class="feature-list">${p.items.map(i=>`<li><span class="check">✓</span>${escapeHtml(i)}</li>`).join('')}</ul>
+          <div class="price-grid">
+            ${vehicles.slice(0,4).map(v=>`<div class="mini-price"><span>${escapeHtml(v)}</span><b>${currency(p.prices[v])}</b></div>`).join('')}
+          </div>
+          <button class="primary-btn" data-select-package="${p.id}">Select Package</button>
+        </article>`).join('');
+      document.querySelectorAll('[data-select-package]').forEach(btn=>btn.addEventListener('click',()=>{state.packageId=btn.dataset.selectPackage;state.step=1;openScreen('book');renderBookingOptions();renderEstimate();}));
+    }
+    function renderBookingOptions(){
+      document.getElementById('vehicleOptions').innerHTML = vehicles.map(v=>`<button type="button" class="option-card ${state.vehicle===v?'selected':''}" data-vehicle="${escapeHtml(v)}"><strong>${escapeHtml(v)}</strong><small>${v.includes('Boat')?'Call for quote':'Mobile service ready'}</small></button>`).join('');
+      document.getElementById('packageOptions').innerHTML = getPackages().map(p=>`<button type="button" class="option-card ${state.packageId===p.id?'selected':''}" data-package="${p.id}"><strong>${escapeHtml(p.name)}</strong><small>${escapeHtml(p.tagline)}</small></button>`).join('') + `<button type="button" class="option-card ${state.packageId==='specialty'?'selected':''}" data-package="specialty"><strong>Specialty Quote</strong><small>Boat, trailer, RV, heavy condition</small></button>`;
+      document.getElementById('addonOptions').innerHTML = getAddons().map(a=>`<button type="button" class="addon-card ${state.addons.includes(a.id)?'selected':''}" data-addon="${a.id}"><span><strong>${escapeHtml(a.name)}</strong><span>${escapeHtml(a.label)}</span></span><span class="toggle"></span></button>`).join('');
+      document.querySelectorAll('[data-vehicle]').forEach(btn=>btn.addEventListener('click',()=>{state.vehicle=btn.dataset.vehicle;renderBookingOptions();renderEstimate();}));
+      document.querySelectorAll('[data-package]').forEach(btn=>btn.addEventListener('click',()=>{state.packageId=btn.dataset.package;if(state.packageId==='specialty'){state.packageId=null;}renderBookingOptions();renderEstimate();}));
+      document.querySelectorAll('[data-addon]').forEach(btn=>btn.addEventListener('click',()=>{const id=btn.dataset.addon;state.addons=state.addons.includes(id)?state.addons.filter(x=>x!==id):state.addons.concat(id);renderBookingOptions();renderEstimate();}));
+    }
+    function setStep(step){
+      state.step=Math.min(5,Math.max(1,step));
+      document.querySelectorAll('.form-step').forEach(el=>el.classList.toggle('active',Number(el.dataset.step)===state.step));
+      document.querySelectorAll('[data-step-indicator]').forEach(el=>el.classList.toggle('active',Number(el.dataset.stepIndicator)===state.step));
+      renderEstimate();
+    }
+    function validateStep(){
+      if(state.step===1 && !state.vehicle){alert('Choose a vehicle type first.');return false;}
+      if(state.step===2 && !state.packageId){alert('Choose a package first.');return false;}
+      if(state.step===4){
+        const required = ['fullName','phone','email','address','date','time'];
+        for(const id of required){const el=document.getElementById(id);if(!el.value.trim()){el.focus();return false;}}
+      }
+      return true;
+    }
+    function renderReviewBox(){
+      const box = document.getElementById('reviewBox');
+      if(!box) return;
+      const e = calculateEstimate();
+      box.innerHTML = `
+        <div class="summary-line"><span>Vehicle</span><strong>${escapeHtml(state.vehicle || '-')}</strong></div>
+        <div class="summary-line"><span>Package</span><strong>${escapeHtml(e.pkg?.name || '-')}</strong></div>
+        <div class="summary-line"><span>Add-ons</span><strong>${e.addonList.map(a=>a.name).join(', ') || 'None'}</strong></div>
+        <div class="summary-line"><span>Coupon</span><strong>${e.coupon ? escapeHtml(e.coupon.code) : 'None'}</strong></div>
+        <div class="summary-line"><span>Total estimate</span><strong class="summary-total">${e.quoteRequired ? 'Quote required' : currency(e.total)}</strong></div>
+        <div class="summary-line"><span>Service area</span><strong>${escapeHtml(document.getElementById('cityArea')?.value || 'Jacksonville area')}</strong></div>`;
+    }
+    function createBooking(event){
+      event.preventDefault();
+      const e = calculateEstimate();
+      const now = new Date();
+      const id = `AA-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}-${Math.floor(1000+Math.random()*9000)}`;
+      const booking = {
+        id,
+        createdAt:now.toISOString(),
+        status:e.quoteRequired ? 'Pending Quote' : 'Appointment Requested',
+        vehicleType:state.vehicle,
+        packageId:state.packageId,
+        packageName:e.pkg?.name || 'Specialty Quote',
+        addons:e.addonList.map(a=>({id:a.id,name:a.name,price:a.price,label:a.label,variable:a.variable})),
+        coupon:e.coupon?.code || '',
+        subtotal:e.subtotal,
+        discount:e.discount,
+        total:e.total,
+        quoteRequired:e.quoteRequired,
+        travelFee:0,
+        depositPaid:0,
+        balance:e.total,
+        customer:{
+          name:document.getElementById('fullName').value.trim(),
+          phone:document.getElementById('phone').value.trim(),
+          email:document.getElementById('email').value.trim(),
+          address:document.getElementById('address').value.trim(),
+          cityArea:document.getElementById('cityArea').value,
+          locationType:document.getElementById('locationType').value,
+          vehicleInfo:document.getElementById('vehicleInfo').value.trim(),
+          notes:document.getElementById('notes').value.trim()
+        },
+        appointment:{date:document.getElementById('date').value,time:document.getElementById('time').value},
+        timeline:[{status:e.quoteRequired?'Pending Quote':'Appointment Requested',at:now.toISOString(),note:'Booking request submitted by customer.'}],
+        tracking:null,
+        qrLogs:[],
+        adminExtras:[]
+      };
+      const bookings = readStore(STORAGE.bookings,[]);bookings.unshift(booking);writeStore(STORAGE.bookings,bookings);
+      const qrData = encodeURIComponent(id);
+      document.getElementById('bookingForm').style.display='none';
+      document.getElementById('confirmationBox').innerHTML = `
+        <div class="ok-box"><h3>Booking request received</h3><p>Your confirmation ID is <strong>${id}</strong>.</p></div>
+        <div class="qr-box"><img alt="Booking QR code" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${qrData}"></div>
+        <div class="notice">The admin can scan this QR code on arrival to mark the service as started.</div>
+        <div class="button-row"><button class="primary-btn" id="trackCreated">Track My Service</button><button class="ghost-btn" id="newBooking">Create Another Booking</button></div>`;
+      document.getElementById('trackCreated').addEventListener('click',()=>{document.getElementById('trackInput').value=id;openScreen('track');renderTrackingFromInput();});
+      document.getElementById('newBooking').addEventListener('click',()=>location.reload());
+    }
+    function renderGallery(){
+      const gallery = readStore(STORAGE.gallery,defaultGallery).filter(g=>g.visible !== false);
+      document.getElementById('galleryGrid').innerHTML = gallery.map((g,i)=>`
+        <article class="ba-card"><div class="ba-img"></div><div class="before-after-strip"><span>Before</span><span>After</span></div><div class="ba-content"><span class="status-chip">${escapeHtml(g.category || 'Detail')}</span><h3 style="margin:12px 0 6px">${escapeHtml(g.title)}</h3><p class="muted">${escapeHtml(g.description || '')}</p></div></article>`).join('');
+    }
+    function renderReviews(){
+      const reviews = readStore(STORAGE.reviews,defaultReviews).filter(r=>r.status==='approved');
+      const html = reviews.length ? reviews.map(r=>`<article class="review-card"><div class="stars">${'★'.repeat(Number(r.rating)||5)}</div><strong>${escapeHtml(r.name)}</strong><p class="muted" style="margin-top:8px">${escapeHtml(r.text)}</p></article>`).join('') : '<p class="muted">No approved reviews yet.</p>';
+      document.getElementById('approvedReviews').innerHTML = html;
+    }
+    function submitReview(event){
+      event.preventDefault();
+      const reviews = readStore(STORAGE.reviews,defaultReviews);
+      reviews.unshift({id:`RV-${Date.now()}`,name:document.getElementById('reviewName').value.trim(),rating:Number(document.getElementById('reviewRating').value),text:document.getElementById('reviewText').value.trim(),status:'pending',createdAt:new Date().toISOString()});
+      writeStore(STORAGE.reviews,reviews);
+      document.getElementById('reviewForm').reset();
+      document.getElementById('reviewSubmitMessage').innerHTML = '<div class="ok-box">Review submitted. It will appear after admin approval.</div>';
+      renderReviews();
+    }
+    function renderTrackingFromInput(){
+      const id = (document.getElementById('trackInput')?.value || '').trim();
+      if(!id){document.getElementById('trackingResult').innerHTML='<p class="muted">Enter a confirmation ID to see the service status.</p>';return;}
+      const booking = readStore(STORAGE.bookings,[]).find(b=>b.id.toUpperCase()===id.toUpperCase());
+      if(!booking){document.getElementById('trackingResult').innerHTML='<div class="warn-box">Booking not found in this demo browser storage.</div>';return;}
+      renderBookingTracking(booking);
+    }
+    function renderBookingTracking(booking){
+      const stages = ['Appointment Requested','Pending Quote','Price Confirmed','Appointment Confirmed','Technician On The Way','Service Started','Completed'];
+      const currentIndex = stages.findIndex(s=>s===booking.status);
+      const stageHtml = stages.map((s,i)=>`<div class="timeline-item ${i<=currentIndex || booking.timeline?.some(t=>t.status===s)?'done':''}"><span class="timeline-dot"></span><div><strong>${s}</strong><p>${s===booking.status?'Current status':' '}</p></div></div>`).join('');
+      const gps = booking.tracking ? `<div class="ok-box"><strong>GPS active:</strong><br>Lat ${Number(booking.tracking.lat).toFixed(5)}, Lng ${Number(booking.tracking.lng).toFixed(5)}<br><small>Last update: ${new Date(booking.tracking.updatedAt).toLocaleString()}</small></div>` : '<div class="notice">GPS location appears here after the technician starts tracking from the admin panel.</div>';
+      document.getElementById('trackingResult').innerHTML = `
+        <span class="status-chip">${escapeHtml(booking.status)}</span>
+        <h3 style="margin:12px 0 6px">${escapeHtml(booking.packageName)} — ${escapeHtml(booking.vehicleType)}</h3>
+        <p class="muted">${escapeHtml(booking.appointment?.date || '')} ${escapeHtml(booking.appointment?.time || '')} · ${escapeHtml(booking.customer?.address || '')}</p>
+        <div class="timeline">${stageHtml}</div>${gps}`;
+    }
+    function init(){
+      ensureDefaults();
+      const s = getSettings();
+      document.getElementById('instagramTop').href = s.instagramUrl || '#';
+      document.getElementById('googleReviewLink').href = s.googleReviewUrl || '#';
+      bindNavigation();renderPackages();renderBookingOptions();renderEstimate();renderGallery();renderReviews();
+      document.querySelectorAll('[data-next]').forEach(btn=>btn.addEventListener('click',()=>{if(validateStep()) setStep(state.step+1);}));
+      document.querySelectorAll('[data-prev]').forEach(btn=>btn.addEventListener('click',()=>setStep(state.step-1)));
+      document.getElementById('couponInput').addEventListener('input',renderEstimate);
+      document.getElementById('bookingForm').addEventListener('submit',createBooking);
+      document.getElementById('reviewForm').addEventListener('submit',submitReview);
+      document.getElementById('trackButton').addEventListener('click',renderTrackingFromInput);
+      document.getElementById('trackInput').addEventListener('keydown',e=>{if(e.key==='Enter') renderTrackingFromInput();});
+    }
+    init();
+  </script>
+</body>
+</html>
