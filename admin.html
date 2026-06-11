@@ -1340,11 +1340,16 @@
         t.classList.add("show");
         setTimeout(() => t.classList.remove("show"), 2600);
       }
-      function hydrate() {
-        data.bookings = mergeById(
-          data.bookings || [],
-          readLS("aa_bookings_demo", []),
-        );
+      function hydrate(options = {}) {
+        if (options.liveBookings) {
+          data.bookings = Array.isArray(data.bookings) ? data.bookings.filter((x) => x && x.id) : [];
+          writeLS("aa_bookings_demo", data.bookings);
+        } else {
+          data.bookings = mergeById(
+            data.bookings || [],
+            readLS("aa_bookings_demo", []),
+          );
+        }
         data.packages = data.packages?.length
           ? data.packages
           : readLS("aa_packages_demo", seedPackages);
@@ -1597,7 +1602,7 @@
         const b = data.bookings.find((x) => x.id === id);
         if (!b) return;
         $("#bookingDetail").innerHTML =
-          `<div class="section-head"><div><span class="badge">${escapeHtml(b.id)}</span><h2>${escapeHtml(b.customerName || "Customer")}</h2><p>${escapeHtml(b.vehicleInfo || b.vehicleType || "Vehicle")} • ${escapeHtml(b.packageName || "Package")}</p></div><button class="ghost" id="closeModal">Close</button></div><div class="grid two"><div class="panel"><div class="inner"><h3>Service Info</h3><p class="small-text"><b>Status:</b> ${escapeHtml(b.status || "")}<br><b>Date:</b> ${escapeHtml(b.appointmentDate || "")} ${escapeHtml(b.appointmentTime || "")}<br><b>Address:</b> ${escapeHtml(b.address || "")} ${escapeHtml(b.city || "")}<br><b>Phone:</b> ${escapeHtml(b.phone || "")}<br><b>Email:</b> ${escapeHtml(b.email || "")}</p><div class="drawer-actions"><button class="ok" data-status="${b.id}|Price Confirmed">Confirm Price</button><button class="primary" data-status="${b.id}|Technician On The Way">On The Way + GPS</button><button class="gold" data-payment-due="${b.id}">Balance Due Now</button><button class="danger" data-status="${b.id}|Canceled">Cancel</button></div></div></div><div class="panel"><div class="inner"><h3>Totals</h3><div class="price-line"><span>Total</span><b>${money(b.total)}</b></div><div class="price-line"><span>Deposit</span><b>${money(b.depositPaid)}</b></div><div class="price-line"><span>Balance</span><b>${money(b.balance)}</b></div><div class="price-line"><span>Action</span><b>${escapeHtml(b.balanceAction || "Not requested")}</b></div></div></div></div><div style="height:16px"></div><div class="grid two"><div class="panel"><div class="inner"><h3>Propose New Date / Time</h3><div class="field-grid"><div class="field"><label>New Date</label><input id="propDate" type="date"></div><div class="field"><label>New Time</label><input id="propTime" type="time"></div><div class="field wide"><label>Reason for change</label><textarea id="propReason" placeholder="Explain why this time is recommended"></textarea></div></div><div style="height:12px"></div><button class="primary" data-propose="${b.id}">Send Schedule Option</button></div></div><div class="panel"><div class="inner"><h3>On-site workflow</h3><p class="small-text">Extra services and final completion are handled from the QR Scanner after the customer's secure QR is scanned on arrival.</p><p class="small-text">Use the single Scan QR button in the top-right corner to open the scanner for any appointment.</p></div></div></div>`;
+          `<div class="section-head"><div><span class="badge">${escapeHtml(b.id)}</span><h2>${escapeHtml(b.customerName || "Customer")}</h2><p>${escapeHtml(b.vehicleInfo || b.vehicleType || "Vehicle")} • ${escapeHtml(b.packageName || "Package")}</p></div><button class="ghost" id="closeModal">Close</button></div><div class="grid two"><div class="panel"><div class="inner"><h3>Service Info</h3><p class="small-text"><b>Status:</b> ${escapeHtml(b.status || "")}<br><b>Date:</b> ${escapeHtml(b.appointmentDate || "")} ${escapeHtml(b.appointmentTime || "")}<br><b>Address:</b> ${escapeHtml(b.address || "")} ${escapeHtml(b.city || "")}<br><b>Phone:</b> ${escapeHtml(b.phone || "")}<br><b>Email:</b> ${escapeHtml(b.email || "")}</p><div class="drawer-actions"><button class="ok" data-status="${b.id}|Price Confirmed">Confirm Price</button><button class="primary" data-status="${b.id}|Technician On The Way">On The Way + GPS</button><button class="gold" data-payment-due="${b.id}">Balance Due Now</button><button class="danger" data-status="${b.id}|Canceled">Cancel</button><button class="danger" data-delete-booking="${b.id}">Delete Booking</button></div></div></div><div class="panel"><div class="inner"><h3>Totals</h3><div class="price-line"><span>Total</span><b>${money(b.total)}</b></div><div class="price-line"><span>Deposit</span><b>${money(b.depositPaid)}</b></div><div class="price-line"><span>Balance</span><b>${money(b.balance)}</b></div><div class="price-line"><span>Action</span><b>${escapeHtml(b.balanceAction || "Not requested")}</b></div></div></div></div><div style="height:16px"></div><div class="grid two"><div class="panel"><div class="inner"><h3>Propose New Date / Time</h3><div class="field-grid"><div class="field"><label>New Date</label><input id="propDate" type="date"></div><div class="field"><label>New Time</label><input id="propTime" type="time"></div><div class="field wide"><label>Reason for change</label><textarea id="propReason" placeholder="Explain why this time is recommended"></textarea></div></div><div style="height:12px"></div><button class="primary" data-propose="${b.id}">Send Schedule Option</button></div></div><div class="panel"><div class="inner"><h3>On-site workflow</h3><p class="small-text">Extra services and final completion are handled from the QR Scanner after the customer's secure QR is scanned on arrival.</p><p class="small-text">Use the single Scan QR button in the top-right corner to open the scanner for any appointment.</p></div></div></div>`;
         $("#bookingModal").classList.add("open");
       }
       function updateBooking(id, patch) {
@@ -1686,6 +1691,26 @@
         api("completeService", { id }).catch(() => {});
         if (active === "scanner") renderScanner();
         toast("Service completed and final receipt action triggered.");
+      }
+      async function deleteBooking(id) {
+        const b = data.bookings.find((x) => String(x.id) === String(id));
+        if (!b) return;
+        const ok = confirm(`Delete booking ${id}? This will remove the appointment and related records from the Sheet. Photos stored in Drive for this booking will be moved to Trash when file IDs exist.`);
+        if (!ok) return;
+        data.bookings = data.bookings.filter((x) => String(x.id) !== String(id));
+        writeLS("aa_bookings_demo", data.bookings);
+        if (String(scannedBookingId) === String(id)) scannedBookingId = "";
+        if (String(gpsBookingId) === String(id)) stopGpsShare("Booking deleted.");
+        $("#bookingModal").classList.remove("open");
+        renderActive();
+        try {
+          const res = await api("deleteBooking", { id });
+          if (!res || res.ok === false) throw new Error((res && res.error) || "Delete failed");
+          await load(true);
+          toast("Booking deleted from Sheet.");
+        } catch (err) {
+          toast("Could not delete from API. Check deployment and try Refresh.");
+        }
       }
       function parseQrValue(raw) {
         raw = String(raw || "").trim();
@@ -2108,6 +2133,11 @@
           complete(comp);
           return;
         }
+        const delBooking = e.target.closest("[data-delete-booking]")?.dataset.deleteBooking;
+        if (delBooking) {
+          deleteBooking(delBooking);
+          return;
+        }
         if (e.target.id === "closeModal" || e.target.id === "bookingModal") {
           $("#bookingModal").classList.remove("open");
           return;
@@ -2312,19 +2342,31 @@
         if (e.target.id === "galSecondFile")
           galleryFile("secondImage", e.target.files[0]);
       });
-      async function load() {
+      async function load(silent = false) {
         try {
+          if (!silent) toast("Syncing with Sheet...");
           const res = await api("getAdminData");
           if (res && res.ok) {
             data = { ...data, ...res };
+            data.bookings = Array.isArray(res.bookings) ? res.bookings : [];
+            hydrate({ liveBookings: true });
+            renderTabs();
+            renderActive();
+            if (!silent) toast("Synced with Sheet.");
+            return;
           }
-        } catch (e) {}
-        hydrate();
-        renderTabs();
-        renderActive();
-        toast("Demo ready.");
+          throw new Error((res && res.error) || "API did not return data");
+        } catch (e) {
+          hydrate();
+          renderTabs();
+          renderActive();
+          if (!silent) toast("API not synced. Showing local demo data.");
+        }
       }
-      load();
+      hydrate();
+      renderTabs();
+      renderActive();
+      setTimeout(() => load(true), 80);
     </script>
   </body>
 </html>
